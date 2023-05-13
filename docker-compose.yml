@@ -1,0 +1,25 @@
+version: "3.7"
+
+services:
+  redis:
+    container_name: web1Redis
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
+    environment:
+      - TZ=Asia/Seoul
+
+  mysql:
+      image: mysql:8.0
+      container_name: web1Mysql
+      ports:
+        - 3306:3306
+      environment:
+        - MYSQL_DATABASE=testDB
+        - MYSQL_ROOT_PASSWORD=admin
+        - TZ=Asia/Seoul
+      command:
+        - --character-set-server=utf8mb4
+        - --collation-server=utf8mb4_unicode_ci
+      volumes:
+        - ./mysqldata:/var/lib/mysql
