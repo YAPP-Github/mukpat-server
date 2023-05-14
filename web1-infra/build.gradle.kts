@@ -1,8 +1,8 @@
 dependencies {
 
 }
-val jar: Jar by tasks
-val bootJar: org.springframework.boot.gradle.tasks.bundling.BootJar by tasks
 
-bootJar.enabled = false
-jar.enabled = true
+tasks {
+    withType<Jar> { enabled = true }
+    withType<org.springframework.boot.gradle.tasks.bundling.BootJar> { enabled = false }
+}

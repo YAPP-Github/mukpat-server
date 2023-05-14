@@ -1,4 +1,7 @@
 rootProject.name = "Web-1-BE"
-include("web1-api")
-include("web1-domain")
-include("web1-infra")
+
+include(
+    "web1-api",
+    "web1-domain",
+    "web1-infra"
+)
