@@ -6,6 +6,6 @@ import javax.persistence.Id
 @Entity
 data class TestEntity(
     @Id
-    val id: Long,
-    val name: String
+    val id: Long = 1,
+    val name: String = "test"
 )
