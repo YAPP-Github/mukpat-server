@@ -10,7 +10,7 @@ class TestServiceTest : StringSpec({
 
     "kotest 테스트 " {
         // given
-        every { testService.test() } returns TestEntity()
+        every { testService.test() } returns TestResponse.of(TestEntity())
         val result = testService.test()
 
         result.id shouldBe 1

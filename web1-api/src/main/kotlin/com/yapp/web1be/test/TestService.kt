@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service
 @Service
 class TestService {
 
-    fun test(): TestEntity {
-        return TestEntity()
+    fun test(): TestResponse {
+        return TestResponse.of(TestEntity())
     }
 }
