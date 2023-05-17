@@ -10,6 +10,8 @@ plugins {
     kotlin("plugin.jpa") version "1.6.21" apply false
 
     id("org.jlleitschuh.gradle.ktlint") version "11.3.2"
+
+    kotlin("kapt") version "1.6.21" apply false
 }
 
 java.sourceCompatibility = JavaVersion.VERSION_11

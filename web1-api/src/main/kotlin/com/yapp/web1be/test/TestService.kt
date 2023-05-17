@@ -1,11 +1,17 @@
 package com.yapp.web1be.test
 
+import org.aspectj.weaver.ast.Test
 import org.springframework.stereotype.Service
 
 @Service
-class TestService {
+class TestService (
+    private val testRepository: TestRepository,
+    private val querydslRepository: TestQuerydslRepository,
+        ) {
 
     fun test(): TestResponse {
-        return TestResponse.of(TestEntity())
+        testRepository.save(TestEntity(1, "querydsl"))
+        return TestResponse.of(querydslRepository.getTestByName("querydsl")?:TestEntity())
     }
+
 }
