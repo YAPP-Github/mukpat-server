@@ -13,7 +13,7 @@ data class TestResponse(
     var name: String = "test",
     @field:JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
     @field:ApiModelProperty(notes = "현재 날짜", example = "20230515")
-    var currentTime: LocalDate,
+    var currentTime: LocalDate
 ) {
     companion object {
         fun of(testEntity: TestEntity): TestResponse {

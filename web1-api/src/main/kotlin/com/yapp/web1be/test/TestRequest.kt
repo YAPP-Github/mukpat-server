@@ -10,6 +10,6 @@ data class TestRequest(
     @field:NotBlank(message = "이름을 입력해 주세요.")
     var name: String?,
 
-    @field:ApiModelProperty(notes = "나이",  example = "10")
-    var age: Int = 0,
+    @field:ApiModelProperty(notes = "나이", example = "10")
+    var age: Int = 0
 )

@@ -6,15 +6,14 @@ import org.springframework.stereotype.Repository
 
 @Repository
 class TestQuerydslRepository(
-    private val queryFactory: JPAQueryFactory,
+    private val queryFactory: JPAQueryFactory
 ) {
 
-    fun getTestByName (name : String) : TestEntity? {
+    fun getTestByName(name: String): TestEntity? {
         return queryFactory.select(testEntity)
             .from(testEntity)
             .where(testEntity.name.eq(name))
             .limit(1)
             .fetchOne()
     }
-
 }

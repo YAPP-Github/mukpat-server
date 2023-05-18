@@ -6,7 +6,7 @@ import io.mockk.every
 import io.mockk.mockk
 
 class TestServiceTest : StringSpec({
-    val testService:TestService = mockk()
+    val testService: TestService = mockk()
 
     "kotest 테스트 " {
         // given
