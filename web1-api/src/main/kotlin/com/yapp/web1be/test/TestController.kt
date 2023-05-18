@@ -1,7 +1,12 @@
 package com.yapp.web1be.test
 
 import com.yapp.web1be.swagger.TEST_SAMPLE
-import io.swagger.annotations.*
+import io.swagger.annotations.Api
+import io.swagger.annotations.ApiOperation
+import io.swagger.annotations.ApiResponse
+import io.swagger.annotations.ApiResponses
+import io.swagger.annotations.Example
+import io.swagger.annotations.ExampleProperty
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -37,7 +42,10 @@ class TestController(private val testService: TestService) {
 
     @PostMapping("/v1/test")
     @ApiOperation(value = "Post 테스트")
-    fun postTest(@RequestBody @Valid request: TestRequest): ResponseEntity<String> {
+    fun postTest(
+        @RequestBody @Valid
+        request: TestRequest
+    ): ResponseEntity<String> {
         return ResponseEntity.ok("${request.name}(${request.age})")
     }
 }
