@@ -2,9 +2,9 @@ package com.yapp.web1be.test
 
 import com.querydsl.jpa.impl.JPAQueryFactory
 import com.yapp.web1be.test.QTestEntity.testEntity
-import org.springframework.stereotype.Component
+import org.springframework.stereotype.Repository
 
-@Component
+@Repository
 class TestQuerydslRepository(
     private val queryFactory: JPAQueryFactory,
 ) {
