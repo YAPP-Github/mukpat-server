@@ -1,4 +1,4 @@
-package com.yapp.web1be.test
+package com.yapp.muckpot.test
 
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty

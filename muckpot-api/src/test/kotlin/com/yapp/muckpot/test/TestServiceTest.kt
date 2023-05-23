@@ -1,4 +1,4 @@
-package com.yapp.web1be.test
+package com.yapp.muckpot.test
 
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe

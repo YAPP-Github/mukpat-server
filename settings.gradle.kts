@@ -1,4 +1,4 @@
-rootProject.name = "Web-1-BE"
+rootProject.name = "Muckpot-BE"
 
 include(
     "muckpot-api",

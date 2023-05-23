@@ -1,4 +1,4 @@
-package com.yapp.web1be.config
+package com.yapp.muckpot.config
 
 import com.querydsl.jpa.impl.JPAQueryFactory
 import org.springframework.context.annotation.Bean

@@ -1,4 +1,4 @@
-package com.yapp.web1be.config
+package com.yapp.muckpot.config
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

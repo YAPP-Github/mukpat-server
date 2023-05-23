@@ -1,6 +1,6 @@
-package com.yapp.web1be.test
+package com.yapp.muckpot.test
 
-import com.yapp.web1be.swagger.TEST_SAMPLE
+import com.yapp.muckpot.swagger.TEST_SAMPLE
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiResponse

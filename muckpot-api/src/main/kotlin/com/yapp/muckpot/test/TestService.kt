@@ -1,4 +1,4 @@
-package com.yapp.web1be.test
+package com.yapp.muckpot.test
 
 import org.springframework.stereotype.Service
 

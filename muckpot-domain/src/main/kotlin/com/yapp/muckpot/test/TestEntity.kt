@@ -1,4 +1,4 @@
-package com.yapp.web1be.test
+package com.yapp.muckpot.test
 
 import javax.persistence.Entity
 import javax.persistence.Id

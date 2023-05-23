@@ -1,4 +1,4 @@
-package com.yapp.web1be.swagger
+package com.yapp.muckpot.swagger
 
 const val TEST_SAMPLE = """
 {

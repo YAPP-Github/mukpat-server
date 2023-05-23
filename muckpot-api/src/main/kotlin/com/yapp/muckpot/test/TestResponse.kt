@@ -1,4 +1,4 @@
-package com.yapp.web1be.test
+package com.yapp.muckpot.test
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import io.swagger.annotations.ApiModel

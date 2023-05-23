@@ -1,4 +1,4 @@
-package com.yapp.web1be
+package com.yapp.muckpot
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication

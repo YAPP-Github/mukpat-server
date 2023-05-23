@@ -1,7 +1,7 @@
-package com.yapp.web1be.test
+package com.yapp.muckpot.test
 
 import com.querydsl.jpa.impl.JPAQueryFactory
-import com.yapp.web1be.test.QTestEntity.testEntity
+import com.yapp.muckpot.test.QTestEntity.testEntity
 import org.springframework.stereotype.Repository
 
 @Repository
