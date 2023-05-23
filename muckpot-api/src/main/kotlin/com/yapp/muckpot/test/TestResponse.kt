@@ -1,6 +1,7 @@
 package com.yapp.muckpot.test
 
 import com.fasterxml.jackson.annotation.JsonFormat
+import com.yapp.muckpot.domains.test.entity.TestEntity
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 import java.time.LocalDate
@@ -17,7 +18,7 @@ data class TestResponse(
 ) {
     companion object {
         fun of(testEntity: TestEntity): TestResponse {
-            return TestResponse(testEntity.id, testEntity.name, LocalDate.now())
+            return TestResponse(testEntity.id, testEntity.name, testEntity.createdAt.toLocalDate())
         }
     }
 }
