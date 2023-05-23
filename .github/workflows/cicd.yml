@@ -1,4 +1,4 @@
-name: Java CI with Gradle
+name: muckpot api CI/CD script
 
 on:
   push:
@@ -41,7 +41,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
-          context: ./web1-api
+          context: ./muckpot-api
           push: true
           tags: muckpot/muckpot-api:${{ github.run_number }}
 
