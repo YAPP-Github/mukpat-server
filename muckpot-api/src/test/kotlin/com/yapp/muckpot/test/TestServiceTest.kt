@@ -1,5 +1,6 @@
 package com.yapp.muckpot.test
 
+import com.yapp.muckpot.domains.test.entity.TestEntity
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every

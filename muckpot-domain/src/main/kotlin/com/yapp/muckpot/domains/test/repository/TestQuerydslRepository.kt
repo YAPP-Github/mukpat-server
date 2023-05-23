@@ -1,7 +1,8 @@
-package com.yapp.muckpot.test
+package com.yapp.muckpot.domains.test.repository
 
 import com.querydsl.jpa.impl.JPAQueryFactory
-import com.yapp.muckpot.test.QTestEntity.testEntity
+import com.yapp.muckpot.domains.test.entity.QTestEntity.testEntity
+import com.yapp.muckpot.domains.test.entity.TestEntity
 import org.springframework.stereotype.Repository
 
 @Repository
