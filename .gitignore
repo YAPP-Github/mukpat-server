@@ -38,3 +38,7 @@ out/
 
 ### dcoker mysql ###
 .mysqldata/
+
+### .env ###
+.env
+.env.*
