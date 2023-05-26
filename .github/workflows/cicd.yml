@@ -46,6 +46,7 @@ jobs:
         with:
           context: ./muckpot-api
           push: true
+          args: --build-arg PROFILE=$ACTIVE_PROFILE
           tags: muckpot/muckpot-api:${{ github.run_number }}
 
   deploy:
