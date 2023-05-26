@@ -5,21 +5,21 @@ services:
     container_name: web1Redis
     image: "redis:alpine"
     ports:
-      - "6379:6379"
+      - ${REDIS_PORT}:${REDIS_PORT}
     environment:
       - TZ=Asia/Seoul
 
-  mysql:
-      image: mysql:8.0
-      container_name: web1Mysql
-      ports:
-        - 3306:3306
-      environment:
-        - MYSQL_DATABASE=testDB
-        - MYSQL_ROOT_PASSWORD=admin
-        - TZ=Asia/Seoul
-      command:
-        - --character-set-server=utf8mb4
-        - --collation-server=utf8mb4_unicode_ci
-      volumes:
-        - ./mysqldata:/var/lib/mysql
+#  mysql: mariadb로 변경 필요
+#      image: mysql:8.0
+#      container_name: web1Mysql
+#      ports:
+#        - 3306:3306
+#      environment:
+#        - MYSQL_DATABASE=testDB
+#        - MYSQL_ROOT_PASSWORD=admin
+#        - TZ=Asia/Seoul
+#      command:
+#        - --character-set-server=utf8mb4
+#        - --collation-server=utf8mb4_unicode_ci
+#      volumes:
+#        - ./mysqldata:/var/lib/mysql

@@ -1,8 +1,11 @@
-name: muckpot api CI/CD script
+name: muckpot dev api CI/CD script
 
 on:
   push:
-    branches: [ "main", "develop" ]
+    branches: [ "develop" ]
+
+env:
+  ACTIVE_PROFILE: "dev"
 
 permissions:
   contents: read
@@ -53,16 +56,15 @@ jobs:
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: ubuntu
+          username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
+          port: ${{ env.DEV_PORT }}
           script: |
+            sudo touch .env
+            echo "${{ secrets.ENV_VARS }}" | sudo tee .env > /dev/null
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/muckpot-api:${{ github.run_number }}
             docker stop $(docker ps -a -q)
-            docker run -d -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/muckpot-api:${{ github.run_number }}
+            docker run --restart=unless-stopped -d -p ${{ env.DEV_PORT }}:${{ env.DEV_PORT }} --env-file .env ${{ secrets.DOCKERHUB_USERNAME }}/muckpot-api:${{ github.run_number }}
             docker rm $(docker ps -a -q --filter "status=exited")
             docker image prune -a -f
-
-
-
-
 
