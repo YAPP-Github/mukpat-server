@@ -15,11 +15,11 @@ dependencies {
     // https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-spatial
     implementation("org.hibernate:hibernate-spatial:5.6.15.Final")
 
-    runtimeOnly("com.mysql:mysql-connector-j")
+    runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
 
     testImplementation("org.testcontainers:testcontainers:$containerVer")
     testImplementation("org.testcontainers:junit-jupiter:$containerVer")
-    testImplementation("org.testcontainers:mysql:$containerVer")
+    testImplementation("org.testcontainers:mariadb:$containerVer")
 }
 
 allOpen {
