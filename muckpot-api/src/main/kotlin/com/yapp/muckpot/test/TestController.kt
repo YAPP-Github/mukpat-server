@@ -48,6 +48,6 @@ class TestController(private val testService: TestService) {
         @RequestBody @Valid
         request: TestRequest
     ): ResponseEntity<ResponseDto> {
-        return ResponseEntityUtil.created(testService.save())
+        return ResponseEntityUtil.created(testService.save(request))
     }
 }
