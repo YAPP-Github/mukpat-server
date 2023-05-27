@@ -1,7 +1,5 @@
 package com.yapp.muckpot.test
 
-import com.yapp.muckpot.common.ResponseDto
-import com.yapp.muckpot.common.ResponseEntityUtil
 import com.yapp.muckpot.swagger.TEST_SAMPLE
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
@@ -38,8 +36,8 @@ class TestController(private val testService: TestService) {
             )
         ]
     )
-    fun getTest(): ResponseEntity<ResponseDto> {
-        return ResponseEntityUtil.ok(testService.test())
+    fun getTest(): TestResponse {
+        return testService.test()
     }
 
     @PostMapping("/v1/test")
@@ -47,7 +45,7 @@ class TestController(private val testService: TestService) {
     fun postTest(
         @RequestBody @Valid
         request: TestRequest
-    ): ResponseEntity<ResponseDto> {
-        return ResponseEntityUtil.created(testService.save())
+    ): ResponseEntity<String> {
+        return ResponseEntity.ok("${request.name}(${request.age})")
     }
 }
