@@ -26,7 +26,7 @@ class ParticipantRepositoryTest(
         val location = Location("location", 40.7128, -74.0060)
         val user = MuckPotUser(
             null, "email@email.com", "pw", "nickname", Gender.MEN,
-            2000, "main", "sub", location
+            2000, "main", "sub", location, "url"
         )
         val board = Board(
             null, user, "title", location, null, LocationType.COMPANY,

@@ -16,7 +16,7 @@ class MuckPotUserRepositoryTest(
         // given
         val muckPotUser = MuckPotUser(
             null, "email2@email.com", "pw", "nickname2", Gender.MEN,
-            2000, "main", "sub", Location("location", 40.7128, -74.0060)
+            2000, "main", "sub", Location("location", 40.7128, -74.0060), "url"
         )
         // when
         val saveUser = muckPotUserRepository.save(muckPotUser)

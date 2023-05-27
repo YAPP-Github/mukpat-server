@@ -4,6 +4,7 @@ import com.yapp.muckpot.common.BaseTimeEntity
 import com.yapp.muckpot.common.Location
 import com.yapp.muckpot.common.enums.Gender
 import com.yapp.muckpot.common.enums.RegexPattern
+import com.yapp.muckpot.common.enums.State
 import javax.persistence.Column
 import javax.persistence.Embedded
 import javax.persistence.Entity
@@ -45,7 +46,14 @@ class MuckPotUser(
     var subCategory: String,
 
     @Embedded
-    var location: Location
+    var location: Location,
+
+    @Column(name = "image_url")
+    var imageUrl: String,
+
+    @Column(name = "state")
+    @Enumerated(value = EnumType.STRING)
+    var state: State = State.ACTIVE
 ) : BaseTimeEntity() {
     init {
         require(email.isNotBlank()) { "이메일은 필수입니다" }

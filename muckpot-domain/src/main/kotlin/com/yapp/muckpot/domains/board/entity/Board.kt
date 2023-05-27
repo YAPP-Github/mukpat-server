@@ -2,6 +2,7 @@ package com.yapp.muckpot.domains.board.entity
 
 import com.yapp.muckpot.common.BaseTimeEntity
 import com.yapp.muckpot.common.Location
+import com.yapp.muckpot.common.enums.State
 import com.yapp.muckpot.domains.user.entity.MuckPotUser
 import com.yapp.muckpot.domains.user.enums.LocationType
 import com.yapp.muckpot.domains.user.enums.MuckPotStatus
@@ -70,7 +71,11 @@ class Board(
     var minAge: Int = AGE_MIN,
 
     @Column(name = "max_age")
-    var maxAge: Int = AGE_MAX
+    var maxAge: Int = AGE_MAX,
+
+    @Column(name = "state")
+    @Enumerated(value = EnumType.STRING)
+    var state: State = State.ACTIVE
 ) : BaseTimeEntity() {
     init {
         require(minAge in AGE_MIN..AGE_MAX) { AGE_EXP_MSG }
