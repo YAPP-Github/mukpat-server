@@ -1,9 +1,8 @@
 spring:
   datasource:
-    url: jdbc:mariadb://localhost:3306/muckpot_local
-    username: root
-    password: admin
-    driver-class-name: org.mariadb.jdbc.Driver
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    url: jdbc:tc:mariadb:10.5:///
+
   jpa:
     hibernate:
       ddl-auto: update

@@ -1,11 +1,13 @@
 spring:
   datasource:
-    driver-class-name:
-    url: jdbc:h2:mem:testdb;MODE=MySQL
-    username: sa
-    password:
+    url: jdbc:mariadb://${RDS_DEV_URL}/${RDS_DEV_DB_NAME}
+    username: ${RDS_DEV_ID}
+    password: ${RDS_DEV_PW}
+    driver-class-name: org.mariadb.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: create-drop
-
-## 추후 RDS로 연동
+      ddl-auto: update # TODO DDL 완성 후 해당 옵션 변경해주어야 함
+    generate-ddl: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.spatial.dialect.mariadb.MariaDB103SpatialDialect

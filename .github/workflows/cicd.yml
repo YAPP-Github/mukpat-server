@@ -68,4 +68,3 @@ jobs:
             docker run --restart=unless-stopped -d -p ${{ secrets.DEV_PORT }}:${{ secrets.DEV_PORT }} --env-file .env ${{ secrets.DOCKERHUB_USERNAME }}/muckpot-api:${{ github.run_number }}
             docker rm $(docker ps -a -q --filter "status=exited")
             docker image prune -a -f
-
