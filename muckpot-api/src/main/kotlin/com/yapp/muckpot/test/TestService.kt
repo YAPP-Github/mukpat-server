@@ -12,7 +12,11 @@ class TestService(
 ) {
 
     fun test(): TestResponse {
-        testRepository.save(TestEntity(1, "querydsl"))
+        testRepository.save(TestEntity(null, "querydsl"))
         return TestResponse.of(querydslRepository.getTestByName("querydsl") ?: TestEntity())
+    }
+
+    fun save(request: TestRequest): Long? {
+        return testRepository.save(TestEntity(null, request.name ?: "test")).id
     }
 }
