@@ -9,7 +9,7 @@ import java.time.LocalDate
 @ApiModel(value = "테스트 Response")
 data class TestResponse(
     @field:ApiModelProperty(notes = "테스트Dto 아이디", example = "test")
-    var id: Long = 1,
+    var id: Long? = 1,
     @field:ApiModelProperty(notes = "테스트Dto 이름", example = "test")
     var name: String = "test",
     @field:JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
