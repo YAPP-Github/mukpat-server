@@ -2,6 +2,7 @@ package com.yapp.muckpot.test
 
 import com.yapp.muckpot.common.ResponseDto
 import com.yapp.muckpot.common.ResponseEntityUtil
+import com.yapp.muckpot.redis.RedisService
 import com.yapp.muckpot.swagger.TEST_SAMPLE
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
@@ -21,7 +22,10 @@ import javax.validation.Valid
 @RestController
 @Api(tags = ["테스트 api"], description = "스웨거 사용 기본 템플릿")
 @RequestMapping("/api")
-class TestController(private val testService: TestService) {
+class TestController(
+    private val testService: TestService,
+    private val redisService: RedisService
+) {
     @GetMapping("/v1/test")
     @ApiOperation(value = "Get 테스트")
     @ApiResponses(
@@ -49,5 +53,11 @@ class TestController(private val testService: TestService) {
         request: TestRequest
     ): ResponseEntity<ResponseDto> {
         return ResponseEntityUtil.created(testService.save(request))
+    }
+
+    @PostMapping("/v1/test/redis")
+    @ApiOperation(value = "redis 테스트")
+    fun redisTest(): String {
+        return redisService.redisString()
     }
 }
