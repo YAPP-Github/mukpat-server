@@ -1,6 +1,8 @@
 spring:
   profiles:
-    active: local
+    include:
+      - domain
+      - infra
 
   mvc:
     pathmatch:

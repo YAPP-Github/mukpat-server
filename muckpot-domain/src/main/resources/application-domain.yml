@@ -1,0 +1,35 @@
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    url: jdbc:mariadb://localhost:3306/muckpot_local
+    username: root
+    password: admin
+    driver-class-name: org.mariadb.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    generate-ddl: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.spatial.dialect.mariadb.MariaDB103SpatialDialect
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:mariadb://${RDS_DEV_URL}/${RDS_DEV_DB_NAME}
+    username: ${RDS_DEV_ID}
+    password: ${RDS_DEV_PW}
+    driver-class-name: org.mariadb.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update # TODO DDL 완성 후 해당 옵션 변경해주어야 함
+    generate-ddl: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.spatial.dialect.mariadb.MariaDB103SpatialDialect
