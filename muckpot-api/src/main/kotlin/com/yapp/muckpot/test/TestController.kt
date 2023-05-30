@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiResponse
 import io.swagger.annotations.ApiResponses
 import io.swagger.annotations.Example
 import io.swagger.annotations.ExampleProperty
+import mu.KLogging
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -26,6 +27,8 @@ class TestController(
     private val testService: TestService,
     private val redisService: RedisService
 ) {
+    private val log = KLogging().logger
+
     @GetMapping("/v1/test")
     @ApiOperation(value = "Get 테스트")
     @ApiResponses(
@@ -43,6 +46,9 @@ class TestController(
         ]
     )
     fun getTest(): ResponseEntity<ResponseDto> {
+        log.info { "info" }
+        log.warn { "warn" }
+        log.error { "error" }
         return ResponseEntityUtil.ok(testService.test())
     }
 
