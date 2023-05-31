@@ -1,4 +1,19 @@
 spring:
+  mail:
+    host: smtp.gmail.com
+    port: ${GOOGLE_SMTP_PORT}
+    username: ${GOOGLE_SMTP_USERNAME}
+    password: ${GOOGLE_SMTP_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+---
+
+spring:
   config:
     activate:
       on-profile: local

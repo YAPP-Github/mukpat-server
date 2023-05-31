@@ -22,5 +22,9 @@ data class ResponseDto(
         fun created(data: Any? = "성공"): ResponseDto {
             return ResponseDto(status = StatusCode.CREATED.code, message = "생성에 성공하였습니다.", result = data)
         }
+
+        fun noContent(): ResponseDto {
+            return ResponseDto(status = StatusCode.NO_CONTENT.code, message = null, result = null)
+        }
     }
 }
