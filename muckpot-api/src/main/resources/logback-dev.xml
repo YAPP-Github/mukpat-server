@@ -26,7 +26,6 @@
         </encoder>
     </appender>
 
-
     <appender name="INFO_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${INFO_LOG_PATH}/${INFO_FILE_NAME}</file>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
