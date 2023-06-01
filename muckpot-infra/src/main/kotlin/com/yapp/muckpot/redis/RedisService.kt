@@ -14,7 +14,10 @@ class RedisService(private val redisTemplate: RedisTemplate<String, Any>) {
         return operations.get("test") as String
     }
 
-    fun setDataExpire(key: String, value: String, duration: Long) {
+    fun setDataExpireWithNewest(key: String, value: String, duration: Long) {
+        if (redisTemplate.hasKey(key)) { // 만료돼지않은 인증코드 값이 잔존할 경우 삭제 후 재발급
+            redisTemplate.delete(key)
+        }
         redisTemplate.opsForValue().set(key, value, Duration.ofSeconds(duration))
     }
     fun deleteData(key: String) {
