@@ -43,13 +43,13 @@ class MuckPotUser(
     var mainCategory: String,
 
     @Column(name = "sub_category")
-    var subCategory: String,
+    var subCategory: String? = null,
 
     @Embedded
     var location: Location,
 
     @Column(name = "image_url")
-    var imageUrl: String,
+    var imageUrl: String? = null,
 
     @Column(name = "state")
     @Enumerated(value = EnumType.STRING)
@@ -62,6 +62,5 @@ class MuckPotUser(
         require(nickName.isNotBlank()) { "닉네임은 필수입니다" }
         require(yearOfBirth in 1900..2023) { "잘못된 출생 연도입니다" }
         require(mainCategory.isNotBlank()) { "주요 카테고리는 필수입니다" }
-        require(subCategory.isNotBlank()) { "하위 카테고리는 필수입니다" }
     }
 }
