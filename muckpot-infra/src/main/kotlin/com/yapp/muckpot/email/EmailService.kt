@@ -1,6 +1,5 @@
 package com.yapp.muckpot.email
 import mu.KLogging
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.mail.MailException
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.MimeMessageHelper
@@ -10,12 +9,8 @@ import org.springframework.stereotype.Service
 @Service
 class EmailService(private val javaMailSender: JavaMailSender) {
 
-    @Value("\${spring.mail.username}")
-    private lateinit var from: String
-
     private val log = KLogging().logger
 
-    // TODO: 동기, 비동기 관련된 부분 좀 더 고민해보기
     @Async
     fun sendAuthMail(authKey: String, to: String) {
         try {
@@ -26,7 +21,7 @@ class EmailService(private val javaMailSender: JavaMailSender) {
             val email = javaMailSender.createMimeMessage()
             val helper = MimeMessageHelper(email, true, "UTF-8")
             helper.setTo(to)
-            helper.setFrom(from)
+            helper.setFrom("muckpot@gmail.com")
             helper.setTo(to)
             helper.setSubject(subject)
             helper.setText(textSetting, true)
