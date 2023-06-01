@@ -1,0 +1,16 @@
+spring:
+  profiles:
+    active: local
+    include:
+      - domain
+      - infra
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+  jpa:
+    open-in-view: false
+
+jwt:
+  issuer: "muckpot"
+  secret-key: "test-secret"
