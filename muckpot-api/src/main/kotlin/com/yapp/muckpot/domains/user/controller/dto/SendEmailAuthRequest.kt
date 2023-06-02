@@ -1,4 +1,4 @@
-package com.yapp.muckpot.user.dto
+package com.yapp.muckpot.domains.user.controller.dto
 
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty

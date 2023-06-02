@@ -21,7 +21,7 @@ class EmailService(private val javaMailSender: JavaMailSender) {
             val email = javaMailSender.createMimeMessage()
             val helper = MimeMessageHelper(email, true, "UTF-8")
             helper.setTo(to)
-            helper.setFrom("muckpot@gmail.com")
+            helper.setFrom("muckpotinfo@gmail.com")
             helper.setTo(to)
             helper.setSubject(subject)
             helper.setText(textSetting, true)

@@ -9,10 +9,17 @@ const val TEST_SAMPLE = """
 """
 
 const val LOGIN_RESPONSE = """
+{
     "status": 200,
     "result": {
         "userId": 1,
         "nickName": "nickName"
     }
+}
+"""
+
+const val EMAIL_AUTH_REQ_RESPONSE = """
+{
+    "status": 204
 }
 """

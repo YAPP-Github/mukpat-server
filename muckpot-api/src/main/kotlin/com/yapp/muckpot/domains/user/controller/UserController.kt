@@ -3,7 +3,9 @@ package com.yapp.muckpot.domains.user.controller
 import com.yapp.muckpot.common.ResponseDto
 import com.yapp.muckpot.common.ResponseEntityUtil
 import com.yapp.muckpot.domains.user.controller.dto.LoginRequest
+import com.yapp.muckpot.domains.user.controller.dto.SendEmailAuthRequest
 import com.yapp.muckpot.domains.user.service.UserService
+import com.yapp.muckpot.swagger.EMAIL_AUTH_REQ_RESPONSE
 import com.yapp.muckpot.swagger.LOGIN_RESPONSE
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
@@ -47,5 +49,28 @@ class UserController(
         request: LoginRequest
     ): ResponseEntity<ResponseDto> {
         return ResponseEntityUtil.ok(userService.login(request))
+    }
+
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                code = 204,
+                examples = Example(
+                    ExampleProperty(
+                        value = EMAIL_AUTH_REQ_RESPONSE,
+                        mediaType = MediaType.APPLICATION_JSON_VALUE
+                    )
+                ),
+                message = "성공"
+            )
+        ]
+    )
+    @ApiOperation(value = "이메일 인증 요청")
+    @PostMapping("/v1/emails/request")
+    fun sendEmailAuth(
+        @RequestBody @Valid
+        request: SendEmailAuthRequest
+    ): ResponseEntity<ResponseDto> {
+        return ResponseEntityUtil.noContent(userService.sendEmailAuth(request))
     }
 }

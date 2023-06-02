@@ -1,10 +1,13 @@
 package com.yapp.muckpot.domains.user.service
 
 import com.yapp.muckpot.common.JwtCookieUtil
+import com.yapp.muckpot.common.RandomCodeUtil
 import com.yapp.muckpot.domains.user.controller.dto.LoginRequest
+import com.yapp.muckpot.domains.user.controller.dto.SendEmailAuthRequest
 import com.yapp.muckpot.domains.user.controller.dto.UserResponse
 import com.yapp.muckpot.domains.user.exception.UserErrorCode
 import com.yapp.muckpot.domains.user.repository.MuckPotUserRepository
+import com.yapp.muckpot.email.EmailService
 import com.yapp.muckpot.exception.MuckPotException
 import com.yapp.muckpot.redis.RedisService
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -16,7 +19,8 @@ class UserService(
     private val userRepository: MuckPotUserRepository,
     private val jwtService: JwtService,
     private val redisService: RedisService,
-    private val passwordEncoder: PasswordEncoder
+    private val passwordEncoder: PasswordEncoder,
+    private val emailService: EmailService
 ) {
     @Transactional
     fun login(request: LoginRequest): UserResponse {
@@ -34,5 +38,12 @@ class UserService(
         } ?: run {
             throw MuckPotException(UserErrorCode.LOGIN_FAIL)
         }
+    }
+
+    @Transactional
+    fun sendEmailAuth(request: SendEmailAuthRequest) {
+        val authKey = RandomCodeUtil.generateRandomCode() // 인증 코드 생성
+        emailService.sendAuthMail(authKey = authKey, to = request.email!!) // 인증 코드 메일 전송
+        redisService.setDataExpireWithNewest(key = request.email!!, value = authKey, 60 * 30L) // 유효기간 30분 redis 저장
     }
 }
