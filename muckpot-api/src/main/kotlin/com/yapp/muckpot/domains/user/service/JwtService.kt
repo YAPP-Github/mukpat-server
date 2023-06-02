@@ -55,7 +55,8 @@ class JwtService(
             val decodedJwt = verify(JwtCookieUtil.getAccessToken())
             objectMapper.readValue(decodedJwt.getClaim(USER_CLAIM).asString(), UserResponse::class.java)
         } catch (exception: Exception) {
-            log.info(exception) { "로그인 유저 정보를 찾을 수 없습니다." }
+            log.debug(exception) { "" }
+            log.info { "로그인 유저 정보를 찾을 수 없습니다." }
             null
         }
     }
