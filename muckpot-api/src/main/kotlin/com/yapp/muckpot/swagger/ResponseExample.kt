@@ -7,3 +7,12 @@ const val TEST_SAMPLE = """
   "currentTime": "20230515"
 }
 """
+
+const val LOGIN_RESPONSE = """
+    "status": 200,
+    "result": {
+        "userId": 1,
+        "nickName": "nickName"
+    }
+}
+"""

@@ -5,6 +5,7 @@ import com.yapp.muckpot.common.enums.Gender
 import com.yapp.muckpot.config.CustomDataJpaTest
 import com.yapp.muckpot.domains.user.entity.MuckPotUser
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.springframework.beans.factory.annotation.Autowired
 
@@ -22,5 +23,11 @@ class MuckPotUserRepositoryTest(
         val saveUser = muckPotUserRepository.save(muckPotUser)
         // then
         saveUser.id shouldNotBe null
+    }
+
+    "findByEmail 호출 성공" {
+        val user = muckPotUserRepository.findByEmail("user@samsung.com")
+
+        user shouldBe null
     }
 })

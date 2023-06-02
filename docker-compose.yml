@@ -5,7 +5,7 @@ services:
     container_name: web1Redis
     image: "redis:alpine"
     ports:
-      - ${REDIS_PORT}:${REDIS_PORT}
+      - 6379:6379
     environment:
       - TZ=Asia/Seoul
 

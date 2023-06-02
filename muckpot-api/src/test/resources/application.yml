@@ -1,9 +1,9 @@
 spring:
   profiles:
+    active: local
     include:
       - domain
       - infra
-
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
@@ -13,11 +13,8 @@ spring:
 
 jwt:
   issuer: "muckpot"
-  secret-key: ${JWT_SECRET_KEY:secret}
-
-logging:
-  config: classpath:logback-${spring.config.activate.on-profile}.xml
+  secret-key: "test-secret"
 
 api:
   option:
-    permit-all: false # 배포: false, 테스트 : true
+    permit-all: false
