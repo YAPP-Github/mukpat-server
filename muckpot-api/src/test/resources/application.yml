@@ -14,3 +14,7 @@ spring:
 jwt:
   issuer: "muckpot"
   secret-key: "test-secret"
+
+api:
+  option:
+    permit-all: false

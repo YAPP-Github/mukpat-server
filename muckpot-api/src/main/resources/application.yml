@@ -17,3 +17,7 @@ jwt:
 
 logging:
   config: classpath:logback-${spring.config.activate.on-profile}.xml
+
+api:
+  option:
+    permit-all: false # 배포: false, 테스트 : true

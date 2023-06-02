@@ -4,6 +4,7 @@ import com.yapp.muckpot.common.LOGIN_URL
 import com.yapp.muckpot.common.security.CustomAuthenticationEntryPoint
 import com.yapp.muckpot.domains.user.service.JwtService
 import com.yapp.muckpot.filter.JwtAuthorizationFilter
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
@@ -20,9 +21,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
 class SecurityConfig(
-    private val jwtService: JwtService
+    private val jwtService: JwtService,
+    @Value("\${api.option.permit-all}")
+    private val permitAll: Boolean
 ) {
-
     @Bean
     @Throws(Exception::class)
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
@@ -33,8 +35,13 @@ class SecurityConfig(
                     .permitAll()
                     .antMatchers(HttpMethod.GET, "/api/**", "/swagger-ui/**")
                     .permitAll()
-                    .antMatchers("/api/**")
-                    .hasRole("USER")
+                    .antMatchers("/api/**").apply {
+                        if (permitAll) {
+                            permitAll()
+                        } else {
+                            hasRole("USER")
+                        }
+                    }
             }
             .cors { cors ->
                 cors.configurationSource(corsConfigurationSource())
