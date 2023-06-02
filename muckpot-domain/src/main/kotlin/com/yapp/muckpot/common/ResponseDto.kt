@@ -16,11 +16,11 @@ data class ResponseDto(
         }
 
         fun success(data: Any? = "성공"): ResponseDto {
-            return ResponseDto(status = StatusCode.OK.code, message = "요청에 성공하였습니다.", result = data)
+            return ResponseDto(status = StatusCode.OK.code, null, result = data)
         }
 
         fun created(data: Any? = "성공"): ResponseDto {
-            return ResponseDto(status = StatusCode.CREATED.code, message = "생성에 성공하였습니다.", result = data)
+            return ResponseDto(status = StatusCode.CREATED.code, null, result = data)
         }
     }
 }

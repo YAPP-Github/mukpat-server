@@ -12,4 +12,8 @@ class RedisService(private val redisTemplate: RedisTemplate<String, Any>) {
         operations.set("test", "테스트")
         return operations.get("test") as String
     }
+
+    fun saveRefreshToken(email: String, refreshToken: String) {
+        redisTemplate.opsForValue().set(email, refreshToken)
+    }
 }
