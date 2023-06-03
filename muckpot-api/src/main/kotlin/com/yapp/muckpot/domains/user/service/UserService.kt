@@ -45,14 +45,14 @@ class UserService(
     @Transactional
     fun sendEmailAuth(request: SendEmailAuthRequest): EmailAuthResponse {
         val authKey = RandomCodeUtil.generateRandomCode() // 인증 코드 생성
-        emailService.sendAuthMail(authKey = authKey, to = request.email!!) // 인증 코드 메일 전송
-        redisService.setDataExpireWithNewest(key = request.email!!, value = authKey, 60 * 30L) // 유효기간 30분 redis 저장
+        emailService.sendAuthMail(authKey = authKey, to = request.email) // 인증 코드 메일 전송
+        redisService.setDataExpireWithNewest(key = request.email, value = authKey, 60 * 30L) // 유효기간 30분 redis 저장
         return EmailAuthResponse(authKey)
     }
 
     @Transactional
     fun verifyEmailAuth(request: VerifyEmailAuthRequest) {
-        val authKey = redisService.getData(request.email!!)
+        val authKey = redisService.getData(request.email)
         authKey?.let {
             if (authKey.equals(request.email)) {
                 throw MuckPotException(UserErrorCode.EMAIL_VERIFY_FAIL)

@@ -12,5 +12,5 @@ data class SendEmailAuthRequest(
     @field:ApiModelProperty(notes = "이메일", required = true, example = "co@samsung.com")
     @field:NotBlank(message = "이메일을 입력해 주세요.")
     @field:Pattern(regexp = "^[A-Za-z0-9._%+-]+@naver\\.com\$", message = "현재 버전은 네이버 사우만 이용 가능합니다.") // for test
-    val email: String?
+    val email: String
 )
