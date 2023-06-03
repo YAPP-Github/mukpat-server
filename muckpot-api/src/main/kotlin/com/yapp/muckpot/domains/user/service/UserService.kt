@@ -24,6 +24,8 @@ class UserService(
     private val passwordEncoder: PasswordEncoder,
     private val emailService: EmailService
 ) {
+    val THIRTY_MINS: Long = 60 * 30L
+
     @Transactional
     fun login(request: LoginRequest): UserResponse {
         userRepository.findByEmail(request.email)?.let {
@@ -46,7 +48,7 @@ class UserService(
     fun sendEmailAuth(request: SendEmailAuthRequest): EmailAuthResponse {
         val authKey = RandomCodeUtil.generateRandomCode()
         emailService.sendAuthMail(authKey = authKey, to = request.email)
-        redisService.setDataExpireWithNewest(key = request.email, value = authKey, 60 * 30L) // 유효 기간 30분
+        redisService.setDataExpireWithNewest(key = request.email, value = authKey, duration = THIRTY_MINS)
         return EmailAuthResponse(authKey)
     }
 
@@ -54,7 +56,7 @@ class UserService(
     fun verifyEmailAuth(request: VerifyEmailAuthRequest) {
         val authKey = redisService.getData(request.email)
         authKey?.let {
-            if (authKey != request.verificationCode) {
+            if (it != request.verificationCode) {
                 throw MuckPotException(UserErrorCode.EMAIL_VERIFY_FAIL)
             }
         } ?: run {
