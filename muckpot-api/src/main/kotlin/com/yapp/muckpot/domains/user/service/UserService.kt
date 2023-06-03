@@ -44,9 +44,9 @@ class UserService(
 
     @Transactional
     fun sendEmailAuth(request: SendEmailAuthRequest): EmailAuthResponse {
-        val authKey = RandomCodeUtil.generateRandomCode() // 인증 코드 생성
-        emailService.sendAuthMail(authKey = authKey, to = request.email) // 인증 코드 메일 전송
-        redisService.setDataExpireWithNewest(key = request.email, value = authKey, 60 * 30L) // 유효기간 30분 redis 저장
+        val authKey = RandomCodeUtil.generateRandomCode()
+        emailService.sendAuthMail(authKey = authKey, to = request.email)
+        redisService.setDataExpireWithNewest(key = request.email, value = authKey, 60 * 30L) // 유효 기간 30분
         return EmailAuthResponse(authKey)
     }
 
