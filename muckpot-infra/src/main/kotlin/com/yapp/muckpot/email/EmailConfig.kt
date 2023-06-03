@@ -24,14 +24,14 @@ class EmailConfig(
 
     @Bean
     fun javaMailSender(): JavaMailSender {
-        val mailSender = JavaMailSenderImpl().apply {
-            host = host
-            port = port
-            username = username
-            password = password
-        }
+        val mailSender = JavaMailSenderImpl()
+        mailSender.host = host
+        mailSender.port = port
+        mailSender.username = username
+        mailSender.password = password
 
         val javaMailProperties = Properties() // TLS 사용 연결
+        javaMailProperties["mail.smtp.auth"] = "true"
         javaMailProperties["mail.smtp.starttls.enable"] = "true"
         mailSender.javaMailProperties = javaMailProperties
 

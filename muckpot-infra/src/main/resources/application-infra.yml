@@ -4,12 +4,6 @@ spring:
     port: ${GOOGLE_SMTP_PORT:8080}
     username: ${GOOGLE_SMTP_USERNAME:test}
     password: ${GOOGLE_SMTP_PASSWORD:test}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
 
 ---
 
