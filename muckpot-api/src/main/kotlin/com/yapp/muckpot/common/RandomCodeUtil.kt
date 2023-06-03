@@ -1,11 +1,11 @@
 package com.yapp.muckpot.common
 
-import java.util.*
+import java.security.SecureRandom
 
 object RandomCodeUtil {
 
     fun generateRandomCode(): String {
-        val random = Random()
+        val random = SecureRandom()
         val codeLength = 6
         val digits = "0123456789"
         val sb = StringBuilder(codeLength)

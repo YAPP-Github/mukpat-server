@@ -54,7 +54,7 @@ class UserService(
     fun verifyEmailAuth(request: VerifyEmailAuthRequest) {
         val authKey = redisService.getData(request.email)
         authKey?.let {
-            if (authKey.equals(request.email)) {
+            if (authKey != request.verificationCode) {
                 throw MuckPotException(UserErrorCode.EMAIL_VERIFY_FAIL)
             }
         } ?: run {
