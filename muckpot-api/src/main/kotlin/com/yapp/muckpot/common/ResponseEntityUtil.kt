@@ -12,7 +12,7 @@ object ResponseEntityUtil {
         return ResponseEntity.status(HttpStatus.CREATED).body(ResponseDto.created(body))
     }
 
-    fun noContent(): ResponseEntity<ResponseDto> {
+    fun noContent(body: Any?): ResponseEntity<ResponseDto> {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ResponseDto.noContent())
     }
 }

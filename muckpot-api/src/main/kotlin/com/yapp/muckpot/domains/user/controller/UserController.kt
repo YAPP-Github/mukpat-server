@@ -96,7 +96,6 @@ class UserController(
         @RequestBody @Valid
         request: VerifyEmailAuthRequest
     ): ResponseEntity<ResponseDto> {
-        userService.verifyEmailAuth(request)
-        return ResponseEntityUtil.noContent()
+        return ResponseEntityUtil.noContent(userService.verifyEmailAuth(request))
     }
 }
