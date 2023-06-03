@@ -20,6 +20,15 @@ const val LOGIN_RESPONSE = """
 
 const val EMAIL_AUTH_REQ_RESPONSE = """
 {
+    "status": 201,
+    "result": {
+        "verificationCode": "123456"
+    }
+}
+"""
+
+const val EMAIL_AUTH_RESPONSE = """
+{
     "status": 204
 }
 """

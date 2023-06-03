@@ -27,4 +27,8 @@ class RedisService(private val redisTemplate: RedisTemplate<String, Any>) {
     fun deleteData(key: String) {
         redisTemplate.delete(key)
     }
+
+    fun getData(key: String): Any? {
+        return redisTemplate.opsForValue().get(key)
+    }
 }
