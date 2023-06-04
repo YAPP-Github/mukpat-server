@@ -32,3 +32,12 @@ const val EMAIL_AUTH_RESPONSE = """
     "status": 204
 }
 """
+
+const val MUCKPOT_SAVE_RESPONSE = """
+{
+  "status": 201,
+  "result": {
+    "boardId": 18
+  }
+}
+"""
