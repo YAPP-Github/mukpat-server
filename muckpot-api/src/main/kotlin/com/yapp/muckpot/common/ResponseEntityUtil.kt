@@ -11,4 +11,8 @@ object ResponseEntityUtil {
     fun created(body: Any?): ResponseEntity<ResponseDto> {
         return ResponseEntity.status(HttpStatus.CREATED).body(ResponseDto.created(body))
     }
+
+    fun noContent(body: Any?): ResponseEntity<ResponseDto> {
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ResponseDto.noContent())
+    }
 }

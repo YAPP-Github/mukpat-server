@@ -22,5 +22,9 @@ data class ResponseDto(
         fun created(data: Any? = "성공"): ResponseDto {
             return ResponseDto(status = StatusCode.CREATED.code, null, result = data)
         }
+
+        fun noContent(): ResponseDto {
+            return ResponseDto(status = StatusCode.NO_CONTENT.code, message = null, result = null)
+        }
     }
 }

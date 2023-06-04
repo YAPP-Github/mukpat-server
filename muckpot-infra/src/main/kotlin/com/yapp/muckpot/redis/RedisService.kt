@@ -3,6 +3,7 @@ package com.yapp.muckpot.redis
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.data.redis.core.ValueOperations
 import org.springframework.stereotype.Service
+import java.time.Duration
 
 @Service
 class RedisService(private val redisTemplate: RedisTemplate<String, Any>) {
@@ -15,5 +16,19 @@ class RedisService(private val redisTemplate: RedisTemplate<String, Any>) {
 
     fun saveRefreshToken(email: String, refreshToken: String) {
         redisTemplate.opsForValue().set(email, refreshToken)
+    }
+
+    fun setDataExpireWithNewest(key: String, value: String, duration: Long) {
+        if (redisTemplate.hasKey(key)) {
+            redisTemplate.delete(key)
+        }
+        redisTemplate.opsForValue().set(key, value, Duration.ofSeconds(duration))
+    }
+    fun deleteData(key: String) {
+        redisTemplate.delete(key)
+    }
+
+    fun getData(key: String): Any? {
+        return redisTemplate.opsForValue().get(key)
     }
 }
