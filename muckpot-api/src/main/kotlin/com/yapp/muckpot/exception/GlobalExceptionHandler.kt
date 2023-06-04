@@ -44,7 +44,7 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(value = [HttpMessageNotReadableException::class])
-    fun httpMessageNotReadableExceptionHandler(ex: HttpMessageNotReadableException): ResponseEntity<*> {
+    fun httpMessageNotReadableExceptionHandler(ex: HttpMessageNotReadableException): ResponseEntity<ResponseDto> {
         var message = ex.message
         val cause = ex.cause
         if (cause is MissingKotlinParameterException) {
