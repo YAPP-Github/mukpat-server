@@ -30,9 +30,9 @@ data class MuckpotCreateRequest(
     @field:Min(2, message = "최대 인원은 {value}명 이상 가능합니다.")
     val maxApply: Int = 2,
     @field:ApiModelProperty(notes = "최소 나이", required = false, example = "20")
-    val minAge: Int = AGE_MIN,
+    val minAge: Int? = null,
     @field:ApiModelProperty(notes = "최대 나이", required = false, example = "100")
-    val maxAge: Int = AGE_MAX,
+    val maxAge: Int? = null,
     @field:ApiModelProperty(notes = "주소", required = true, example = "서울 성북구 안암동5가 104-30 캐치카페 안암")
     var locationName: String,
     @field:ApiModelProperty(notes = "주소 상세", required = false, example = "6층")
@@ -55,6 +55,7 @@ data class MuckpotCreateRequest(
         title = title.trim()
         content = content?.trim()
         chatLink = chatLink.trim()
+        locationDetail = locationDetail?.trim()
     }
 
     fun toBoard(user: MuckPotUser): Board {
@@ -65,8 +66,8 @@ data class MuckpotCreateRequest(
             locationDetail = locationDetail,
             meetingDate = meetingDate,
             meetingTime = meetingTime,
-            minAge = minAge,
-            maxAge = maxAge,
+            minAge = minAge ?: AGE_MIN,
+            maxAge = maxAge ?: AGE_MAX,
             maxApply = maxApply,
             chatLink = chatLink
         )
