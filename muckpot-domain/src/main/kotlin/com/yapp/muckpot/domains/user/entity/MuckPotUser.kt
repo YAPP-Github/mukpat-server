@@ -1,9 +1,9 @@
 package com.yapp.muckpot.domains.user.entity
 
 import com.yapp.muckpot.common.BaseTimeEntity
+import com.yapp.muckpot.common.EMAIL
 import com.yapp.muckpot.common.Location
 import com.yapp.muckpot.common.enums.Gender
-import com.yapp.muckpot.common.enums.RegexPattern
 import com.yapp.muckpot.common.enums.State
 import javax.persistence.Column
 import javax.persistence.Embedded
@@ -57,7 +57,7 @@ class MuckPotUser(
 ) : BaseTimeEntity() {
     init {
         require(email.isNotBlank()) { "이메일은 필수입니다" }
-        require(RegexPattern.EMAIL.matches(this.email)) { "유효한 이메일 형식이 아닙니다" }
+        require(EMAIL.toRegex().matches(this.email)) { "유효한 이메일 형식이 아닙니다" }
         require(password.isNotBlank()) { "비밀번호는 필수입니다" }
         require(nickName.isNotBlank()) { "닉네임은 필수입니다" }
         require(yearOfBirth in 1900..2023) { "잘못된 출생 연도입니다" }
