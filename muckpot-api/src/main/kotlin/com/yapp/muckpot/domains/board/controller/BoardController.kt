@@ -14,6 +14,7 @@ import io.swagger.annotations.Example
 import io.swagger.annotations.ExampleProperty
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -44,9 +45,14 @@ class BoardController(
     @ApiOperation(value = "먹팟 글 생성")
     @PostMapping("/v1/boards")
     fun saveBoard(
+        @AuthenticationPrincipal userId: Long,
         @RequestBody @Valid
         request: MuckpotCreateRequest
     ): ResponseEntity<ResponseDto> {
-        return ResponseEntityUtil.created(MuckpotCreateResponse(boardService.saveBoard(request)))
+        return ResponseEntityUtil.created(
+            MuckpotCreateResponse(
+                boardService.saveBoard(userId, request)
+            )
+        )
     }
 }

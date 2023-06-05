@@ -1,6 +1,5 @@
 package com.yapp.muckpot.domains.board.service
 
-import com.yapp.muckpot.common.SecurityContextHolderUtil
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateRequest
 import com.yapp.muckpot.domains.board.entity.Participant
 import com.yapp.muckpot.domains.board.repository.BoardRepository
@@ -19,9 +18,9 @@ class BoardService(
     private val participantRepository: ParticipantRepository
 ) {
     @Transactional
-    fun saveBoard(request: MuckpotCreateRequest): Long? {
+    fun saveBoard(userId: Long, request: MuckpotCreateRequest): Long? {
         // TODO 먹팟 등록 시 같은 회사 인원에게 메일 전송
-        val user = userRepository.findByIdOrNull(SecurityContextHolderUtil.getCurrentUserId())
+        val user = userRepository.findByIdOrNull(userId)
             ?: throw MuckPotException(UserErrorCode.USER_NOT_FOUND)
         val board = boardRepository.save(request.toBoard(user))
         participantRepository.save(Participant(user, board))

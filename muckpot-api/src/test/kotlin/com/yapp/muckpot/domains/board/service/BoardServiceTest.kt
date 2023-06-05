@@ -1,13 +1,11 @@
 package com.yapp.muckpot.domains.board.service
 
 import com.yapp.muckpot.common.Location
-import com.yapp.muckpot.common.TestUtil.forceLogin
 import com.yapp.muckpot.common.enums.Gender
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateRequest
 import com.yapp.muckpot.domains.board.entity.ParticipantId
 import com.yapp.muckpot.domains.board.repository.BoardRepository
 import com.yapp.muckpot.domains.board.repository.ParticipantRepository
-import com.yapp.muckpot.domains.user.controller.dto.UserResponse
 import com.yapp.muckpot.domains.user.entity.MuckPotUser
 import com.yapp.muckpot.domains.user.repository.MuckPotUserRepository
 import io.kotest.core.spec.style.StringSpec
@@ -50,7 +48,6 @@ class BoardServiceTest @Autowired constructor(
             )
         )
         userId = user.id!!
-        forceLogin(UserResponse.of(user))
     }
 
     afterEach {
@@ -61,7 +58,7 @@ class BoardServiceTest @Autowired constructor(
 
     "먹팟 생성 성공" {
         // when
-        val boardId = boardService.saveBoard(request)
+        val boardId = boardService.saveBoard(userId, request)
 
         // then
         val findBoard = boardRepository.findByIdOrNull(boardId)!!
