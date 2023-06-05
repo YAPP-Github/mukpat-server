@@ -41,7 +41,7 @@ class BoardController(
             )
         ]
     )
-    @ApiOperation(value = "먹팟 생성")
+    @ApiOperation(value = "먹팟 글 생성")
     @PostMapping("/v1/boards")
     fun saveBoard(
         @RequestBody @Valid
