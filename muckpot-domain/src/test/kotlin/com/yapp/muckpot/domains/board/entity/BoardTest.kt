@@ -9,7 +9,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.mockk
 import java.lang.IllegalArgumentException
-import java.time.LocalDate
+import java.time.LocalDateTime
 
 class BoardTest : FunSpec({
     val user: MuckPotUser = mockk()
@@ -24,8 +24,7 @@ class BoardTest : FunSpec({
                     title = "title",
                     location = location,
                     locationDetail = null,
-                    meetingDate = LocalDate.now(),
-                    meetingTime = "오전 12:00",
+                    meetingTime = LocalDateTime.now(),
                     content = "content",
                     views = 0,
                     currentApply = 0,
@@ -46,8 +45,7 @@ class BoardTest : FunSpec({
                     title = "title",
                     location = location,
                     locationDetail = null,
-                    meetingDate = LocalDate.now(),
-                    meetingTime = "오전 12:00",
+                    meetingTime = LocalDateTime.now(),
                     content = "content",
                     views = 0,
                     currentApply = 0,
@@ -67,11 +65,10 @@ class BoardTest : FunSpec({
                 title = "title",
                 location = location,
                 locationDetail = null,
-                meetingDate = LocalDate.now(),
-                meetingTime = "오전 12:00",
+                meetingTime = LocalDateTime.now(),
                 content = "content",
                 views = 0,
-                currentApply = 0,
+                currentApply = 1,
                 maxApply = 2,
                 chatLink = "link",
                 status = MuckPotStatus.IN_PROGRESS,

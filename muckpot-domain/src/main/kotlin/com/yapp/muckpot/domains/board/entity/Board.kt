@@ -9,7 +9,7 @@ import com.yapp.muckpot.common.MAX_APPLY_MIN
 import com.yapp.muckpot.common.enums.State
 import com.yapp.muckpot.domains.user.entity.MuckPotUser
 import com.yapp.muckpot.domains.user.enums.MuckPotStatus
-import java.time.LocalDate
+import java.time.LocalDateTime
 import javax.persistence.Column
 import javax.persistence.Embedded
 import javax.persistence.Entity
@@ -44,11 +44,8 @@ class Board(
     @Column(name = "location_detail")
     var locationDetail: String? = null,
 
-    @Column(name = "meeting_date", nullable = false)
-    var meetingDate: LocalDate,
-
     @Column(name = "meeting_time", nullable = false)
-    var meetingTime: String,
+    var meetingTime: LocalDateTime,
 
     @Column(name = "content")
     var content: String? = "",
@@ -84,11 +81,13 @@ class Board(
         require(maxAge in AGE_MIN..AGE_MAX) { AGE_EXP_MSG }
         require(minAge < maxAge) { "최소나이는 최대나이보다 작아야 합니다." }
         require(maxApply >= MAX_APPLY_MIN) { "최대 인원은 ${MAX_APPLY_MIN}명 이상 가능합니다." }
-        participate()
     }
 
     fun participate() {
         require(currentApply < maxApply) { "정원이 초과되었습니다." }
         this.currentApply++
+        if (currentApply == maxApply) {
+            this.status = MuckPotStatus.DONE
+        }
     }
 }
