@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.repository.findByIdOrNull
 import java.time.LocalDate
+import java.time.LocalTime
 
 @SpringBootTest
 class BoardServiceTest @Autowired constructor(
@@ -27,7 +28,7 @@ class BoardServiceTest @Autowired constructor(
     var userId: Long = 0
     val request = MuckpotCreateRequest(
         meetingDate = LocalDate.now(),
-        meetingTime = "오전 12:00",
+        meetingTime = LocalTime.of(12, 0),
         maxApply = 10,
         minAge = 20,
         maxAge = 100,
