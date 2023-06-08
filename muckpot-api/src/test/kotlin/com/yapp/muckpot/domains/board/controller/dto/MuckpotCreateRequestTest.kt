@@ -6,6 +6,7 @@ import com.yapp.muckpot.common.TITLE_MAX
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import java.time.LocalDate
+import java.time.LocalTime
 import javax.validation.ConstraintViolation
 import javax.validation.Validation
 import javax.validation.Validator
@@ -21,7 +22,7 @@ class MuckpotCreateRequestTest : StringSpec({
     beforeEach {
         request = MuckpotCreateRequest(
             meetingDate = LocalDate.now(),
-            meetingTime = "오전 12:00",
+            meetingTime = LocalTime.of(12, 1),
             maxApply = 10,
             minAge = 20,
             maxAge = 100,

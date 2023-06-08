@@ -11,7 +11,7 @@ import com.yapp.muckpot.domains.user.repository.MuckPotUserRepository
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldNotBe
 import org.springframework.beans.factory.annotation.Autowired
-import java.time.LocalDate
+import java.time.LocalDateTime
 
 @CustomDataJpaTest
 class ParticipantRepositoryTest(
@@ -29,7 +29,7 @@ class ParticipantRepositoryTest(
         )
         val board = Board(
             null, user, "title", location, null,
-            LocalDate.now(), "오전 12:00", "content", 0, 0, 3, "link",
+            LocalDateTime.now(), "content", 0, 0, 3, "link",
             MuckPotStatus.IN_PROGRESS, 21, 23
         )
         muckPotUserRepository.save(user)

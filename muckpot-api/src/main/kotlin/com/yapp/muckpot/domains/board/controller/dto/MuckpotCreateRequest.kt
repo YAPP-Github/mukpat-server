@@ -5,8 +5,8 @@ import com.yapp.muckpot.common.AGE_MAX
 import com.yapp.muckpot.common.AGE_MIN
 import com.yapp.muckpot.common.CHAT_LINK_MAX
 import com.yapp.muckpot.common.CONTENT_MAX
+import com.yapp.muckpot.common.HHmm
 import com.yapp.muckpot.common.Location
-import com.yapp.muckpot.common.MEETING_TIME
 import com.yapp.muckpot.common.TITLE_MAX
 import com.yapp.muckpot.common.YYYYMMDD
 import com.yapp.muckpot.domains.board.entity.Board
@@ -15,17 +15,18 @@ import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 import org.hibernate.validator.constraints.Length
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
 import javax.validation.constraints.Min
-import javax.validation.constraints.Pattern
 
 @ApiModel(value = "먹팟생성 요청")
 data class MuckpotCreateRequest(
     @field:ApiModelProperty(notes = "만날 날짜", required = true, example = "2023-05-21")
     @field:JsonFormat(shape = JsonFormat.Shape.STRING, pattern = YYYYMMDD)
     val meetingDate: LocalDate,
-    @field:ApiModelProperty(notes = "만날 시간", required = true, example = "오후 12:00")
-    @field:Pattern(regexp = MEETING_TIME)
-    val meetingTime: String,
+    @field:ApiModelProperty(notes = "만날 시간", required = true, example = "13:00")
+    @field:JsonFormat(shape = JsonFormat.Shape.STRING, pattern = HHmm)
+    val meetingTime: LocalTime,
     @field:ApiModelProperty(notes = "최대 인원", required = true, example = "5")
     @field:Min(2, message = "최대 인원은 {value}명 이상 가능합니다.")
     val maxApply: Int = 2,
@@ -41,10 +42,10 @@ data class MuckpotCreateRequest(
     val x: Double,
     @field:ApiModelProperty(notes = "y 좌표", required = true, example = "37.58392327180857")
     val y: Double,
-    @field:ApiModelProperty(notes = "제목", required = true, example = "37.58392327180857")
+    @field:ApiModelProperty(notes = "제목", required = true, example = "같이 밥묵으실분")
     @field:Length(max = TITLE_MAX, message = "제목은 {max}(자)를 넘을 수 없습니다.")
     var title: String,
-    @field:ApiModelProperty(notes = "내용", required = false, example = "같이 밥묵으실분")
+    @field:ApiModelProperty(notes = "내용", required = false, example = "내용 입니다.")
     @field:Length(max = CONTENT_MAX, message = "내용은 {max}(자)를 넘을 수 없습니다.")
     var content: String? = null,
     @field:ApiModelProperty(notes = "오픈채팅방 링크", required = true, example = "https://open.kakao.com/o/gSIkvvHc")
@@ -62,14 +63,15 @@ data class MuckpotCreateRequest(
         return Board(
             user = user,
             title = title,
+            content = content,
             location = Location(locationName, x, y),
             locationDetail = locationDetail,
-            meetingDate = meetingDate,
-            meetingTime = meetingTime,
+            meetingTime = LocalDateTime.of(meetingDate, meetingTime),
             minAge = minAge ?: AGE_MIN,
             maxAge = maxAge ?: AGE_MAX,
             maxApply = maxApply,
-            chatLink = chatLink
+            chatLink = chatLink,
+            currentApply = 1
         )
     }
 }
