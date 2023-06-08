@@ -29,14 +29,11 @@ object TimeUtil {
      */
     fun formatElapsedTime(localDateTime: LocalDateTime): String {
         val timeDiff = ChronoUnit.MINUTES.between(localDateTime, LocalDateTime.now())
-        return if (timeDiff < HOUR_IN_MINUTES) {
-            N_MINUTES_AGO.format(timeDiff)
-        } else if (timeDiff in HOUR_IN_MINUTES until MINUTES_IN_ONE_DAY) {
-            N_HOURS_AGO.format(timeDiff / HOUR_IN_MINUTES)
-        } else if (timeDiff in MINUTES_IN_ONE_DAY until MINUTES_IN_TWO_DAY) {
-            A_DAY_AGO
-        } else {
-            localDateTime.toLocalDate().toString()
+        return when {
+            (timeDiff < HOUR_IN_MINUTES) -> N_MINUTES_AGO.format(timeDiff)
+            (timeDiff in HOUR_IN_MINUTES until MINUTES_IN_ONE_DAY) -> N_HOURS_AGO.format(timeDiff / HOUR_IN_MINUTES)
+            (timeDiff in MINUTES_IN_ONE_DAY until MINUTES_IN_TWO_DAY) -> A_DAY_AGO
+            else -> localDateTime.toLocalDate().toString()
         }
     }
 
