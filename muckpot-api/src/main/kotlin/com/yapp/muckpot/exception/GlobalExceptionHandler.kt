@@ -19,28 +19,28 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(MuckPotException::class)
     fun muckpotGlobalExceptionHandler(exception: MuckPotException): ResponseEntity<ResponseDto> {
-        log.info(exception) { "" }
+        log.error(exception) { "" }
         val responseDto = exception.errorCode.toResponseDto()
         return ResponseEntity.status(valueOf(responseDto.status)).body(responseDto)
     }
 
     @ExceptionHandler(IllegalStateException::class)
     fun internalServerErrorHandler(exception: Exception): ResponseEntity<ResponseDto> {
-        log.info(exception) { "" }
+        log.error(exception) { "" }
         return ResponseEntity.internalServerError()
             .body(ResponseDto(HttpStatus.INTERNAL_SERVER_ERROR.value(), exception.message))
     }
 
     @ExceptionHandler(IllegalArgumentException::class)
     fun badRequestErrorHandler(exception: Exception): ResponseEntity<ResponseDto> {
-        log.info(exception) { "" }
+        log.error(exception) { "" }
         return ResponseEntity.badRequest()
             .body(ResponseDto(HttpStatus.BAD_REQUEST.value(), exception.message))
     }
 
     @ExceptionHandler(value = [MethodArgumentNotValidException::class, ValidationException::class])
     fun methodArgumentNotValidExceptionHandler(exception: Exception): ResponseEntity<ResponseDto> {
-        log.info(exception) { "" }
+        log.error(exception) { "" }
         var message = exception.message
         if (exception is MethodArgumentNotValidException && exception.hasErrors()) {
             message = exception.allErrors.firstOrNull()?.defaultMessage ?: exception.message
@@ -51,7 +51,7 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(value = [HttpMessageNotReadableException::class])
     fun httpMessageNotReadableExceptionHandler(exception: HttpMessageNotReadableException): ResponseEntity<ResponseDto> {
-        log.info(exception) { "" }
+        log.error(exception) { "" }
         var message = exception.message
         val cause = exception.cause
         if (cause is MissingKotlinParameterException) {
