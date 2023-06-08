@@ -90,4 +90,8 @@ class Board(
             this.status = MuckPotStatus.DONE
         }
     }
+
+    fun expired(): Boolean {
+        return (this.status == MuckPotStatus.IN_PROGRESS && this.meetingTime.isBefore(LocalDateTime.now()))
+    }
 }
