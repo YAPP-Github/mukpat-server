@@ -64,24 +64,6 @@ const val MUCKPOT_FIND_ALL = """
           }
         ]
       },
-      {
-        "boardId": 74,
-        "title": "타이틀",
-        "status": "모집중",
-        "todayOrTomorrow": "오늘",
-        "elapsedTime": "0분 전",
-        "meetingTime": "07월 01일 (토) 오후 01:00",
-        "meetingPlace": "경기도 용인시 기흥구",
-        "maxApply": 4,
-        "currentApply": 2,
-        "participants": [
-          {
-            "userId": 2,
-            "nickName": "hi"
-          }
-        ]
-      }
-    ],
     "lastId": 74
   }
 }
