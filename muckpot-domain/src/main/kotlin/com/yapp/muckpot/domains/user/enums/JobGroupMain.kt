@@ -1,5 +1,7 @@
 package com.yapp.muckpot.domains.user.enums
 
+import java.lang.IllegalArgumentException
+
 enum class JobGroupMain(val korName: String) {
     DEVELOPMENT("개발"),
     EDUCATION("교육"),
@@ -23,8 +25,9 @@ enum class JobGroupMain(val korName: String) {
     PUBLIC("특수계층/공공");
 
     companion object {
-        fun findByKorName(korName: String): JobGroupMain? {
+        fun findByKorName(korName: String): JobGroupMain {
             return values().find { it.korName == korName }
+                ?: throw IllegalArgumentException("직군 대분류가 존재하지 않습니다.")
         }
     }
 }

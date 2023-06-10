@@ -76,7 +76,6 @@ class UserService(
             throw MuckPotException(UserErrorCode.ALREADY_EXISTS_USER)
         } ?: run {
             val jobGroupMain = JobGroupMain.findByKorName(request.jobGroupMain)
-                ?: throw MuckPotException(UserErrorCode.WRONG_MAIN_JOB)
             val encodePw = passwordEncoder.encode(request.password)
             val user = userRepository.save(request.toUser(jobGroupMain, encodePw))
             return UserResponse.of(user)
