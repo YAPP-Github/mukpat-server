@@ -66,6 +66,10 @@ class UserService(
         }
     }
 
+    fun findLoginUserProfile(): UserResponse? {
+        return jwtService.getCurrentUserClaim()
+    }
+
     @Transactional
     fun signUp(request: SignUpRequest): UserResponse {
         userRepository.findByEmail(request.email)?.let {
