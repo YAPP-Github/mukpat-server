@@ -40,10 +40,9 @@ class BoardService(
         val boardIds = allBoard.map { it.id }
         val participantsByBoardId = participantQuerydslRepository.findByBoardIds(boardIds).groupBy { it.boardId }
         val responseList = allBoard.map { MuckpotReadResponse.of(it, participantsByBoardId.getOrDefault(it.id, emptyList())) }
-        var lastId: Long? = null
-        if (responseList.size.toLong() == request.countPerScroll) {
-            lastId = responseList.last().boardId
+        if (responseList.isNotEmpty()) {
+            return CursorPaginationResponse(responseList, responseList.last().boardId)
         }
-        return CursorPaginationResponse(responseList, lastId)
+        return CursorPaginationResponse(responseList)
     }
 }
