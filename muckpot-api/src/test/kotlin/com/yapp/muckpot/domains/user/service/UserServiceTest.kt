@@ -20,7 +20,7 @@ class UserServiceTest @Autowired constructor(
 ) : StringSpec({
 
     val request = SignUpRequest(
-        email = UUID.randomUUID().toString().substring(0, 5) + "@samsung.com",
+        email = UUID.randomUUID().toString().substring(0, 5) + "@naver.com",
         password = "abc1234!",
         nickname = UUID.randomUUID().toString().substring(0, 3),
         jobGroupMain = "개발",

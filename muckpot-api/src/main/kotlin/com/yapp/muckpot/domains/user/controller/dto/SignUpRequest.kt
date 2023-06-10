@@ -1,6 +1,7 @@
 package com.yapp.muckpot.domains.user.controller.dto
 
 import com.yapp.muckpot.common.Location
+import com.yapp.muckpot.common.ONLY_NAVER
 import com.yapp.muckpot.common.enums.Gender
 import com.yapp.muckpot.domains.user.entity.MuckPotUser
 import com.yapp.muckpot.domains.user.enums.JobGroupMain
@@ -11,8 +12,8 @@ import javax.validation.constraints.Size
 
 @ApiModel(value = "회원가입")
 data class SignUpRequest(
-    @field:ApiModelProperty(notes = "이메일", required = true, example = "co@samsung.com")
-    @field:Pattern(regexp = "^[A-Za-z0-9._%+-]+@samsung\\.com\$", message = "현재 버전은 삼성전자 사우만 이용 가능합니다.")
+    @field:ApiModelProperty(notes = "이메일", required = true, example = "co@naver.com")
+    @field:Pattern(regexp = ONLY_NAVER, message = "현재 버전은 네이버 사우만 이용 가능합니다.")
     val email: String,
 
     @field:ApiModelProperty(notes = "비밀번호", required = true, example = "abc12345")

@@ -32,13 +32,13 @@ class SignUpRequestTest : StringSpec({
         val violations: MutableSet<ConstraintViolation<SignUpRequest>> = validator.validate(request)
         violations.size shouldBe 1
         for (violation in violations) {
-            violation.message shouldBe "현재 버전은 삼성전자 사우만 이용 가능합니다."
+            violation.message shouldBe "현재 버전은 네이버 사우만 이용 가능합니다."
         }
     }
 
     "비밀번호 형식 검사" {
         request = SignUpRequest(
-            email = "email@samsung.com",
+            email = "email@naver.com",
             password = "12",
             nickname = "닉네임",
             jobGroupMain = "개발",
@@ -59,7 +59,7 @@ class SignUpRequestTest : StringSpec({
 
     "닉네임 글자수 2-10자 제한" {
         request = SignUpRequest(
-            email = "email@samsung.com",
+            email = "email@naver.com",
             password = "abc1234!",
             nickname = "팟",
             jobGroupMain = "개발",
@@ -80,7 +80,7 @@ class SignUpRequestTest : StringSpec({
 
     "직군 소분류 최대 10자 제한" {
         request = SignUpRequest(
-            email = "email@samsung.com",
+            email = "email@naver.com",
             password = "abc1234!",
             nickname = "닉네임",
             jobGroupMain = "개발",

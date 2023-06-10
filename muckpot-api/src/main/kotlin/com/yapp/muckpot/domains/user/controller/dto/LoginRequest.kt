@@ -11,7 +11,7 @@ import javax.validation.constraints.Pattern
 data class LoginRequest(
     // TODO 상용 시 samsung.com 으로 변경
     @field:ApiModelProperty(notes = "이메일", required = true, example = "user@naver.com")
-    @field:Pattern(regexp = ONLY_NAVER, message = "현재 버전은 삼성전자 사우만 이용 가능합니다.")
+    @field:Pattern(regexp = ONLY_NAVER, message = "현재 버전은 네이버 사우만 이용 가능합니다.")
     val email: String,
     @field:ApiModelProperty(notes = "비밀번호", required = true, example = "abcd1234")
     @field:Pattern(

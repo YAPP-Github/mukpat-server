@@ -45,7 +45,7 @@ class BoardServiceTest @Autowired constructor(
     beforeEach {
         user = userRepository.save(
             MuckPotUser(
-                null, "test@samsung.com", "pw", "nickname",
+                null, "test@naver.com", "pw", "nickname",
                 Gender.MEN, 2000, JobGroupMain.DEVELOPMENT, "sub", Location("location", 0.0, 0.0), "url"
             )
         )

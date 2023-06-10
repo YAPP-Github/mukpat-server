@@ -21,7 +21,7 @@ class MuckPotUserRepositoryTest(
     }
 
     "findByEmail 호출 성공" {
-        val user = muckPotUserRepository.findByEmail("user@samsung.com")
+        val user = muckPotUserRepository.findByEmail("user@naver.com")
 
         user shouldBe null
     }
