@@ -2,6 +2,7 @@ package com.yapp.muckpot.domains.user.entity
 
 import com.yapp.muckpot.common.Location
 import com.yapp.muckpot.common.enums.Gender
+import com.yapp.muckpot.domains.user.enums.JobGroupMain
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -18,7 +19,7 @@ class MuckPotUserTest : FunSpec({
             shouldThrow<IllegalArgumentException> {
                 MuckPotUser(
                     null, "email#email.com", "pw", "nickname",
-                    Gender.MEN, 2000, "main", "sub", Location("location", point), "url"
+                    Gender.MEN, 2000, JobGroupMain.DEVELOPMENT, "sub", Location("location", point), "url"
                 )
             }.message shouldBe "유효한 이메일 형식이 아닙니다"
         }
@@ -28,7 +29,7 @@ class MuckPotUserTest : FunSpec({
             shouldThrow<IllegalArgumentException> {
                 MuckPotUser(
                     null, "email@email.com", "pw", "nickname",
-                    Gender.MEN, 1899, "main", "sub", Location("location", point), "url"
+                    Gender.MEN, 1899, JobGroupMain.DEVELOPMENT, "sub", Location("location", point), "url"
                 )
             }.message shouldBe "잘못된 출생 연도입니다"
         }
