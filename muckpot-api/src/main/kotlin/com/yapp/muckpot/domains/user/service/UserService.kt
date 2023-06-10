@@ -63,4 +63,8 @@ class UserService(
             throw MuckPotException(UserErrorCode.NO_VERIFY_CODE)
         }
     }
+
+    fun findLoginUserProfile(): UserResponse? {
+        return jwtService.getCurrentUserClaim()
+    }
 }
