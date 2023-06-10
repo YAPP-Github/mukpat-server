@@ -4,6 +4,7 @@ import com.yapp.muckpot.common.EMAIL_REQUEST
 import com.yapp.muckpot.common.EMAIL_VERIFY
 import com.yapp.muckpot.common.LOGIN_URL
 import com.yapp.muckpot.common.SIGN_UP_URL
+import com.yapp.muckpot.common.USER_PROFILE_URL
 import com.yapp.muckpot.common.security.CustomAuthenticationEntryPoint
 import com.yapp.muckpot.domains.user.service.JwtService
 import com.yapp.muckpot.filter.JwtAuthorizationFilter
@@ -87,6 +88,12 @@ class SecurityConfig(
     }
 
     companion object {
-        val POST_PERMIT_ALL_URLS = listOf(LOGIN_URL, SIGN_UP_URL, EMAIL_REQUEST, EMAIL_VERIFY)
+        val POST_PERMIT_ALL_URLS = listOf(
+            LOGIN_URL,
+            SIGN_UP_URL,
+            EMAIL_REQUEST,
+            EMAIL_VERIFY,
+            USER_PROFILE_URL
+        )
     }
 }

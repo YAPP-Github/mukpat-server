@@ -17,6 +17,7 @@ import io.swagger.annotations.Example
 import io.swagger.annotations.ExampleProperty
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -96,6 +97,35 @@ class UserController(
         @RequestBody @Valid
         request: VerifyEmailAuthRequest
     ): ResponseEntity<ResponseDto> {
-        return ResponseEntityUtil.noContent(userService.verifyEmailAuth(request))
+        userService.verifyEmailAuth(request)
+        return ResponseEntityUtil.noContent()
+    }
+
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                code = 200,
+                examples = Example(
+                    ExampleProperty(
+                        value = LOGIN_RESPONSE,
+                        mediaType = MediaType.APPLICATION_JSON_VALUE
+                    )
+                ),
+                message = "성공"
+            ),
+            ApiResponse(
+                code = 204,
+                message = "비 로그인 유저 응답"
+            )
+        ]
+    )
+    @ApiOperation(value = "유저 프로필 조회")
+    @GetMapping("/v1/users/profile")
+    fun findLoginUserProfile(): ResponseEntity<ResponseDto> {
+        return userService.findLoginUserProfile()?.let {
+            ResponseEntityUtil.ok(it)
+        } ?: run {
+            ResponseEntityUtil.noContent()
+        }
     }
 }
