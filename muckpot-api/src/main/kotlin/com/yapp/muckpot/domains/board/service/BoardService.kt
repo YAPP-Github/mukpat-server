@@ -1,8 +1,13 @@
 package com.yapp.muckpot.domains.board.service
 
+import com.yapp.muckpot.common.dto.CursorPaginationRequest
+import com.yapp.muckpot.common.dto.CursorPaginationResponse
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateRequest
+import com.yapp.muckpot.domains.board.controller.dto.MuckpotReadResponse
 import com.yapp.muckpot.domains.board.entity.Participant
+import com.yapp.muckpot.domains.board.repository.BoardQuerydslRepository
 import com.yapp.muckpot.domains.board.repository.BoardRepository
+import com.yapp.muckpot.domains.board.repository.ParticipantQuerydslRepository
 import com.yapp.muckpot.domains.board.repository.ParticipantRepository
 import com.yapp.muckpot.domains.user.exception.UserErrorCode
 import com.yapp.muckpot.domains.user.repository.MuckPotUserRepository
@@ -15,7 +20,9 @@ import org.springframework.transaction.annotation.Transactional
 class BoardService(
     private val userRepository: MuckPotUserRepository,
     private val boardRepository: BoardRepository,
-    private val participantRepository: ParticipantRepository
+    private val boardQuerydslRepository: BoardQuerydslRepository,
+    private val participantRepository: ParticipantRepository,
+    private val participantQuerydslRepository: ParticipantQuerydslRepository
 ) {
     @Transactional
     fun saveBoard(userId: Long, request: MuckpotCreateRequest): Long? {
@@ -25,5 +32,17 @@ class BoardService(
         val board = boardRepository.save(request.toBoard(user))
         participantRepository.save(Participant(user, board))
         return board.id
+    }
+
+    @Transactional(readOnly = true)
+    fun findAllMuckpot(request: CursorPaginationRequest): CursorPaginationResponse<MuckpotReadResponse> {
+        val allBoard = boardQuerydslRepository.findAllWithPagination(request.lastId, request.countPerScroll)
+        val boardIds = allBoard.map { it.id }
+        val participantsByBoardId = participantQuerydslRepository.findByBoardIds(boardIds).groupBy { it.boardId }
+        val responseList = allBoard.map { MuckpotReadResponse.of(it, participantsByBoardId.getOrDefault(it.id, emptyList())) }
+        if (responseList.isNotEmpty()) {
+            return CursorPaginationResponse(responseList, responseList.last().boardId)
+        }
+        return CursorPaginationResponse(responseList)
     }
 }

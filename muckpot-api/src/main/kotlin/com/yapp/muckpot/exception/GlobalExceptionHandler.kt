@@ -24,13 +24,6 @@ class GlobalExceptionHandler {
         return ResponseEntity.status(valueOf(responseDto.status)).body(responseDto)
     }
 
-    @ExceptionHandler(IllegalStateException::class)
-    fun internalServerErrorHandler(exception: Exception): ResponseEntity<ResponseDto> {
-        log.error(exception) { "" }
-        return ResponseEntity.internalServerError()
-            .body(ResponseDto(HttpStatus.INTERNAL_SERVER_ERROR.value(), exception.message))
-    }
-
     @ExceptionHandler(IllegalArgumentException::class)
     fun badRequestErrorHandler(exception: Exception): ResponseEntity<ResponseDto> {
         log.error(exception) { "" }
@@ -62,5 +55,12 @@ class GlobalExceptionHandler {
         }
         return ResponseEntity.badRequest()
             .body(ResponseDto(HttpStatus.BAD_REQUEST.value(), message))
+    }
+
+    @ExceptionHandler(Exception::class)
+    fun internalServerErrorHandler(exception: Exception): ResponseEntity<ResponseDto> {
+        log.error(exception) { "" }
+        return ResponseEntity.internalServerError()
+            .body(ResponseDto(HttpStatus.INTERNAL_SERVER_ERROR.value(), exception.message))
     }
 }
