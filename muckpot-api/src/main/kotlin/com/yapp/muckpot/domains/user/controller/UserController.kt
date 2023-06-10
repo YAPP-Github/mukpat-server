@@ -4,11 +4,13 @@ import com.yapp.muckpot.common.ResponseDto
 import com.yapp.muckpot.common.ResponseEntityUtil
 import com.yapp.muckpot.domains.user.controller.dto.LoginRequest
 import com.yapp.muckpot.domains.user.controller.dto.SendEmailAuthRequest
+import com.yapp.muckpot.domains.user.controller.dto.SignUpRequest
 import com.yapp.muckpot.domains.user.controller.dto.VerifyEmailAuthRequest
 import com.yapp.muckpot.domains.user.service.UserService
 import com.yapp.muckpot.swagger.EMAIL_AUTH_REQ_RESPONSE
 import com.yapp.muckpot.swagger.EMAIL_AUTH_RESPONSE
 import com.yapp.muckpot.swagger.LOGIN_RESPONSE
+import com.yapp.muckpot.swagger.SIGN_UP_RESPONSE
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiResponse
@@ -97,5 +99,28 @@ class UserController(
         request: VerifyEmailAuthRequest
     ): ResponseEntity<ResponseDto> {
         return ResponseEntityUtil.noContent(userService.verifyEmailAuth(request))
+    }
+
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                code = 201,
+                examples = Example(
+                    ExampleProperty(
+                        value = SIGN_UP_RESPONSE,
+                        mediaType = MediaType.APPLICATION_JSON_VALUE
+                    )
+                ),
+                message = "성공"
+            )
+        ]
+    )
+    @ApiOperation(value = "회원가입")
+    @PostMapping("/v1/users")
+    fun signUp(
+        @RequestBody @Valid
+        request: SignUpRequest
+    ): ResponseEntity<ResponseDto> {
+        return ResponseEntityUtil.created(userService.signUp(request))
     }
 }

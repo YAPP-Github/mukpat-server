@@ -68,3 +68,13 @@ const val MUCKPOT_FIND_ALL = """
   }
 }
 """
+
+const val SIGN_UP_RESPONSE = """
+{
+    "status": 201,
+    "result": {
+        "userId": 1,
+        "nickName": "nickName"
+    }
+}
+"""

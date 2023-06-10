@@ -7,6 +7,7 @@ import com.yapp.muckpot.domains.board.entity.ParticipantId
 import com.yapp.muckpot.domains.board.repository.BoardRepository
 import com.yapp.muckpot.domains.board.repository.ParticipantRepository
 import com.yapp.muckpot.domains.user.entity.MuckPotUser
+import com.yapp.muckpot.domains.user.enums.JobGroupMain
 import com.yapp.muckpot.domains.user.repository.MuckPotUserRepository
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
@@ -45,7 +46,7 @@ class BoardServiceTest @Autowired constructor(
         user = userRepository.save(
             MuckPotUser(
                 null, "test@samsung.com", "pw", "nickname",
-                Gender.MEN, 2000, "main", "sub", Location("location", 0.0, 0.0), "url"
+                Gender.MEN, 2000, JobGroupMain.DEVELOPMENT, "sub", Location("location", 0.0, 0.0), "url"
             )
         )
         userId = user.id!!

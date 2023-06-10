@@ -9,6 +9,7 @@ import com.yapp.muckpot.domains.board.entity.Board
 import com.yapp.muckpot.domains.board.entity.Participant
 import com.yapp.muckpot.domains.board.entity.ParticipantId
 import com.yapp.muckpot.domains.user.entity.MuckPotUser
+import com.yapp.muckpot.domains.user.enums.JobGroupMain
 import com.yapp.muckpot.domains.user.enums.MuckPotStatus
 import java.time.LocalDateTime
 import java.util.*
@@ -21,7 +22,7 @@ object Fixture {
         nickName: String = UUID.randomUUID().toString(),
         gender: Gender = Gender.MEN,
         yearOfBirth: Int = 2000,
-        mainCategory: String = "mainCategory",
+        mainCategory: JobGroupMain = JobGroupMain.DEVELOPMENT,
         subCategory: String? = "subCategory",
         location: Location = Location("userLocation", 40.7128, -74.0060),
         imageUrl: String? = "image_url",

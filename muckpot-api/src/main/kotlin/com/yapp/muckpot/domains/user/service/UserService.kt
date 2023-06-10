@@ -5,8 +5,10 @@ import com.yapp.muckpot.common.RandomCodeUtil
 import com.yapp.muckpot.domains.user.controller.dto.EmailAuthResponse
 import com.yapp.muckpot.domains.user.controller.dto.LoginRequest
 import com.yapp.muckpot.domains.user.controller.dto.SendEmailAuthRequest
+import com.yapp.muckpot.domains.user.controller.dto.SignUpRequest
 import com.yapp.muckpot.domains.user.controller.dto.UserResponse
 import com.yapp.muckpot.domains.user.controller.dto.VerifyEmailAuthRequest
+import com.yapp.muckpot.domains.user.enums.JobGroupMain
 import com.yapp.muckpot.domains.user.exception.UserErrorCode
 import com.yapp.muckpot.domains.user.repository.MuckPotUserRepository
 import com.yapp.muckpot.email.EmailService
@@ -61,6 +63,19 @@ class UserService(
             }
         } ?: run {
             throw MuckPotException(UserErrorCode.NO_VERIFY_CODE)
+        }
+    }
+
+    @Transactional
+    fun signUp(request: SignUpRequest): UserResponse {
+        userRepository.findByEmail(request.email)?.let {
+            throw MuckPotException(UserErrorCode.ALREADY_EXISTS_USER)
+        } ?: run {
+            val jobGroupMain = JobGroupMain.findByKorName(request.jobGroupMain)
+                ?: throw MuckPotException(UserErrorCode.WRONG_MAIN_JOB)
+            val encodePw = passwordEncoder.encode(request.password)
+            val user = userRepository.save(request.toUser(jobGroupMain, encodePw))
+            return UserResponse.of(user)
         }
     }
 }
