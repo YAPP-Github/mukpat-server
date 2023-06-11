@@ -11,5 +11,3 @@ const val MINUTES_IN_TWO_DAY = 2880
 const val N_MINUTES_AGO = "%d분 전"
 const val N_HOURS_AGO = "%d시간 전"
 const val A_DAY_AGO = "하루 전"
-
-const val MEETING_TIME_PATTERN = "MM월 dd일 (E) a hh:mm"

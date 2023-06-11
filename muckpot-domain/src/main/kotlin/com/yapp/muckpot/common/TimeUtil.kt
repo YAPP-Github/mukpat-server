@@ -37,8 +37,8 @@ object TimeUtil {
         }
     }
 
-    fun formatMeetingTime(localDateTime: LocalDateTime): String {
-        val formatter = DateTimeFormatter.ofPattern(MEETING_TIME_PATTERN, Locale.KOREAN)
+    fun localeKoreanFormatting(localDateTime: LocalDateTime, pattern: String): String {
+        val formatter = DateTimeFormatter.ofPattern(pattern, Locale.KOREAN)
         return localDateTime.format(formatter)
     }
 }
