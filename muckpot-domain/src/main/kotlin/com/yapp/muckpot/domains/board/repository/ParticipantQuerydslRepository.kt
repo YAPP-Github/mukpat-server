@@ -15,7 +15,8 @@ class ParticipantQuerydslRepository(
             QParticipantReadResponse(
                 participant.participantId.board.id,
                 participant.participantId.user.id,
-                participant.participantId.user.nickName
+                participant.participantId.user.nickName,
+                participant.participantId.user.mainCategory
             )
         )
             .from(participant)
