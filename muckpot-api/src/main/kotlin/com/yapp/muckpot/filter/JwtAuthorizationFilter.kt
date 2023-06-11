@@ -1,6 +1,5 @@
 package com.yapp.muckpot.filter
 
-import com.yapp.muckpot.common.LOGIN_URL
 import com.yapp.muckpot.common.ResponseWriter
 import com.yapp.muckpot.common.security.AuthenticationUser
 import com.yapp.muckpot.config.SecurityConfig.Companion.POST_PERMIT_ALL_URLS
@@ -20,7 +19,7 @@ class JwtAuthorizationFilter(private val jwtService: JwtService) : OncePerReques
         filterChain: FilterChain
     ) {
         jwtService.getCurrentUserClaim()?.let {
-            if (POST_PERMIT_ALL_URLS.contains(request.requestURI.equals(LOGIN_URL).toString())) {
+            if (POST_PERMIT_ALL_URLS.contains(request.requestURI.toString())) {
                 ResponseWriter.writeResponse(response, HttpStatus.BAD_REQUEST, "이미 로그인한 유저 입니다.")
                 return
             }
