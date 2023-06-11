@@ -68,7 +68,7 @@ class SecurityConfig(
 
         configuration.allowedMethods = listOf("*")
         configuration.allowedHeaders = listOf("*")
-        configuration.allowedOriginPatterns = listOf("*")
+        configuration.allowedOrigins = ALLOWED_ORIGINS
         configuration.allowCredentials = true
         source.registerCorsConfiguration("/**", configuration)
         return source
@@ -94,6 +94,10 @@ class SecurityConfig(
             EMAIL_REQUEST,
             EMAIL_VERIFY,
             USER_PROFILE_URL
+        )
+
+        val ALLOWED_ORIGINS = listOf(
+            "http://localhost:3000"
         )
     }
 }
