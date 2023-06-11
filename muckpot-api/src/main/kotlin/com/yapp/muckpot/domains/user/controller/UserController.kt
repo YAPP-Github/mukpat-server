@@ -2,6 +2,7 @@ package com.yapp.muckpot.domains.user.controller
 
 import com.yapp.muckpot.common.ResponseDto
 import com.yapp.muckpot.common.ResponseEntityUtil
+import com.yapp.muckpot.common.SecurityContextHolderUtil
 import com.yapp.muckpot.domains.user.controller.dto.LoginRequest
 import com.yapp.muckpot.domains.user.controller.dto.SendEmailAuthRequest
 import com.yapp.muckpot.domains.user.controller.dto.SignUpRequest
@@ -124,7 +125,7 @@ class UserController(
     @ApiOperation(value = "유저 프로필 조회")
     @GetMapping("/v1/users/profile")
     fun findLoginUserProfile(): ResponseEntity<ResponseDto> {
-        return userService.findLoginUserProfile()?.let {
+        return SecurityContextHolderUtil.getCredentialOrNull()?.let {
             ResponseEntityUtil.ok(it)
         } ?: run {
             ResponseEntityUtil.noContent()
