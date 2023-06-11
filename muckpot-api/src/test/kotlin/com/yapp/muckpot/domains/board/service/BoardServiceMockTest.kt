@@ -68,6 +68,6 @@ class BoardServiceMockTest @Autowired constructor(
         // when
         val actual = boardService.findAllMuckpot(CursorPaginationRequest(null, allBoardSize.toLong()))
         // then
-        actual.list[0].status shouldBe MuckPotStatus.DONE.krNm
+        actual.list[0].status shouldBe MuckPotStatus.DONE.korNm
     }
 })
