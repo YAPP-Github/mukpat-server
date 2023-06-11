@@ -104,7 +104,6 @@ const val MUCKPOT_FIND_BY_ID = """
     "views": 1,
     "participants": [
       {
-        "boardId": 114,
         "userId": 128,
         "nickName": "nickname2",
         "jobGroupMain": "개발",
