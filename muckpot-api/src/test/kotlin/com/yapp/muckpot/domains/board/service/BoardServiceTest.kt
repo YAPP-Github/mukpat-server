@@ -6,6 +6,7 @@ import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateRequest
 import com.yapp.muckpot.domains.board.entity.ParticipantId
 import com.yapp.muckpot.domains.board.repository.BoardRepository
 import com.yapp.muckpot.domains.board.repository.ParticipantRepository
+import com.yapp.muckpot.domains.user.controller.dto.UserResponse
 import com.yapp.muckpot.domains.user.entity.MuckPotUser
 import com.yapp.muckpot.domains.user.enums.JobGroupMain
 import com.yapp.muckpot.domains.user.repository.MuckPotUserRepository
@@ -70,5 +71,19 @@ class BoardServiceTest @Autowired constructor(
         findBoard.user?.id shouldBe userId
         findBoard.currentApply shouldBe 1
         participant shouldNotBe null
+    }
+
+    "먹팟 상세 조회시 조회수가 증가한다." {
+        // given
+        val boardId = boardService.saveBoard(userId, request)!!
+        val loginUserInfo = UserResponse.of(user)
+
+        // when
+        boardService.findBoardDetailAndVisit(boardId, loginUserInfo)
+        boardService.findBoardDetailAndVisit(boardId, loginUserInfo)
+
+        // then
+        val findBoard = boardRepository.findByIdOrNull(boardId)!!
+        findBoard.views shouldBe 2
     }
 })

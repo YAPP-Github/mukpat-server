@@ -1,5 +1,6 @@
 package com.yapp.muckpot.swagger
 
+// User
 const val TEST_SAMPLE = """
 {
   "id": 1,
@@ -33,6 +34,17 @@ const val EMAIL_AUTH_RESPONSE = """
 }
 """
 
+const val SIGN_UP_RESPONSE = """
+{
+    "status": 201,
+    "result": {
+        "userId": 1,
+        "nickName": "nickName"
+    }
+}
+"""
+
+// Board
 const val MUCKPOT_SAVE_RESPONSE = """
 {
   "status": 201,
@@ -69,12 +81,36 @@ const val MUCKPOT_FIND_ALL = """
 }
 """
 
-const val SIGN_UP_RESPONSE = """
+const val MUCKPOT_FIND_BY_ID = """
 {
-    "status": 201,
-    "result": {
-        "userId": 1,
-        "nickName": "nickName"
-    }
+  "status": 200,
+  "result": {
+    "boardId": 114,
+    "title": "같이 밥묵으실분",
+    "content": "내용 입니다.",
+    "chatLink": "https://open.kakao.com/o/gSIkvvHc",
+    "status": "모집중",
+    "meetingDate": "07월 21일 (금)",
+    "meetingTime": "오후 01:00",
+    "createDate": "2023년 06월 11일",
+    "maxApply": 5,
+    "currentApply": 1,
+    "minAge": 20,
+    "maxAge": 100,
+    "locationName": "서울 성북구 안암동5가 104-30 캐치카페 안암",
+    "x": 127.02970799701643,
+    "y": 37.58392327180857,
+    "locationDetail": "6층",
+    "views": 1,
+    "participants": [
+      {
+        "boardId": 114,
+        "userId": 128,
+        "nickName": "nickname2",
+        "jobGroupMain": "개발",
+        "writer": true
+      }
+    ]
+  }
 }
 """

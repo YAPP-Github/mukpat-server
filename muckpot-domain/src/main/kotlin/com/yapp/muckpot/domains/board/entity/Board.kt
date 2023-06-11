@@ -91,7 +91,19 @@ class Board(
         }
     }
 
+    fun visit() {
+        this.views++
+    }
+
     fun expired(): Boolean {
         return (this.status == MuckPotStatus.IN_PROGRESS && this.meetingTime.isBefore(LocalDateTime.now()))
+    }
+
+    fun getX(): Double {
+        return this.location.locationPoint.x
+    }
+
+    fun getY(): Double {
+        return this.location.locationPoint.y
     }
 }
