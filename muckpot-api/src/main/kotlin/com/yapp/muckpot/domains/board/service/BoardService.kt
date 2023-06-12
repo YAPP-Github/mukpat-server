@@ -3,12 +3,15 @@ package com.yapp.muckpot.domains.board.service
 import com.yapp.muckpot.common.dto.CursorPaginationRequest
 import com.yapp.muckpot.common.dto.CursorPaginationResponse
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateRequest
+import com.yapp.muckpot.domains.board.controller.dto.MuckpotDetailResponse
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotReadResponse
 import com.yapp.muckpot.domains.board.entity.Participant
+import com.yapp.muckpot.domains.board.exception.BoardErrorCode
 import com.yapp.muckpot.domains.board.repository.BoardQuerydslRepository
 import com.yapp.muckpot.domains.board.repository.BoardRepository
 import com.yapp.muckpot.domains.board.repository.ParticipantQuerydslRepository
 import com.yapp.muckpot.domains.board.repository.ParticipantRepository
+import com.yapp.muckpot.domains.user.controller.dto.UserResponse
 import com.yapp.muckpot.domains.user.exception.UserErrorCode
 import com.yapp.muckpot.domains.user.repository.MuckPotUserRepository
 import com.yapp.muckpot.exception.MuckPotException
@@ -44,5 +47,17 @@ class BoardService(
             return CursorPaginationResponse(responseList, responseList.last().boardId)
         }
         return CursorPaginationResponse(responseList)
+    }
+
+    @Transactional
+    fun findBoardDetailAndVisit(boardId: Long, loginUserInfo: UserResponse?): MuckpotDetailResponse {
+        boardRepository.findByIdOrNull(boardId)?.let {
+            it.visit()
+            return MuckpotDetailResponse.of(it, participantQuerydslRepository.findByBoardIds(listOf(boardId))).apply {
+                sortParticipantsByLoginUser(loginUserInfo)
+            }
+        } ?: run {
+            throw MuckPotException(BoardErrorCode.BOARD_NOT_FOUND)
+        }
     }
 }

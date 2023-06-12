@@ -12,7 +12,7 @@ class Location(
     var locationName: String,
 
     @Column(name = "location_point", columnDefinition = "Point")
-    val locationPoint: Point? = null
+    val locationPoint: Point
 ) {
     constructor(locationName: String, x: Double, y: Double) : this(
         locationName,

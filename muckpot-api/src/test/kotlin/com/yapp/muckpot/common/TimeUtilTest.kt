@@ -76,7 +76,7 @@ class TimeUtilTest : FunSpec({
         }
     }
 
-    context("formatMeetingTime 테스트") {
+    context("a_hhmm 포 테스트") {
         withData(
             nameFn = { "${it.a}:${it.b}" },
             row(0, 0, "오전"),
@@ -87,7 +87,21 @@ class TimeUtilTest : FunSpec({
             // given
             val localDateTime = LocalDateTime.of(2023, 1, 1, hour, minute)
             // when & then
-            TimeUtil.formatMeetingTime(localDateTime) shouldContain amPm
+            TimeUtil.localeKoreanFormatting(localDateTime, a_hhmm) shouldContain amPm
         }
+    }
+
+    test("KR_MM_DD_E 포맷 테스트") {
+        // given
+        val localDateTime = LocalDateTime.of(2020, 1, 2, 12, 0)
+        // when & then
+        TimeUtil.localeKoreanFormatting(localDateTime, KR_MM_DD_E) shouldBe "01월 02일 (목)"
+    }
+
+    test("KR_YYYY_MM_DD 포맷 테스트") {
+        // given
+        val localDateTime = LocalDateTime.of(2020, 1, 2, 12, 0)
+        // when & then
+        TimeUtil.localeKoreanFormatting(localDateTime, KR_YYYY_MM_DD) shouldBe "2020년 01월 02일"
     }
 })

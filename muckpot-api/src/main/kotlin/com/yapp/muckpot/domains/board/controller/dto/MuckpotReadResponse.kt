@@ -1,17 +1,19 @@
 package com.yapp.muckpot.domains.board.controller.dto
 
+import com.yapp.muckpot.common.KR_MM_DD_E
 import com.yapp.muckpot.common.TimeUtil
+import com.yapp.muckpot.common.a_hhmm
 import com.yapp.muckpot.domains.board.dto.ParticipantReadResponse
 import com.yapp.muckpot.domains.board.entity.Board
 import com.yapp.muckpot.domains.user.enums.MuckPotStatus
 
 data class MuckpotReadResponse(
-    val boardId: Long?,
+    val boardId: Long,
     val title: String,
     val status: String,
     val todayOrTomorrow: String?,
     val elapsedTime: String,
-    val meetingTime: String,
+    val meetingDateTime: String,
     val meetingPlace: String,
     val maxApply: Int,
     val currentApply: Int,
@@ -33,17 +35,17 @@ data class MuckpotReadResponse(
 
         fun of(board: Board, participants: List<ParticipantReadResponse>): MuckpotReadResponse {
             // TODO 만료 된 먹팟 종료 처리 후, 해당 로직은 제거.
-            var status = board.status.krNm
+            var status = board.status.korNm
             if (board.expired()) {
-                status = MuckPotStatus.DONE.krNm
+                status = MuckPotStatus.DONE.korNm
             }
             return MuckpotReadResponse(
-                boardId = board.id,
+                boardId = board.id ?: 0,
                 title = board.title,
                 status = status,
                 todayOrTomorrow = TimeUtil.isTodayOrTomorrow(board.createdAt.toLocalDate()),
                 elapsedTime = TimeUtil.formatElapsedTime(board.createdAt),
-                meetingTime = TimeUtil.formatMeetingTime(board.meetingTime),
+                meetingDateTime = TimeUtil.localeKoreanFormatting(board.meetingTime, "$KR_MM_DD_E $a_hhmm"),
                 meetingPlace = board.location.locationName,
                 maxApply = board.maxApply,
                 currentApply = board.currentApply,
