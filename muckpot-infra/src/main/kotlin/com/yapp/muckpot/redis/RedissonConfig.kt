@@ -1,4 +1,4 @@
-package com.yapp.muckpot.redisson
+package com.yapp.muckpot.redis
 
 import org.redisson.Redisson
 import org.redisson.api.RedissonClient
