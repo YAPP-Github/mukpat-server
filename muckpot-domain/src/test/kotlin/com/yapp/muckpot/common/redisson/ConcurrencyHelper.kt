@@ -6,8 +6,8 @@ import java.util.concurrent.atomic.AtomicLong
 
 class ConcurrencyHelper {
     companion object {
-        private const val NUMBER_OF_THREADS = 100
-        private const val NUMBER_OF_THREAD_POOL = 100
+        private const val NUMBER_OF_THREADS = 500
+        private const val NUMBER_OF_THREAD_POOL = 500
 
         fun execute(operation: () -> Any?, successCount: AtomicLong) {
             val executorService = Executors.newFixedThreadPool(NUMBER_OF_THREAD_POOL)
