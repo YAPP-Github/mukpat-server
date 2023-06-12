@@ -33,10 +33,10 @@ class Board(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "writer_id", referencedColumnName = "user_id")
-    var user: MuckPotUser? = null,
+    var user: MuckPotUser,
 
     @Column(name = "title", nullable = false)
-    val title: String,
+    var title: String,
 
     @Embedded
     var location: Location,

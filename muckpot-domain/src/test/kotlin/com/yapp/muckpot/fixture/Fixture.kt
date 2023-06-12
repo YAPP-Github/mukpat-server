@@ -45,7 +45,7 @@ object Fixture {
 
     fun createBoard(
         id: Long? = null,
-        user: MuckPotUser? = createUser(),
+        user: MuckPotUser = createUser(),
         title: String = "board_title",
         location: Location = Location("boardLocation", 40.7128, -74.0060),
         locationDetail: String? = null,
