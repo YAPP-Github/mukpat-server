@@ -5,9 +5,14 @@ import com.yapp.muckpot.common.AGE_MAX
 import com.yapp.muckpot.common.AGE_MIN
 import com.yapp.muckpot.common.CHAT_LINK_MAX
 import com.yapp.muckpot.common.CONTENT_MAX
+import com.yapp.muckpot.common.CONTENT_MAX_INVALID
 import com.yapp.muckpot.common.HHmm
+import com.yapp.muckpot.common.LINK_MAX_INVALID
 import com.yapp.muckpot.common.Location
+import com.yapp.muckpot.common.MAX_APPLY_MIN_INVALID
+import com.yapp.muckpot.common.NOT_BLANK_COMMON
 import com.yapp.muckpot.common.TITLE_MAX
+import com.yapp.muckpot.common.TITLE_MAX_INVALID
 import com.yapp.muckpot.common.YYYYMMDD
 import com.yapp.muckpot.domains.board.entity.Board
 import com.yapp.muckpot.domains.board.exception.BoardErrorCode
@@ -30,7 +35,7 @@ data class MuckpotUpdateRequest(
     @field:JsonFormat(shape = JsonFormat.Shape.STRING, pattern = HHmm)
     val meetingTime: LocalTime,
     @field:ApiModelProperty(notes = "최대 인원", required = true, example = "5")
-    @field:Min(2, message = "최대 인원은 {value}명 이상 가능합니다.")
+    @field:Min(2, message = MAX_APPLY_MIN_INVALID)
     val maxApply: Int = 2,
     @field:ApiModelProperty(notes = "최소 나이", required = false, example = "20")
     val minAge: Int? = null,
@@ -45,15 +50,15 @@ data class MuckpotUpdateRequest(
     @field:ApiModelProperty(notes = "y 좌표", required = true, example = "37.58392327180857")
     val y: Double,
     @field:ApiModelProperty(notes = "제목", required = true, example = "같이 밥묵으실분")
-    @field:Length(max = TITLE_MAX, message = "제목은 {max}(자)를 넘을 수 없습니다.")
-    @field:NotBlank
+    @field:Length(max = TITLE_MAX, message = TITLE_MAX_INVALID)
+    @field:NotBlank(message = NOT_BLANK_COMMON)
     var title: String,
     @field:ApiModelProperty(notes = "내용", required = false, example = "내용 입니다.")
-    @field:Length(max = CONTENT_MAX, message = "내용은 {max}(자)를 넘을 수 없습니다.")
+    @field:Length(max = CONTENT_MAX, message = CONTENT_MAX_INVALID)
     var content: String? = null,
     @field:ApiModelProperty(notes = "오픈채팅방 링크", required = true, example = "https://open.kakao.com/o/gSIkvvHc")
-    @field:Length(max = CHAT_LINK_MAX, message = "링크는 {max}(자)를 넘을 수 없습니다.")
-    @field:NotBlank
+    @field:Length(max = CHAT_LINK_MAX, message = LINK_MAX_INVALID)
+    @field:NotBlank(message = NOT_BLANK_COMMON)
     var chatLink: String
 ) {
     init {
