@@ -8,6 +8,8 @@ plugins {
 }
 
 dependencies {
+    implementation(project(":muckpot-infra"))
+
     val kapt by configurations
     // querydsl
     api("com.querydsl:querydsl-jpa:5.0.0")
@@ -20,6 +22,8 @@ dependencies {
     testImplementation("org.testcontainers:testcontainers:$containerVer")
     testImplementation("org.testcontainers:junit-jupiter:$containerVer")
     testImplementation("org.testcontainers:mariadb:$containerVer")
+
+    implementation("org.redisson:redisson:3.20.0")
 }
 
 allOpen {
