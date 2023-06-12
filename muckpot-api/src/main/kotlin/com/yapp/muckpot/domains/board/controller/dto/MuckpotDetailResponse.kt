@@ -9,7 +9,7 @@ import com.yapp.muckpot.domains.board.entity.Board
 import com.yapp.muckpot.domains.user.controller.dto.UserResponse
 
 data class MuckpotDetailResponse(
-    val boardId: Long?,
+    val boardId: Long,
     val title: String,
     val content: String? = null,
     val chatLink: String,
@@ -34,7 +34,7 @@ data class MuckpotDetailResponse(
         }
     }
 
-    fun sortParticipantsIfLoginUserParticipant(loginUserInfo: UserResponse?) {
+    fun sortParticipantsByLoginUser(loginUserInfo: UserResponse?) {
         if (participants.size > 1) {
             loginUserInfo?.let { userInfo ->
                 val mutableParticipants = participants.toMutableList()
@@ -50,7 +50,7 @@ data class MuckpotDetailResponse(
     companion object {
         fun of(board: Board, participants: List<ParticipantReadResponse>): MuckpotDetailResponse {
             return MuckpotDetailResponse(
-                boardId = board.id,
+                boardId = board.id ?: 0,
                 title = board.title,
                 content = board.content,
                 chatLink = board.chatLink,

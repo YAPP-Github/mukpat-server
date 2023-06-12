@@ -18,7 +18,7 @@ class MuckpotDetailResponseTest : StringSpec({
         )
         val response = MuckpotDetailResponse.of(Fixture.createBoard(), participants)
         // when
-        response.sortParticipantsIfLoginUserParticipant(loginUser)
+        response.sortParticipantsByLoginUser(loginUser)
         // then
         response.participants[0].userId shouldBe loginUser.userId
         response.participants[0].nickName shouldBe loginUser.nickName

@@ -54,7 +54,7 @@ class BoardService(
         boardRepository.findByIdOrNull(boardId)?.let {
             it.visit()
             return MuckpotDetailResponse.of(it, participantQuerydslRepository.findByBoardIds(listOf(boardId))).apply {
-                sortParticipantsIfLoginUserParticipant(loginUserInfo)
+                sortParticipantsByLoginUser(loginUserInfo)
             }
         } ?: run {
             throw MuckPotException(BoardErrorCode.BOARD_NOT_FOUND)

@@ -8,7 +8,7 @@ import com.yapp.muckpot.domains.board.entity.Board
 import com.yapp.muckpot.domains.user.enums.MuckPotStatus
 
 data class MuckpotReadResponse(
-    val boardId: Long?,
+    val boardId: Long,
     val title: String,
     val status: String,
     val todayOrTomorrow: String?,
@@ -40,7 +40,7 @@ data class MuckpotReadResponse(
                 status = MuckPotStatus.DONE.korNm
             }
             return MuckpotReadResponse(
-                boardId = board.id,
+                boardId = board.id ?: 0,
                 title = board.title,
                 status = status,
                 todayOrTomorrow = TimeUtil.isTodayOrTomorrow(board.createdAt.toLocalDate()),
