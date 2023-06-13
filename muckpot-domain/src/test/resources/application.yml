@@ -10,11 +10,3 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.spatial.dialect.mariadb.MariaDB103SpatialDialect
-  redis:
-    host: ${LOCAL_REDIS_HOST:localhost}
-    port: ${REDIS_PORT:6379}
-  mail:
-    host: smtp.gmail.com
-    port: ${GOOGLE_SMTP_PORT:8080}
-    username: ${GOOGLE_SMTP_USERNAME:test}
-    password: ${GOOGLE_SMTP_PASSWORD:test}
