@@ -26,7 +26,7 @@ class DistributedLockAopTest @Autowired constructor(
 class RedissonService(
     var apply: Int = 0
 ) {
-    // @DistributedLock("id", "testLock")
+    @DistributedLock("id", "testLock")
     fun test(id: Int) {
         apply += 1
     }
