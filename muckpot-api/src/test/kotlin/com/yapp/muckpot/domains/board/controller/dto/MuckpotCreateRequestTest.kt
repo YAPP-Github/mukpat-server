@@ -2,6 +2,7 @@ package com.yapp.muckpot.domains.board.controller.dto
 
 import com.yapp.muckpot.common.CHAT_LINK_MAX
 import com.yapp.muckpot.common.CONTENT_MAX
+import com.yapp.muckpot.common.NOT_BLANK_COMMON
 import com.yapp.muckpot.common.TITLE_MAX
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
@@ -15,7 +16,7 @@ class MuckpotCreateRequestTest : StringSpec({
     lateinit var validator: Validator
     lateinit var request: MuckpotCreateRequest
 
-    beforeSpec {
+    beforeTest {
         validator = Validation.buildDefaultValidatorFactory().validator
     }
 
@@ -32,7 +33,7 @@ class MuckpotCreateRequestTest : StringSpec({
             y = 0.0,
             title = "title",
             content = null,
-            chatLink = ""
+            chatLink = "chat_link"
         )
     }
 
@@ -63,6 +64,15 @@ class MuckpotCreateRequestTest : StringSpec({
         violations.size shouldBe 1
         for (violation in violations) {
             violation.message shouldBe "링크는 $CHAT_LINK_MAX(자)를 넘을 수 없습니다."
+        }
+    }
+
+    "chatLink는 공백이 될 수 없다." {
+        request.chatLink = "  "
+        val violations: MutableSet<ConstraintViolation<MuckpotCreateRequest>> = validator.validate(request)
+        violations.size shouldBe 1
+        for (violation in violations) {
+            violation.message shouldBe NOT_BLANK_COMMON
         }
     }
 })

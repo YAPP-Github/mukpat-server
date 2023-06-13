@@ -5,6 +5,7 @@ import com.yapp.muckpot.common.dto.CursorPaginationResponse
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateRequest
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotDetailResponse
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotReadResponse
+import com.yapp.muckpot.domains.board.controller.dto.MuckpotUpdateRequest
 import com.yapp.muckpot.domains.board.entity.Participant
 import com.yapp.muckpot.domains.board.exception.BoardErrorCode
 import com.yapp.muckpot.domains.board.repository.BoardQuerydslRepository
@@ -56,6 +57,19 @@ class BoardService(
             return MuckpotDetailResponse.of(it, participantQuerydslRepository.findByBoardIds(listOf(boardId))).apply {
                 sortParticipantsByLoginUser(loginUserInfo)
             }
+        } ?: run {
+            throw MuckPotException(BoardErrorCode.BOARD_NOT_FOUND)
+        }
+    }
+
+    @Transactional
+    fun updateBoard(userId: Long, boardId: Long, request: MuckpotUpdateRequest) {
+        // TODO 먹팟 수정 시 같은 회사 인원에게 메일 전송
+        boardRepository.findByIdOrNull(boardId)?.let { board ->
+            if (board.user.id != userId) {
+                throw MuckPotException(BoardErrorCode.BOARD_UNAUTHORIZED)
+            }
+            request.updateBoard(board)
         } ?: run {
             throw MuckPotException(BoardErrorCode.BOARD_NOT_FOUND)
         }
