@@ -1,5 +1,6 @@
 package com.yapp.muckpot.common.redisson
 
+import mu.KLogging
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect
@@ -14,6 +15,8 @@ class DistributedLockAop(
     private val redissonClient: RedissonClient,
     private val redissonCallNewTransaction: RedissonCallNewTransaction
 ) {
+
+    private val log = KLogging().logger
 
     @Around("@annotation(com.yapp.muckpot.common.redisson.DistributedLock)")
     fun lock(joinPoint: ProceedingJoinPoint): Any? {
@@ -37,7 +40,8 @@ class DistributedLockAop(
             try {
                 rLock.unlock()
             } catch (e: IllegalMonitorStateException) {
-                throw e
+                // 이미 unlock된 상태에서 다시 unlock 시도시 발생, 에러로그로 남김
+                log.error(e.toString())
             }
         }
     }
