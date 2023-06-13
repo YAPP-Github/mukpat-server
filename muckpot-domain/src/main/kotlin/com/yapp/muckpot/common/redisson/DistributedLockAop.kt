@@ -41,7 +41,7 @@ class DistributedLockAop(
                 rLock.unlock()
             } catch (e: IllegalMonitorStateException) {
                 // 이미 unlock된 상태에서 다시 unlock 시도시 발생, 에러로그로 남김
-                log.error(e.toString())
+                log.error(e.stackTrace.joinToString("\n"))
             }
         }
     }
