@@ -8,6 +8,8 @@ plugins {
 }
 
 dependencies {
+    implementation(project(":muckpot-infra"))
+
     val kapt by configurations
     // querydsl
     api("com.querydsl:querydsl-jpa:5.0.0")
