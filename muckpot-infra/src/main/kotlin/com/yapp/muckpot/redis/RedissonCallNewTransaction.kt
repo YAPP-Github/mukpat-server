@@ -1,4 +1,4 @@
-package com.yapp.muckpot.common.redisson
+package com.yapp.muckpot.redis
 
 import org.aspectj.lang.ProceedingJoinPoint
 import org.springframework.stereotype.Component

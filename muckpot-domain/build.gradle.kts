@@ -22,8 +22,6 @@ dependencies {
     testImplementation("org.testcontainers:testcontainers:$containerVer")
     testImplementation("org.testcontainers:junit-jupiter:$containerVer")
     testImplementation("org.testcontainers:mariadb:$containerVer")
-
-    implementation("org.redisson:redisson:3.20.0")
 }
 
 allOpen {
