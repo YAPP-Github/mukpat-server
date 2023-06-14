@@ -15,7 +15,8 @@ import com.yapp.muckpot.common.TITLE_MAX
 import com.yapp.muckpot.common.TITLE_MAX_INVALID
 import com.yapp.muckpot.common.YYYYMMDD
 import com.yapp.muckpot.domains.board.entity.Board
-import com.yapp.muckpot.domains.user.entity.MuckPotUser
+import com.yapp.muckpot.domains.board.exception.BoardErrorCode
+import com.yapp.muckpot.exception.MuckPotException
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 import org.hibernate.validator.constraints.Length
@@ -25,8 +26,8 @@ import java.time.LocalTime
 import javax.validation.constraints.Min
 import javax.validation.constraints.NotBlank
 
-@ApiModel(value = "먹팟생성 요청")
-data class MuckpotCreateRequest(
+@ApiModel(value = "먹팟수정 요청")
+data class MuckpotUpdateRequest(
     @field:ApiModelProperty(notes = "만날 날짜", required = true, example = "2023-05-21")
     @field:JsonFormat(shape = JsonFormat.Shape.STRING, pattern = YYYYMMDD)
     val meetingDate: LocalDate,
@@ -67,19 +68,18 @@ data class MuckpotCreateRequest(
         locationDetail = locationDetail?.trim()
     }
 
-    fun toBoard(user: MuckPotUser): Board {
-        return Board(
-            user = user,
-            title = title,
-            content = content,
-            location = Location(locationName, x, y),
-            locationDetail = locationDetail,
-            meetingTime = LocalDateTime.of(meetingDate, meetingTime),
-            minAge = minAge ?: AGE_MIN,
-            maxAge = maxAge ?: AGE_MAX,
-            maxApply = maxApply,
-            chatLink = chatLink,
-            currentApply = 1
-        )
+    fun updateBoard(board: Board) {
+        if (this.maxApply < board.currentApply) {
+            throw MuckPotException(BoardErrorCode.MAX_APPLY_UPDATE_FAIL)
+        }
+        board.title = this.title
+        board.content = this.content
+        board.location = Location(locationName, x, y)
+        board.locationDetail = this.locationDetail
+        board.meetingTime = LocalDateTime.of(meetingDate, meetingTime)
+        board.minAge = minAge ?: AGE_MIN
+        board.maxAge = maxAge ?: AGE_MAX
+        board.maxApply = this.maxApply
+        board.chatLink = this.chatLink
     }
 }

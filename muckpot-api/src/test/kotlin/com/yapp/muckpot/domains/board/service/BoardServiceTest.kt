@@ -4,6 +4,7 @@ import com.yapp.muckpot.common.Location
 import com.yapp.muckpot.common.enums.Gender
 import com.yapp.muckpot.common.redisson.ConcurrencyHelper
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateRequest
+import com.yapp.muckpot.domains.board.controller.dto.MuckpotUpdateRequest
 import com.yapp.muckpot.domains.board.entity.ParticipantId
 import com.yapp.muckpot.domains.board.exception.BoardErrorCode
 import com.yapp.muckpot.domains.board.repository.BoardRepository
@@ -33,7 +34,7 @@ class BoardServiceTest @Autowired constructor(
 ) : StringSpec({
     lateinit var user: MuckPotUser
     var userId: Long = 0
-    val request = MuckpotCreateRequest(
+    val createRequest = MuckpotCreateRequest(
         meetingDate = LocalDate.now(),
         meetingTime = LocalTime.of(12, 0),
         maxApply = 70,
@@ -45,7 +46,21 @@ class BoardServiceTest @Autowired constructor(
         y = 0.0,
         title = "title",
         content = null,
-        chatLink = ""
+        chatLink = "chatLink"
+    )
+    val updateRequest = MuckpotUpdateRequest(
+        meetingDate = LocalDate.now(),
+        meetingTime = LocalTime.of(12, 0),
+        maxApply = 6,
+        minAge = 25,
+        maxAge = 70,
+        locationName = "modify location",
+        locationDetail = "detail",
+        x = 1.0,
+        y = 1.0,
+        title = "modify title",
+        content = "content",
+        chatLink = "modify chatLink"
     )
 
     beforeEach {
@@ -66,21 +81,21 @@ class BoardServiceTest @Autowired constructor(
 
     "먹팟 생성 성공" {
         // when
-        val boardId = boardService.saveBoard(userId, request)
+        val boardId = boardService.saveBoard(userId, createRequest)
 
         // then
         val findBoard = boardRepository.findByIdOrNull(boardId)!!
         val participant = participantRepository.findById(ParticipantId(user, findBoard))
 
         findBoard shouldNotBe null
-        findBoard.user?.id shouldBe userId
+        findBoard.user.id shouldBe userId
         findBoard.currentApply shouldBe 1
         participant shouldNotBe null
     }
 
     "먹팟 상세 조회시 조회수가 증가한다." {
         // given
-        val boardId = boardService.saveBoard(userId, request)!!
+        val boardId = boardService.saveBoard(userId, createRequest)!!
         val loginUserInfo = UserResponse.of(user)
 
         // when
@@ -92,9 +107,37 @@ class BoardServiceTest @Autowired constructor(
         findBoard.views shouldBe 2
     }
 
+    "먹팟 수정 성공" {
+        // given
+        val boardId = boardService.saveBoard(userId, createRequest)!!
+        // when
+        boardService.updateBoard(userId, boardId, updateRequest)
+        // then
+        val actual = boardRepository.findByIdOrNull(boardId)!!
+        actual.maxApply shouldBe updateRequest.maxApply
+        actual.minAge shouldBe updateRequest.minAge
+        actual.maxAge shouldBe updateRequest.maxAge
+        actual.location.locationName shouldBe updateRequest.locationName
+        actual.getX() shouldBe updateRequest.x
+        actual.getY() shouldBe updateRequest.y
+        actual.title shouldBe updateRequest.title
+        actual.content shouldBe updateRequest.content
+        actual.chatLink shouldBe updateRequest.chatLink
+    }
+
+    "자신의 글만 수정할 수 있다." {
+        // given
+        val otherUserId = -1L
+        val boardId = boardService.saveBoard(userId, createRequest)!!
+        // when & then
+        shouldThrow<MuckPotException> {
+            boardService.updateBoard(otherUserId, boardId, updateRequest)
+        }.errorCode shouldBe BoardErrorCode.BOARD_UNAUTHORIZED
+    }
+
     "먹팟 참가 신청 성공" {
         // given
-        val boardId = boardService.saveBoard(userId, request)!!
+        val boardId = boardService.saveBoard(userId, createRequest)!!
         val applyUser = userRepository.save(
             MuckPotUser(
                 null, "test1@naver.com", "pw", "nickname1",
@@ -114,7 +157,7 @@ class BoardServiceTest @Autowired constructor(
     }
 
     "먹팟 중복 참가 신청 불가 검증" {
-        val boardId = boardService.saveBoard(userId, request)!!
+        val boardId = boardService.saveBoard(userId, createRequest)!!
         shouldThrow<MuckPotException> {
             boardService.joinBoard(userId, boardId)
         }.errorCode shouldBe BoardErrorCode.ALREADY_JOIN
@@ -122,7 +165,7 @@ class BoardServiceTest @Autowired constructor(
 
     "먹팟 참가 동시성 테스트" {
         // given
-        val boardId = boardService.saveBoard(userId, request)!!
+        val boardId = boardService.saveBoard(userId, createRequest)!!
         val applyUser = userRepository.save(
             MuckPotUser(
                 null, "test1@naver.com", "pw", "nickname1",
