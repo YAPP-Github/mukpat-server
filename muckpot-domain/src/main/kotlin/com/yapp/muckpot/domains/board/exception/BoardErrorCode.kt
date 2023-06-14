@@ -8,7 +8,8 @@ enum class BoardErrorCode(
     private val status: Int,
     private val reason: String
 ) : BaseErrorCode {
-    BOARD_NOT_FOUND(StatusCode.BAD_REQUEST.code, "먹팟 정보를 찾을 수 없습니다.");
+    BOARD_NOT_FOUND(StatusCode.BAD_REQUEST.code, "먹팟 정보를 찾을 수 없습니다."),
+    ALREADY_JOIN(StatusCode.BAD_REQUEST.code, "이미 참여한 유저입니다.");
 
     override fun toResponseDto(): ResponseDto {
         return ResponseDto(this.status, this.reason, null)

@@ -6,6 +6,8 @@ import com.yapp.muckpot.common.Location
 import com.yapp.muckpot.common.enums.Gender
 import com.yapp.muckpot.common.enums.State
 import com.yapp.muckpot.domains.user.enums.JobGroupMain
+import java.time.LocalDate
+import java.time.Period
 import javax.persistence.Column
 import javax.persistence.Embedded
 import javax.persistence.Entity
@@ -64,5 +66,11 @@ class MuckPotUser(
         require(nickName.isNotBlank()) { "닉네임은 필수입니다" }
         require(yearOfBirth in 1900..2023) { "잘못된 출생 연도입니다" }
         require(mainCategory.name.isNotBlank()) { "주요 카테고리는 필수입니다" }
+    }
+
+    fun getAge(): Int {
+        val currentDate = LocalDate.now()
+        val birthDate = LocalDate.of(yearOfBirth, 1, 1)
+        return Period.between(birthDate, currentDate).years
     }
 }
