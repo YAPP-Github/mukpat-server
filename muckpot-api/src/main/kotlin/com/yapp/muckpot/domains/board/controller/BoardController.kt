@@ -21,6 +21,7 @@ import io.swagger.annotations.ExampleProperty
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.PatchMapping
@@ -145,5 +146,23 @@ class BoardController(
         return ResponseEntityUtil.created(
             boardService.joinBoard(userId, boardId)
         )
+    }
+
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                code = 204,
+                message = "먹팟 글 삭제 성공"
+            )
+        ]
+    )
+    @ApiOperation(value = "먹팟 글 삭제")
+    @DeleteMapping("/v1/boards/{boardId}")
+    fun deleteBoard(
+        @AuthenticationPrincipal userId: Long,
+        @PathVariable boardId: Long
+    ): ResponseEntity<ResponseDto> {
+        boardService.deleteBoard(userId, boardId)
+        return ResponseEntityUtil.noContent()
     }
 }

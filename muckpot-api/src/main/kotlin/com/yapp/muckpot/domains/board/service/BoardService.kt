@@ -8,7 +8,6 @@ import com.yapp.muckpot.domains.board.controller.dto.MuckpotDetailResponse
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotReadResponse
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotUpdateRequest
 import com.yapp.muckpot.domains.board.entity.Participant
-import com.yapp.muckpot.domains.board.entity.ParticipantId
 import com.yapp.muckpot.domains.board.exception.BoardErrorCode
 import com.yapp.muckpot.domains.board.repository.BoardQuerydslRepository
 import com.yapp.muckpot.domains.board.repository.BoardRepository
@@ -66,9 +65,9 @@ class BoardService(
 
     @Transactional
     fun updateBoard(userId: Long, boardId: Long, request: MuckpotUpdateRequest) {
-        // TODO 먹팟 수정 시 같은 회사 인원에게 메일 전송
+        // TODO 먹팟 수정 시 참여 인원에게 메일 전송
         boardRepository.findByIdOrNull(boardId)?.let { board ->
-            if (board.user.id != userId) {
+            if (board.isNotMyBoard(userId)) {
                 throw MuckPotException(BoardErrorCode.BOARD_UNAUTHORIZED)
             }
             request.updateBoard(board)
@@ -81,10 +80,24 @@ class BoardService(
     fun joinBoard(userId: Long, boardId: Long) {
         boardRepository.findByIdOrNull(boardId)?.let {
             val user = userRepository.findByIdOrNull(userId) ?: throw MuckPotException(UserErrorCode.USER_NOT_FOUND)
-            val participant = participantRepository.findByIdOrNull(ParticipantId(user, it))
+            val participant = participantRepository.findByUserAndBoard(user, it)
             if (participant != null) throw MuckPotException(BoardErrorCode.ALREADY_JOIN)
             it.join(user.getAge())
             participantRepository.save(Participant(user, it))
+        } ?: run {
+            throw MuckPotException(BoardErrorCode.BOARD_NOT_FOUND)
+        }
+    }
+
+    @Transactional
+    fun deleteBoard(userId: Long, boardId: Long) {
+        // TODO 먹팟 삭제 시 참여 인원에게 메일 전송
+        boardRepository.findByIdOrNull(boardId)?.let { board ->
+            if (board.isNotMyBoard(userId)) {
+                throw MuckPotException(BoardErrorCode.BOARD_UNAUTHORIZED)
+            }
+            participantRepository.softDeleteByBoard(board)
+            boardRepository.delete(board)
         } ?: run {
             throw MuckPotException(BoardErrorCode.BOARD_NOT_FOUND)
         }
