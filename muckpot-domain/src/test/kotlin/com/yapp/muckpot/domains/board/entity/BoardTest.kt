@@ -75,10 +75,32 @@ class BoardTest : FunSpec({
                 minAge = 21,
                 maxAge = 25
             )
-            board.participate()
+            board.join(23)
             shouldThrow<IllegalArgumentException> {
-                board.participate()
-            }.message shouldBe "정원이 초과되었습니다."
+                board.join(23)
+            }.message shouldBe "참여 모집이 마감되었습니다."
+        }
+
+        test("나이 제한에 걸릴 경우 참여할 수 없다.") {
+            val board = Board(
+                id = null,
+                user = user,
+                title = "title",
+                location = location,
+                locationDetail = null,
+                meetingTime = LocalDateTime.now(),
+                content = "content",
+                views = 0,
+                currentApply = 1,
+                maxApply = 2,
+                chatLink = "link",
+                status = MuckPotStatus.IN_PROGRESS,
+                minAge = 21,
+                maxAge = 25
+            )
+            shouldThrow<IllegalArgumentException> {
+                board.join(40)
+            }.message shouldBe "참여 가능 나이가 아닙니다."
         }
     }
 })

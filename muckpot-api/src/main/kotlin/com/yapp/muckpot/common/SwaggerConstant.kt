@@ -113,3 +113,8 @@ const val MUCKPOT_FIND_BY_ID = """
   }
 }
 """
+const val MUCKPOT_JOIN_RESPONSE = """
+{
+  "status": 201
+}
+"""

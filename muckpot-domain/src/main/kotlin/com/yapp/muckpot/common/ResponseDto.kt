@@ -20,6 +20,7 @@ data class ResponseDto(
         }
 
         fun created(data: Any? = "성공"): ResponseDto {
+            if (data == Unit) return ResponseDto(status = StatusCode.CREATED.code, null, result = null)
             return ResponseDto(status = StatusCode.CREATED.code, null, result = data)
         }
 

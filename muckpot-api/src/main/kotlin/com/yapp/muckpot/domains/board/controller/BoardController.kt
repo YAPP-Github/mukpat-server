@@ -10,6 +10,7 @@ import com.yapp.muckpot.domains.board.controller.dto.MuckpotUpdateRequest
 import com.yapp.muckpot.domains.board.service.BoardService
 import com.yapp.muckpot.swagger.MUCKPOT_FIND_ALL
 import com.yapp.muckpot.swagger.MUCKPOT_FIND_BY_ID
+import com.yapp.muckpot.swagger.MUCKPOT_JOIN_RESPONSE
 import com.yapp.muckpot.swagger.MUCKPOT_SAVE_RESPONSE
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
@@ -119,5 +120,30 @@ class BoardController(
     ): ResponseEntity<ResponseDto> {
         boardService.updateBoard(userId, boardId, request)
         return ResponseEntityUtil.noContent()
+    }
+
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                code = 201,
+                examples = Example(
+                    ExampleProperty(
+                        value = MUCKPOT_JOIN_RESPONSE,
+                        mediaType = MediaType.APPLICATION_JSON_VALUE
+                    )
+                ),
+                message = "성공"
+            )
+        ]
+    )
+    @ApiOperation(value = "먹팟 참가 신청")
+    @PostMapping("/v1/boards/{boardId}/join")
+    fun joinBoard(
+        @AuthenticationPrincipal userId: Long,
+        @PathVariable boardId: Long
+    ): ResponseEntity<ResponseDto> {
+        return ResponseEntityUtil.created(
+            boardService.joinBoard(userId, boardId)
+        )
     }
 }

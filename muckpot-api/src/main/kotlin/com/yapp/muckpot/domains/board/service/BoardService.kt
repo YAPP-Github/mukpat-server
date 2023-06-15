@@ -2,11 +2,13 @@ package com.yapp.muckpot.domains.board.service
 
 import com.yapp.muckpot.common.dto.CursorPaginationRequest
 import com.yapp.muckpot.common.dto.CursorPaginationResponse
+import com.yapp.muckpot.common.redisson.DistributedLock
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateRequest
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotDetailResponse
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotReadResponse
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotUpdateRequest
 import com.yapp.muckpot.domains.board.entity.Participant
+import com.yapp.muckpot.domains.board.entity.ParticipantId
 import com.yapp.muckpot.domains.board.exception.BoardErrorCode
 import com.yapp.muckpot.domains.board.repository.BoardQuerydslRepository
 import com.yapp.muckpot.domains.board.repository.BoardRepository
@@ -70,6 +72,19 @@ class BoardService(
                 throw MuckPotException(BoardErrorCode.BOARD_UNAUTHORIZED)
             }
             request.updateBoard(board)
+        } ?: run {
+            throw MuckPotException(BoardErrorCode.BOARD_NOT_FOUND)
+        }
+    }
+
+    @DistributedLock(lockName = "joinLock", identifier = "boardId")
+    fun joinBoard(userId: Long, boardId: Long) {
+        boardRepository.findByIdOrNull(boardId)?.let {
+            val user = userRepository.findByIdOrNull(userId) ?: throw MuckPotException(UserErrorCode.USER_NOT_FOUND)
+            val participant = participantRepository.findByIdOrNull(ParticipantId(user, it))
+            if (participant != null) throw MuckPotException(BoardErrorCode.ALREADY_JOIN)
+            it.join(user.getAge())
+            participantRepository.save(Participant(user, it))
         } ?: run {
             throw MuckPotException(BoardErrorCode.BOARD_NOT_FOUND)
         }

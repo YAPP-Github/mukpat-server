@@ -2,6 +2,7 @@ package com.yapp.muckpot.domains.board.service
 
 import com.yapp.muckpot.common.Location
 import com.yapp.muckpot.common.enums.Gender
+import com.yapp.muckpot.common.redisson.ConcurrencyHelper
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateRequest
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotUpdateRequest
 import com.yapp.muckpot.domains.board.entity.ParticipantId
@@ -22,6 +23,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.repository.findByIdOrNull
 import java.time.LocalDate
 import java.time.LocalTime
+import java.util.concurrent.atomic.AtomicLong
 
 @SpringBootTest
 class BoardServiceTest @Autowired constructor(
@@ -35,7 +37,7 @@ class BoardServiceTest @Autowired constructor(
     val createRequest = MuckpotCreateRequest(
         meetingDate = LocalDate.now(),
         meetingTime = LocalTime.of(12, 0),
-        maxApply = 10,
+        maxApply = 70,
         minAge = 20,
         maxAge = 100,
         locationName = "location",
@@ -131,5 +133,56 @@ class BoardServiceTest @Autowired constructor(
         shouldThrow<MuckPotException> {
             boardService.updateBoard(otherUserId, boardId, updateRequest)
         }.errorCode shouldBe BoardErrorCode.BOARD_UNAUTHORIZED
+    }
+
+    "먹팟 참가 신청 성공" {
+        // given
+        val boardId = boardService.saveBoard(userId, createRequest)!!
+        val applyUser = userRepository.save(
+            MuckPotUser(
+                null, "test1@naver.com", "pw", "nickname1",
+                Gender.MEN, 2000, JobGroupMain.DEVELOPMENT, "sub", Location("location", 0.0, 0.0), "url"
+            )
+        )
+        val applyUserId = applyUser.id!!
+
+        // when
+        boardService.joinBoard(applyUserId, boardId)
+
+        // then
+        val findBoard = boardRepository.findByIdOrNull(boardId)!!
+        val participant = participantRepository.findByIdOrNull(ParticipantId(applyUser, findBoard))
+        findBoard.currentApply shouldBe 2
+        participant shouldNotBe null
+    }
+
+    "먹팟 중복 참가 신청 불가 검증" {
+        val boardId = boardService.saveBoard(userId, createRequest)!!
+        shouldThrow<MuckPotException> {
+            boardService.joinBoard(userId, boardId)
+        }.errorCode shouldBe BoardErrorCode.ALREADY_JOIN
+    }
+
+    "먹팟 참가 동시성 테스트" {
+        // given
+        val boardId = boardService.saveBoard(userId, createRequest)!!
+        val applyUser = userRepository.save(
+            MuckPotUser(
+                null, "test1@naver.com", "pw", "nickname1",
+                Gender.MEN, 2000, JobGroupMain.DEVELOPMENT, "sub", Location("location", 0.0, 0.0), "url"
+            )
+        )
+        val applyId = applyUser.id!!
+
+        // when
+        val successCount = AtomicLong()
+        ConcurrencyHelper.execute(
+            { boardService.joinBoard(applyId, boardId) },
+            successCount
+        )
+
+        // then
+        val findBoard = boardRepository.findByIdOrNull(boardId)!!
+        findBoard.currentApply shouldBe 2
     }
 })

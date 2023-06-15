@@ -83,8 +83,10 @@ class Board(
         require(maxApply >= MAX_APPLY_MIN) { "최대 인원은 ${MAX_APPLY_MIN}명 이상 가능합니다." }
     }
 
-    fun participate() {
-        require(currentApply < maxApply) { "정원이 초과되었습니다." }
+    fun join(userAge: Int) {
+        require(userAge in minAge..maxAge) { "참여 가능 나이가 아닙니다." }
+        require(currentApply < maxApply) { "참여 모집이 마감되었습니다." }
+        require(status == MuckPotStatus.IN_PROGRESS) { "참여 모집이 마감되었습니다." }
         this.currentApply++
         if (currentApply == maxApply) {
             this.status = MuckPotStatus.DONE
