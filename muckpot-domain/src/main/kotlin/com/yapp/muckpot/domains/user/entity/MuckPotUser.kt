@@ -6,6 +6,8 @@ import com.yapp.muckpot.common.Location
 import com.yapp.muckpot.common.enums.Gender
 import com.yapp.muckpot.common.enums.State
 import com.yapp.muckpot.domains.user.enums.JobGroupMain
+import org.hibernate.annotations.SQLDelete
+import org.hibernate.annotations.Where
 import java.time.LocalDate
 import java.time.Period
 import javax.persistence.Column
@@ -18,21 +20,23 @@ import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.Table
 
-@Table(name = "muckpot_user")
 @Entity
+@Table(name = "muckpot_user")
+@Where(clause = "state = \'ACTIVE\'")
+@SQLDelete(sql = "UPDATE muckpot_user SET state = 'INACTIVE' WHERE user_id = ?")
 class MuckPotUser(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     val id: Long? = null,
 
-    @Column(name = "email", unique = true)
+    @Column(name = "email")
     val email: String,
 
     @Column(name = "password")
     var password: String,
 
-    @Column(name = "nick_name", unique = true)
+    @Column(name = "nick_name")
     var nickName: String,
 
     @Enumerated(value = EnumType.STRING)
