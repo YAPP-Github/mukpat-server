@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional
 class ParticipantQuerydslRepository(
     private val queryFactory: JPAQueryFactory
 ) {
-    @Transactional
+    @Transactional(readOnly = true)
     fun findByBoardIds(boardIds: List<Long?>): List<ParticipantReadResponse> {
         return queryFactory.select(
             QParticipantReadResponse(
