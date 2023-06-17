@@ -12,7 +12,7 @@ interface ParticipantRepository : JpaRepository<Participant, Long> {
     @Transactional
     @Modifying
     @Query("UPDATE Participant p SET p.state = 'INACTIVE' WHERE p.board = :board")
-    fun softDeleteByBoard(board: Board)
+    fun deleteByBoard(board: Board)
 
     @Transactional(readOnly = true)
     fun findByBoard(board: Board): List<Participant>

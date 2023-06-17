@@ -42,7 +42,7 @@ class ParticipantRepositoryTest(
         participantRepository.save(Participant(user, board))
 
         // when
-        participantRepository.softDeleteByBoard(board)
+        participantRepository.deleteByBoard(board)
 
         // then
         val actual = participantRepository.findByBoard(board)

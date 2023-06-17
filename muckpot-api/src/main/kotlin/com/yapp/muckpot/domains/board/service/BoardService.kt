@@ -96,7 +96,7 @@ class BoardService(
             if (board.isNotMyBoard(userId)) {
                 throw MuckPotException(BoardErrorCode.BOARD_UNAUTHORIZED)
             }
-            participantRepository.softDeleteByBoard(board)
+            participantRepository.deleteByBoard(board)
             boardRepository.delete(board)
         } ?: run {
             throw MuckPotException(BoardErrorCode.BOARD_NOT_FOUND)
