@@ -5,7 +5,6 @@ import com.yapp.muckpot.common.enums.Gender
 import com.yapp.muckpot.common.redisson.ConcurrencyHelper
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateRequest
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotUpdateRequest
-import com.yapp.muckpot.domains.board.entity.ParticipantId
 import com.yapp.muckpot.domains.board.exception.BoardErrorCode
 import com.yapp.muckpot.domains.board.repository.BoardRepository
 import com.yapp.muckpot.domains.board.repository.ParticipantRepository
@@ -14,8 +13,10 @@ import com.yapp.muckpot.domains.user.entity.MuckPotUser
 import com.yapp.muckpot.domains.user.enums.JobGroupMain
 import com.yapp.muckpot.domains.user.repository.MuckPotUserRepository
 import com.yapp.muckpot.exception.MuckPotException
+import com.yapp.muckpot.fixture.Fixture
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.springframework.beans.factory.annotation.Autowired
@@ -85,7 +86,7 @@ class BoardServiceTest @Autowired constructor(
 
         // then
         val findBoard = boardRepository.findByIdOrNull(boardId)!!
-        val participant = participantRepository.findById(ParticipantId(user, findBoard))
+        val participant = participantRepository.findByBoard(findBoard)
 
         findBoard shouldNotBe null
         findBoard.user.id shouldBe userId
@@ -151,7 +152,7 @@ class BoardServiceTest @Autowired constructor(
 
         // then
         val findBoard = boardRepository.findByIdOrNull(boardId)!!
-        val participant = participantRepository.findByIdOrNull(ParticipantId(applyUser, findBoard))
+        val participant = participantRepository.findByBoard(findBoard)
         findBoard.currentApply shouldBe 2
         participant shouldNotBe null
     }
@@ -184,5 +185,36 @@ class BoardServiceTest @Autowired constructor(
         // then
         val findBoard = boardRepository.findByIdOrNull(boardId)!!
         findBoard.currentApply shouldBe 2
+    }
+
+    "먹팟 삭제 요청시 INACTIVE로 변경된다." {
+        // given
+        val boardId = boardService.saveBoard(userId, createRequest)!!
+
+        // when
+        boardService.deleteBoard(userId, boardId)
+
+        val findBoard = boardRepository.findByIdOrNull(boardId)
+        findBoard shouldBe null
+    }
+
+    "자신의 글만 삭제할 수 있다." {
+        // given
+        val otherUserId = -1L
+        val boardId = boardService.saveBoard(userId, createRequest)!!
+        // when & then
+        shouldThrow<MuckPotException> {
+            boardService.deleteBoard(otherUserId, boardId)
+        }.errorCode shouldBe BoardErrorCode.BOARD_UNAUTHORIZED
+    }
+
+    "글 삭제시 참여자 목록도 함께 삭제한다." {
+        // given
+        val board = boardRepository.save(Fixture.createBoard(user = user))
+        // when
+        boardService.deleteBoard(userId, board.id!!)
+        // then
+        val findBoard = participantRepository.findByBoard(board)
+        findBoard shouldHaveSize 0
     }
 })

@@ -5,11 +5,13 @@ import com.querydsl.jpa.impl.JPAQueryFactory
 import com.yapp.muckpot.domains.board.entity.Board
 import com.yapp.muckpot.domains.board.entity.QBoard.board
 import org.springframework.stereotype.Repository
+import org.springframework.transaction.annotation.Transactional
 
 @Repository
 class BoardQuerydslRepository(
     private val queryFactory: JPAQueryFactory
 ) {
+    @Transactional(readOnly = true)
     fun findAllWithPagination(lastId: Long?, countPerScroll: Long): List<Board> {
         return queryFactory.from(board)
             .select(board)

@@ -7,7 +7,6 @@ import com.yapp.muckpot.common.enums.Gender
 import com.yapp.muckpot.common.enums.State
 import com.yapp.muckpot.domains.board.entity.Board
 import com.yapp.muckpot.domains.board.entity.Participant
-import com.yapp.muckpot.domains.board.entity.ParticipantId
 import com.yapp.muckpot.domains.user.entity.MuckPotUser
 import com.yapp.muckpot.domains.user.enums.JobGroupMain
 import com.yapp.muckpot.domains.user.enums.MuckPotStatus
@@ -80,9 +79,9 @@ object Fixture {
     }
 
     fun createParticipant(
-        participantId: ParticipantId = ParticipantId(createUser(), createBoard()),
-        state: State = State.ACTIVE
+        user: MuckPotUser = createUser(),
+        board: Board = createBoard()
     ): Participant {
-        return Participant(participantId = participantId, state = state)
+        return Participant(user, board)
     }
 }

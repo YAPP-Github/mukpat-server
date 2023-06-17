@@ -9,6 +9,8 @@ import com.yapp.muckpot.common.MAX_APPLY_MIN
 import com.yapp.muckpot.common.enums.State
 import com.yapp.muckpot.domains.user.entity.MuckPotUser
 import com.yapp.muckpot.domains.user.enums.MuckPotStatus
+import org.hibernate.annotations.SQLDelete
+import org.hibernate.annotations.Where
 import java.time.LocalDateTime
 import javax.persistence.Column
 import javax.persistence.Embedded
@@ -22,9 +24,10 @@ import javax.persistence.Id
 import javax.persistence.JoinColumn
 import javax.persistence.ManyToOne
 import javax.persistence.Table
-
-@Table(name = "board")
 @Entity
+@Table(name = "board")
+@Where(clause = "state = \'ACTIVE\'")
+@SQLDelete(sql = "UPDATE board SET state = 'INACTIVE' WHERE board_id = ?")
 class Board(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -107,5 +110,9 @@ class Board(
 
     fun getY(): Double {
         return this.location.locationPoint.y
+    }
+
+    fun isNotMyBoard(userId: Long): Boolean {
+        return this.user.id != userId
     }
 }

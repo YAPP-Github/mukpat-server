@@ -10,3 +10,5 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.spatial.dialect.mariadb.MariaDB103SpatialDialect
+        format_sql: true
+    show_sql: true

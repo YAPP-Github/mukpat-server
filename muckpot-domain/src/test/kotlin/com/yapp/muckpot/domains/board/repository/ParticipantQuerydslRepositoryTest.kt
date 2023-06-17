@@ -4,7 +4,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory
 import com.yapp.muckpot.config.CustomDataJpaTest
 import com.yapp.muckpot.domains.board.entity.Board
 import com.yapp.muckpot.domains.board.entity.Participant
-import com.yapp.muckpot.domains.board.entity.ParticipantId
 import com.yapp.muckpot.domains.user.entity.MuckPotUser
 import com.yapp.muckpot.domains.user.repository.MuckPotUserRepository
 import com.yapp.muckpot.fixture.Fixture
@@ -38,10 +37,10 @@ class ParticipantQuerydslRepositoryTest(
             Fixture.createBoard(title = "board3", user = users[0])
         )
         participants = listOf(
-            Fixture.createParticipant(ParticipantId(users[0], boards[0])),
-            Fixture.createParticipant(ParticipantId(users[1], boards[0])),
-            Fixture.createParticipant(ParticipantId(users[0], boards[1])),
-            Fixture.createParticipant(ParticipantId(users[0], boards[2]))
+            Fixture.createParticipant(users[0], boards[0]),
+            Fixture.createParticipant(users[1], boards[0]),
+            Fixture.createParticipant(users[0], boards[1]),
+            Fixture.createParticipant(users[0], boards[2])
                 .apply { createdAt = LocalDateTime.now().minusDays(3) }
         )
         userRepository.saveAll(users)
@@ -68,7 +67,7 @@ class ParticipantQuerydslRepositoryTest(
         // when
         val actual = participantQuerydslRepository.findByBoardIds(boardIds).first()
         // then
-        actual.boardId shouldBe participants[3].participantId.board.id
-        actual.userId shouldBe participants[3].participantId.user.id
+        actual.boardId shouldBe participants[3].board.id
+        actual.userId shouldBe participants[3].user.id
     }
 })
