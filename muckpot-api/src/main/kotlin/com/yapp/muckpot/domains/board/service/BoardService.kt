@@ -14,6 +14,7 @@ import com.yapp.muckpot.domains.board.repository.BoardRepository
 import com.yapp.muckpot.domains.board.repository.ParticipantQuerydslRepository
 import com.yapp.muckpot.domains.board.repository.ParticipantRepository
 import com.yapp.muckpot.domains.user.controller.dto.UserResponse
+import com.yapp.muckpot.domains.user.enums.MuckPotStatus
 import com.yapp.muckpot.domains.user.exception.UserErrorCode
 import com.yapp.muckpot.domains.user.repository.MuckPotUserRepository
 import com.yapp.muckpot.exception.MuckPotException
@@ -98,6 +99,18 @@ class BoardService(
             }
             participantRepository.deleteByBoard(board)
             boardRepository.delete(board)
+        } ?: run {
+            throw MuckPotException(BoardErrorCode.BOARD_NOT_FOUND)
+        }
+    }
+
+    @Transactional
+    fun changeStatus(userId: Long, boardId: Long, changeStatus: MuckPotStatus) {
+        boardRepository.findByIdOrNull(boardId)?.let { board ->
+            if (board.isNotMyBoard(userId)) {
+                throw MuckPotException(BoardErrorCode.BOARD_UNAUTHORIZED)
+            }
+            board.changeStatus(changeStatus)
         } ?: run {
             throw MuckPotException(BoardErrorCode.BOARD_NOT_FOUND)
         }
