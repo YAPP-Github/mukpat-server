@@ -5,7 +5,9 @@ import com.yapp.muckpot.common.enums.Gender
 import com.yapp.muckpot.common.redisson.ConcurrencyHelper
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateRequest
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotUpdateRequest
+import com.yapp.muckpot.domains.board.entity.Participant
 import com.yapp.muckpot.domains.board.exception.BoardErrorCode
+import com.yapp.muckpot.domains.board.exception.ParticipantErrorCode
 import com.yapp.muckpot.domains.board.repository.BoardRepository
 import com.yapp.muckpot.domains.board.repository.ParticipantRepository
 import com.yapp.muckpot.domains.user.controller.dto.UserResponse
@@ -25,6 +27,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.repository.findByIdOrNull
 import java.time.LocalDate
 import java.time.LocalTime
+import java.util.*
 import java.util.concurrent.atomic.AtomicLong
 
 @SpringBootTest
@@ -162,7 +165,7 @@ class BoardServiceTest @Autowired constructor(
         val boardId = boardService.saveBoard(userId, createRequest)!!
         shouldThrow<MuckPotException> {
             boardService.joinBoard(userId, boardId)
-        }.errorCode shouldBe BoardErrorCode.ALREADY_JOIN
+        }.errorCode shouldBe ParticipantErrorCode.ALREADY_JOIN
     }
 
     "먹팟 참가 동시성 테스트" {
@@ -227,5 +230,38 @@ class BoardServiceTest @Autowired constructor(
         // then
         val actual = boardRepository.findByIdOrNull(boardId)!!
         actual.status shouldBe MuckPotStatus.DONE
+    }
+
+    "먹팟 참가 신청 취소 성공" {
+        // given
+        val applyUser = userRepository.save(Fixture.createUser())
+        val board = boardRepository.save(Fixture.createBoard(user = user))
+        participantRepository.save(Participant(applyUser, board))
+        // when
+        boardService.cancelJoin(applyUser.id!!, board.id!!)
+        // then
+        val findParticipant = participantRepository.findByUserAndBoard(applyUser, board)
+        findParticipant shouldBe null
+        board.currentApply shouldBe 0
+    }
+
+    "기존 참가 신청 내역 없으면 참가 신청 취소 불가" {
+        // given
+        val applyUser = userRepository.save(Fixture.createUser())
+        val board = boardRepository.save(Fixture.createBoard(user = user))
+        // when & then
+        shouldThrow<MuckPotException> {
+            boardService.cancelJoin(applyUser.id!!, board.id!!)
+        }.errorCode shouldBe ParticipantErrorCode.PARTICIPANT_NOT_FOUND
+    }
+
+    "먹팟 글 작성자는 참가 신청 취소할 수 없다." {
+        // given
+        val board = boardRepository.save(Fixture.createBoard(user = user))
+        participantRepository.save(Participant(user, board))
+        // when & then
+        shouldThrow<MuckPotException> {
+            boardService.cancelJoin(user.id!!, board.id!!)
+        }.errorCode shouldBe ParticipantErrorCode.WRITER_MUST_JOIN
     }
 })

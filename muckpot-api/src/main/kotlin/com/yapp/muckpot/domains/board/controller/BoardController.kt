@@ -186,4 +186,22 @@ class BoardController(
         boardService.changeStatus(userId, boardId, status)
         return ResponseEntityUtil.noContent()
     }
+
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                code = 204,
+                message = "먹팟 참가 신청 취소 성공"
+            )
+        ]
+    )
+    @ApiOperation(value = "먹팟 참가 신청 취소")
+    @DeleteMapping("/v1/boards/{boardId}/join")
+    fun deleteParticipant(
+        @AuthenticationPrincipal userId: Long,
+        @PathVariable boardId: Long
+    ): ResponseEntity<ResponseDto> {
+        boardService.cancelJoin(userId, boardId)
+        return ResponseEntityUtil.noContent()
+    }
 }
