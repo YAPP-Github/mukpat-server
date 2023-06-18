@@ -234,9 +234,8 @@ class BoardServiceTest @Autowired constructor(
 
     "먹팟 참가 신청 취소 성공" {
         // given
-        val boardUser = userRepository.save(Fixture.createUser())
         val applyUser = userRepository.save(Fixture.createUser())
-        val board = boardRepository.save(Fixture.createBoard(user = boardUser))
+        val board = boardRepository.save(Fixture.createBoard(user = user))
         participantRepository.save(Participant(applyUser, board))
         // when
         boardService.deleteParticipant(applyUser.id!!, board.id!!)
@@ -248,9 +247,8 @@ class BoardServiceTest @Autowired constructor(
 
     "기존 참가 신청 내역 없으면 참가 신청 취소 불가" {
         // given
-        val boardUser = userRepository.save(Fixture.createUser())
         val applyUser = userRepository.save(Fixture.createUser())
-        val board = boardRepository.save(Fixture.createBoard(user = boardUser))
+        val board = boardRepository.save(Fixture.createBoard(user = user))
         // when & then
         shouldThrow<MuckPotException> {
             boardService.deleteParticipant(applyUser.id!!, board.id!!)
@@ -259,12 +257,11 @@ class BoardServiceTest @Autowired constructor(
 
     "먹팟 글 작성자는 참가 신청 취소할 수 없다." {
         // given
-        val boardUser = userRepository.save(Fixture.createUser())
-        val board = boardRepository.save(Fixture.createBoard(user = boardUser))
-        participantRepository.save(Participant(boardUser, board))
+        val board = boardRepository.save(Fixture.createBoard(user = user))
+        participantRepository.save(Participant(user, board))
         // when & then
         shouldThrow<MuckPotException> {
-            boardService.deleteParticipant(boardUser.id!!, board.id!!)
+            boardService.deleteParticipant(user.id!!, board.id!!)
         }.errorCode shouldBe ParticipantErrorCode.WRITER_MUST_JOIN
     }
 })
