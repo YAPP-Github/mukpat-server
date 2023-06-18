@@ -33,11 +33,12 @@ object JwtCookieUtil {
     /**
      * 현재 응답에 ACCESS_TOKEN 쿠키 추가.
      */
-    fun addAccessTokenCookie(accessToken: String) {
+    fun addAccessTokenCookie(accessToken: String, expiredSeconds: Int) {
         currentResponse.addCookie(
             Cookie(ACCESS_TOKEN, accessToken).apply {
                 path = "/"
                 isHttpOnly = true
+                maxAge = expiredSeconds
             }
         )
     }
@@ -45,11 +46,12 @@ object JwtCookieUtil {
     /**
      * 현재 응답에 REFRESH_TOKEN 쿠키 추가.
      */
-    fun addRefreshTokenCookie(jwtToken: String) {
+    fun addRefreshTokenCookie(jwtToken: String, expiredSeconds: Int) {
         currentResponse.addCookie(
             Cookie(REFRESH_TOKEN, jwtToken).apply {
                 path = "/"
                 isHttpOnly = true
+                maxAge = expiredSeconds
             }
         )
     }

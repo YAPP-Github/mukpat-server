@@ -14,16 +14,13 @@ class RedisService(private val redisTemplate: RedisTemplate<String, Any>) {
         return operations.get("test") as String
     }
 
-    fun saveRefreshToken(email: String, refreshToken: String) {
-        redisTemplate.opsForValue().set(email, refreshToken)
-    }
-
     fun setDataExpireWithNewest(key: String, value: String, duration: Long) {
         if (redisTemplate.hasKey(key)) {
             redisTemplate.delete(key)
         }
         redisTemplate.opsForValue().set(key, value, Duration.ofSeconds(duration))
     }
+
     fun deleteData(key: String) {
         redisTemplate.delete(key)
     }
