@@ -11,6 +11,7 @@ import com.yapp.muckpot.domains.board.repository.ParticipantRepository
 import com.yapp.muckpot.domains.user.controller.dto.UserResponse
 import com.yapp.muckpot.domains.user.entity.MuckPotUser
 import com.yapp.muckpot.domains.user.enums.JobGroupMain
+import com.yapp.muckpot.domains.user.enums.MuckPotStatus
 import com.yapp.muckpot.domains.user.repository.MuckPotUserRepository
 import com.yapp.muckpot.exception.MuckPotException
 import com.yapp.muckpot.fixture.Fixture
@@ -216,5 +217,15 @@ class BoardServiceTest @Autowired constructor(
         // then
         val findBoard = participantRepository.findByBoard(board)
         findBoard shouldHaveSize 0
+    }
+
+    "먹팟 상태변경 성공" {
+        // given
+        val boardId = boardRepository.save(Fixture.createBoard(user = user)).id!!
+        // when
+        boardService.changeStatus(userId, boardId, MuckPotStatus.DONE)
+        // then
+        val actual = boardRepository.findByIdOrNull(boardId)!!
+        actual.status shouldBe MuckPotStatus.DONE
     }
 })

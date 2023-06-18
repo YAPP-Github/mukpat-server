@@ -4,6 +4,7 @@ import com.yapp.muckpot.common.Location
 import com.yapp.muckpot.common.MAX_APPLY_MIN
 import com.yapp.muckpot.domains.user.entity.MuckPotUser
 import com.yapp.muckpot.domains.user.enums.MuckPotStatus
+import com.yapp.muckpot.fixture.Fixture
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -101,6 +102,47 @@ class BoardTest : FunSpec({
             shouldThrow<IllegalArgumentException> {
                 board.join(40)
             }.message shouldBe "참여 가능 나이가 아닙니다."
+        }
+
+        test("IN_PROGRESS 일 때는 DONE 으로만 변경할 수 있다.") {
+            val board = Fixture.createBoard(status = MuckPotStatus.IN_PROGRESS)
+
+            shouldThrow<IllegalArgumentException> {
+                board.changeStatus(MuckPotStatus.IN_PROGRESS)
+            }.message shouldBe "변경 가능한 상태가 아닙니다."
+        }
+
+        test("DONE 일 때는 IN_PROGRESS 으로만 변경할 수 있다.") {
+            val board = Fixture.createBoard(status = MuckPotStatus.DONE)
+
+            shouldThrow<IllegalArgumentException> {
+                board.changeStatus(MuckPotStatus.DONE)
+            }.message shouldBe "변경 가능한 상태가 아닙니다."
+        }
+
+        test("모집인원이 마감된 경우에는 IN_PROGRESS 로 변경할 수 없다.") {
+            val board = Fixture.createBoard(
+                status = MuckPotStatus.DONE,
+                currentApply = 3,
+                maxApply = 3
+            )
+            shouldThrow<IllegalArgumentException> {
+                board.changeStatus(MuckPotStatus.IN_PROGRESS)
+            }.message shouldBe "변경 가능한 상태가 아닙니다."
+        }
+
+        test("IN_PROGRESS -> DONE 변경 성공") {
+            val board = Fixture.createBoard()
+            board.changeStatus(MuckPotStatus.DONE)
+
+            board.status shouldBe MuckPotStatus.DONE
+        }
+
+        test("DONE -> IN_PROGRESS 변경 성공") {
+            val board = Fixture.createBoard(status = MuckPotStatus.DONE)
+            board.changeStatus(MuckPotStatus.IN_PROGRESS)
+
+            board.status shouldBe MuckPotStatus.IN_PROGRESS
         }
     }
 })

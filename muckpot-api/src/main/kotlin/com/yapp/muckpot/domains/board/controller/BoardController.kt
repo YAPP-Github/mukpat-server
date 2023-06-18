@@ -8,6 +8,7 @@ import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateRequest
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateResponse
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotUpdateRequest
 import com.yapp.muckpot.domains.board.service.BoardService
+import com.yapp.muckpot.domains.user.enums.MuckPotStatus
 import com.yapp.muckpot.swagger.MUCKPOT_FIND_ALL
 import com.yapp.muckpot.swagger.MUCKPOT_FIND_BY_ID
 import com.yapp.muckpot.swagger.MUCKPOT_JOIN_RESPONSE
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import javax.validation.Valid
 
@@ -163,6 +165,25 @@ class BoardController(
         @PathVariable boardId: Long
     ): ResponseEntity<ResponseDto> {
         boardService.deleteBoard(userId, boardId)
+        return ResponseEntityUtil.noContent()
+    }
+
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                code = 204,
+                message = "먹팟 글 상태변경 성공"
+            )
+        ]
+    )
+    @ApiOperation(value = "먹팟 글 상태변경")
+    @PatchMapping("/v1/boards/{boardId}/status")
+    fun changeStatus(
+        @AuthenticationPrincipal userId: Long,
+        @PathVariable boardId: Long,
+        @RequestParam("status") status: MuckPotStatus
+    ): ResponseEntity<ResponseDto> {
+        boardService.changeStatus(userId, boardId, status)
         return ResponseEntityUtil.noContent()
     }
 }
