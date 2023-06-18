@@ -9,6 +9,7 @@ import com.yapp.muckpot.domains.board.controller.dto.MuckpotReadResponse
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotUpdateRequest
 import com.yapp.muckpot.domains.board.entity.Participant
 import com.yapp.muckpot.domains.board.exception.BoardErrorCode
+import com.yapp.muckpot.domains.board.exception.ParticipantErrorCode
 import com.yapp.muckpot.domains.board.repository.BoardQuerydslRepository
 import com.yapp.muckpot.domains.board.repository.BoardRepository
 import com.yapp.muckpot.domains.board.repository.ParticipantQuerydslRepository
@@ -82,7 +83,7 @@ class BoardService(
         boardRepository.findByIdOrNull(boardId)?.let {
             val user = userRepository.findByIdOrNull(userId) ?: throw MuckPotException(UserErrorCode.USER_NOT_FOUND)
             val participant = participantRepository.findByUserAndBoard(user, it)
-            if (participant != null) throw MuckPotException(BoardErrorCode.ALREADY_JOIN)
+            if (participant != null) throw MuckPotException(ParticipantErrorCode.ALREADY_JOIN)
             it.join(user.getAge())
             participantRepository.save(Participant(user, it))
         } ?: run {
@@ -111,6 +112,22 @@ class BoardService(
                 throw MuckPotException(BoardErrorCode.BOARD_UNAUTHORIZED)
             }
             board.changeStatus(changeStatus)
+        } ?: run {
+            throw MuckPotException(BoardErrorCode.BOARD_NOT_FOUND)
+        }
+    }
+
+    @Transactional
+    fun deleteParticipant(userId: Long, boardId: Long) {
+        // TODO 먹팟 참가 신청 취소 시 참여 인원에게 메일 전송 기획 논의
+        boardRepository.findByIdOrNull(boardId)?.let { board ->
+            val user = userRepository.findByIdOrNull(userId)
+                ?: throw MuckPotException(UserErrorCode.USER_NOT_FOUND)
+            val participant = participantRepository.findByUserAndBoard(user, board)
+                ?: throw MuckPotException(ParticipantErrorCode.PARTICIPANT_NOT_FOUND)
+            if (board.user.id == userId) throw MuckPotException(ParticipantErrorCode.WRITER_MUST_JOIN)
+            participantRepository.delete(participant)
+            board.cancelJoin()
         } ?: run {
             throw MuckPotException(BoardErrorCode.BOARD_NOT_FOUND)
         }

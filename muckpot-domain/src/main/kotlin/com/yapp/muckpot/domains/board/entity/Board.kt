@@ -127,4 +127,8 @@ class Board(
 
         this.status = changeStatus
     }
+
+    fun cancelJoin() {
+        this.currentApply--
+    }
 }
