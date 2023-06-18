@@ -118,7 +118,7 @@ class BoardService(
     }
 
     @Transactional
-    fun deleteParticipant(userId: Long, boardId: Long) {
+    fun cancelJoin(userId: Long, boardId: Long) {
         // TODO 먹팟 참가 신청 취소 시 참여 인원에게 메일 전송 기획 논의
         boardRepository.findByIdOrNull(boardId)?.let { board ->
             val user = userRepository.findByIdOrNull(userId)

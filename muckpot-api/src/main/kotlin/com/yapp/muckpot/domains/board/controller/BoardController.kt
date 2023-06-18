@@ -201,7 +201,7 @@ class BoardController(
         @AuthenticationPrincipal userId: Long,
         @PathVariable boardId: Long
     ): ResponseEntity<ResponseDto> {
-        boardService.deleteParticipant(userId, boardId)
+        boardService.cancelJoin(userId, boardId)
         return ResponseEntityUtil.noContent()
     }
 }
