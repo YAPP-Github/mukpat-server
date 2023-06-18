@@ -35,11 +35,14 @@ class UserService(
                 throw MuckPotException(UserErrorCode.LOGIN_FAIL)
             }
             val response = UserResponse.of(it)
-            val accessToken = jwtService.generateAccessToken(response, jwtService.getAccessTokenSeconds(request.keep))
-            val refreshToken = jwtService.generateRefreshToken(request.email, jwtService.getRefreshTokenSeconds(request.keep))
-            redisService.setDataExpireWithNewest(request.email, refreshToken, jwtService.getRefreshTokenSeconds(request.keep))
-            JwtCookieUtil.addAccessTokenCookie(accessToken)
-            JwtCookieUtil.addRefreshTokenCookie(refreshToken)
+            val accessTokenSeconds = jwtService.getAccessTokenSeconds(request.keep)
+            val refreshTokenSeconds = jwtService.getRefreshTokenSeconds(request.keep)
+            val accessToken = jwtService.generateAccessToken(response, accessTokenSeconds)
+            val refreshToken = jwtService.generateRefreshToken(request.email, refreshTokenSeconds)
+
+            redisService.setDataExpireWithNewest(request.email, refreshToken, refreshTokenSeconds)
+            JwtCookieUtil.addAccessTokenCookie(accessToken, accessTokenSeconds.toInt())
+            JwtCookieUtil.addRefreshTokenCookie(refreshToken, refreshTokenSeconds.toInt())
             return response
         } ?: run {
             throw MuckPotException(UserErrorCode.LOGIN_FAIL)
