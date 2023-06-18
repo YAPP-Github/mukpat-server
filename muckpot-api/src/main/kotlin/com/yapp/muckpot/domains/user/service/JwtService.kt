@@ -5,7 +5,14 @@ import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.interfaces.DecodedJWT
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.yapp.muckpot.common.ACCESS_TOKEN_BASIC_SECONDS
+import com.yapp.muckpot.common.ACCESS_TOKEN_KEEP_SECONDS
 import com.yapp.muckpot.common.JwtCookieUtil
+import com.yapp.muckpot.common.MS
+import com.yapp.muckpot.common.REFRESH_TOKEN_BASIC_SECONDS
+import com.yapp.muckpot.common.REFRESH_TOKEN_KEEP_SECONDS
+import com.yapp.muckpot.common.USER_CLAIM
+import com.yapp.muckpot.common.USER_EMAIL_CLAIM
 import com.yapp.muckpot.common.enums.YesNo
 import com.yapp.muckpot.domains.user.controller.dto.UserResponse
 import mu.KLogging
@@ -25,23 +32,19 @@ class JwtService(
     private val algorithm: Algorithm by lazy { Algorithm.HMAC512(secretKey) }
     private val jwtVerifier: JWTVerifier by lazy { JWT.require(algorithm).build() }
 
-    fun generateAccessToken(response: UserResponse, keep: YesNo): String {
+    fun generateAccessToken(response: UserResponse, expiredSeconds: Long): String {
         val jwtBuilder = JWT.create()
             .withIssuer(issuer)
             .withClaim(USER_CLAIM, objectMapper.writeValueAsString(response))
-        if (keep == YesNo.N) {
-            jwtBuilder.withExpiresAt(Date(Date().time + ACCESS_EXPIRE_TIME))
-        }
+            .withExpiresAt(Date(Date().time + expiredSeconds * MS))
         return jwtBuilder.sign(algorithm)
     }
 
-    fun generateRefreshToken(email: String, keep: YesNo): String {
+    fun generateRefreshToken(email: String, expiredSeconds: Long): String {
         val jwtBuilder = JWT.create()
             .withIssuer(issuer)
             .withClaim(USER_EMAIL_CLAIM, email)
-        if (keep == YesNo.N) {
-            jwtBuilder.withExpiresAt(Date(Date().time + REFRESH_EXPIRE_TIME))
-        }
+            .withExpiresAt(Date(Date().time + expiredSeconds * MS))
         return jwtBuilder.sign(algorithm)
     }
 
@@ -60,14 +63,23 @@ class JwtService(
         }
     }
 
-    private fun verify(token: String): DecodedJWT {
-        return jwtVerifier.verify(token)
+    fun getAccessTokenSeconds(keep: YesNo): Long {
+        return if (keep == YesNo.Y) {
+            ACCESS_TOKEN_KEEP_SECONDS
+        } else {
+            ACCESS_TOKEN_BASIC_SECONDS
+        }
     }
 
-    companion object {
-        private const val USER_CLAIM = "user"
-        private const val USER_EMAIL_CLAIM = "email"
-        private const val ACCESS_EXPIRE_TIME = 3600000 // 1시간
-        private const val REFRESH_EXPIRE_TIME = 604800000 // 일주일
+    fun getRefreshTokenSeconds(keep: YesNo): Long {
+        return if (keep == YesNo.Y) {
+            REFRESH_TOKEN_KEEP_SECONDS
+        } else {
+            REFRESH_TOKEN_BASIC_SECONDS
+        }
+    }
+
+    private fun verify(token: String): DecodedJWT {
+        return jwtVerifier.verify(token)
     }
 }
