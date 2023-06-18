@@ -34,7 +34,7 @@ data class MuckpotUpdateRequest(
     @field:ApiModelProperty(notes = "만날 시간", required = true, example = "13:00")
     @field:JsonFormat(shape = JsonFormat.Shape.STRING, pattern = HHmm)
     val meetingTime: LocalTime,
-    @field:ApiModelProperty(notes = "최대 인원", required = true, example = "5")
+    @field:ApiModelProperty(notes = "최대 참여 인원", required = true, example = "5")
     @field:Min(2, message = MAX_APPLY_MIN_INVALID)
     val maxApply: Int = 2,
     @field:ApiModelProperty(notes = "최소 나이", required = false, example = "20")
