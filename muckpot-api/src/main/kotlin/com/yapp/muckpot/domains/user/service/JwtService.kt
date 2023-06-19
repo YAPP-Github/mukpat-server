@@ -7,14 +7,20 @@ import com.auth0.jwt.interfaces.DecodedJWT
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.yapp.muckpot.common.ACCESS_TOKEN_BASIC_SECONDS
 import com.yapp.muckpot.common.ACCESS_TOKEN_KEEP_SECONDS
-import com.yapp.muckpot.common.JwtCookieUtil
+import com.yapp.muckpot.common.ACCESS_TOKEN_KEY
+import com.yapp.muckpot.common.CookieUtil
+import com.yapp.muckpot.common.JWT_LOGOUT_VALUE
 import com.yapp.muckpot.common.MS
 import com.yapp.muckpot.common.REFRESH_TOKEN_BASIC_SECONDS
 import com.yapp.muckpot.common.REFRESH_TOKEN_KEEP_SECONDS
+import com.yapp.muckpot.common.REFRESH_TOKEN_KEY
 import com.yapp.muckpot.common.USER_CLAIM
 import com.yapp.muckpot.common.USER_EMAIL_CLAIM
 import com.yapp.muckpot.common.enums.YesNo
 import com.yapp.muckpot.domains.user.controller.dto.UserResponse
+import com.yapp.muckpot.domains.user.exception.UserErrorCode
+import com.yapp.muckpot.exception.MuckPotException
+import com.yapp.muckpot.redis.RedisService
 import mu.KLogging
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -23,6 +29,7 @@ import java.util.*
 @Service
 class JwtService(
     private val objectMapper: ObjectMapper,
+    private val redisService: RedisService,
     @Value("\${jwt.issuer}")
     private val issuer: String,
     @Value("\${jwt.secret-key}")
@@ -55,10 +62,14 @@ class JwtService(
      */
     fun getCurrentUserClaim(): UserResponse? {
         return try {
-            val decodedJwt = verify(JwtCookieUtil.getAccessToken())
+            val token = CookieUtil.getToken(ACCESS_TOKEN_KEY)
+            if (isBlackListToken(token)) {
+                throw MuckPotException(UserErrorCode.IS_BLACKLIST_TOKEN)
+            }
+            val decodedJwt = jwtVerifier.verify(token)
             objectMapper.readValue(decodedJwt.getClaim(USER_CLAIM).asString(), UserResponse::class.java)
         } catch (exception: Exception) {
-            log.debug(exception) { "로그인 유저 정보를 찾을 수 없습니다." }
+            log.debug(exception) { exception.message }
             null
         }
     }
@@ -79,7 +90,26 @@ class JwtService(
         }
     }
 
-    private fun verify(token: String): DecodedJWT {
-        return jwtVerifier.verify(token)
+    fun allTokenClear(): Boolean {
+        return try {
+            val accessToken = CookieUtil.getToken(ACCESS_TOKEN_KEY)
+            val decodedRefreshToken = jwtVerifier.verify(CookieUtil.getToken(REFRESH_TOKEN_KEY))
+            val decodedAccessToken = jwtVerifier.verify(accessToken)
+            val email = decodedRefreshToken.getClaim(USER_EMAIL_CLAIM).asString()
+            redisService.setDataExpireWithNewest(accessToken, JWT_LOGOUT_VALUE, this.getTokenExpirationDuration(decodedAccessToken))
+            redisService.deleteData(email)
+            true
+        } catch (exception: Exception) {
+            log.debug(exception) { exception.message }
+            false
+        }
+    }
+
+    private fun isBlackListToken(token: String): Boolean {
+        return redisService.getData(token) != null
+    }
+
+    private fun getTokenExpirationDuration(decodedJwt: DecodedJWT): Long {
+        return (decodedJwt.expiresAt.time - Date().time) / MS
     }
 }

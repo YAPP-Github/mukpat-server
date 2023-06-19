@@ -1,13 +1,17 @@
 package com.yapp.muckpot.config
 
-import com.yapp.muckpot.common.EMAIL_REQUEST
-import com.yapp.muckpot.common.EMAIL_VERIFY
+import com.yapp.muckpot.common.ACCESS_TOKEN_KEY
+import com.yapp.muckpot.common.EMAIL_REQUEST_URL
+import com.yapp.muckpot.common.EMAIL_VERIFY_URL
 import com.yapp.muckpot.common.LOGIN_URL
+import com.yapp.muckpot.common.LOGOUT_URL
+import com.yapp.muckpot.common.REFRESH_TOKEN_KEY
 import com.yapp.muckpot.common.SIGN_UP_URL
 import com.yapp.muckpot.common.USER_PROFILE_URL
-import com.yapp.muckpot.common.security.CustomAuthenticationEntryPoint
 import com.yapp.muckpot.domains.user.service.JwtService
+import com.yapp.muckpot.filter.AuthenticationFailHandler
 import com.yapp.muckpot.filter.JwtAuthorizationFilter
+import com.yapp.muckpot.filter.JwtLogoutHandler
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -19,9 +23,11 @@ import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.web.authentication.logout.LogoutHandler
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
+import javax.servlet.http.HttpServletResponse
 
 @Configuration
 class SecurityConfig(
@@ -56,7 +62,15 @@ class SecurityConfig(
             .formLogin().disable()
             .httpBasic().disable()
             .exceptionHandling()
-            .authenticationEntryPoint(CustomAuthenticationEntryPoint())
+            .authenticationEntryPoint(AuthenticationFailHandler())
+            .and()
+            .logout()
+            .logoutUrl(LOGOUT_URL)
+            .deleteCookies(ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY)
+            .addLogoutHandler(logoutHandler())
+            .logoutSuccessHandler { _, response, _ ->
+                response.status = HttpServletResponse.SC_NO_CONTENT
+            }
 
         return http.build()
     }
@@ -87,12 +101,17 @@ class SecurityConfig(
         return BCryptPasswordEncoder()
     }
 
+    @Bean
+    fun logoutHandler(): LogoutHandler {
+        return JwtLogoutHandler(jwtService)
+    }
+
     companion object {
         val POST_PERMIT_ALL_URLS = listOf(
             LOGIN_URL,
             SIGN_UP_URL,
-            EMAIL_REQUEST,
-            EMAIL_VERIFY,
+            EMAIL_REQUEST_URL,
+            EMAIL_VERIFY_URL,
             USER_PROFILE_URL
         )
 
