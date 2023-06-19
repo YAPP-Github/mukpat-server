@@ -1,4 +1,4 @@
-package com.yapp.muckpot.common
+package com.yapp.muckpot.common.constants
 
 const val ACCESS_TOKEN_KEY = "accessToken"
 const val REFRESH_TOKEN_KEY = "refreshToken"

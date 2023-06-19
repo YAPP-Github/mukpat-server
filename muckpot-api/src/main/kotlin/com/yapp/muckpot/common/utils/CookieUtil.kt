@@ -1,4 +1,4 @@
-package com.yapp.muckpot.common
+package com.yapp.muckpot.common.utils
 
 import com.yapp.muckpot.domains.user.exception.UserErrorCode
 import com.yapp.muckpot.exception.MuckPotException

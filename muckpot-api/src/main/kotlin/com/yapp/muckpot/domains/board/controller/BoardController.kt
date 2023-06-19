@@ -1,18 +1,18 @@
 package com.yapp.muckpot.domains.board.controller
 
 import com.yapp.muckpot.common.ResponseDto
-import com.yapp.muckpot.common.ResponseEntityUtil
-import com.yapp.muckpot.common.SecurityContextHolderUtil
+import com.yapp.muckpot.common.constants.MUCKPOT_FIND_ALL
+import com.yapp.muckpot.common.constants.MUCKPOT_FIND_BY_ID
+import com.yapp.muckpot.common.constants.MUCKPOT_JOIN_RESPONSE
+import com.yapp.muckpot.common.constants.MUCKPOT_SAVE_RESPONSE
 import com.yapp.muckpot.common.dto.CursorPaginationRequest
+import com.yapp.muckpot.common.utils.ResponseEntityUtil
+import com.yapp.muckpot.common.utils.SecurityContextHolderUtil
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateRequest
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateResponse
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotUpdateRequest
 import com.yapp.muckpot.domains.board.service.BoardService
 import com.yapp.muckpot.domains.user.enums.MuckPotStatus
-import com.yapp.muckpot.swagger.MUCKPOT_FIND_ALL
-import com.yapp.muckpot.swagger.MUCKPOT_FIND_BY_ID
-import com.yapp.muckpot.swagger.MUCKPOT_JOIN_RESPONSE
-import com.yapp.muckpot.swagger.MUCKPOT_SAVE_RESPONSE
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiResponse

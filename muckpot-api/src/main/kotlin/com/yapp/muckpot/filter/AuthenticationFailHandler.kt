@@ -1,6 +1,6 @@
 package com.yapp.muckpot.filter
 
-import com.yapp.muckpot.common.ResponseWriter
+import com.yapp.muckpot.common.utils.ResponseWriter
 import mu.KLogging
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.AuthenticationException

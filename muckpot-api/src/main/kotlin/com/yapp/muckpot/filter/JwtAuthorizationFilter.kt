@@ -1,9 +1,9 @@
 package com.yapp.muckpot.filter
 
-import com.yapp.muckpot.common.LOGIN_URL
-import com.yapp.muckpot.common.ResponseWriter
-import com.yapp.muckpot.common.SIGN_UP_URL
+import com.yapp.muckpot.common.constants.LOGIN_URL
+import com.yapp.muckpot.common.constants.SIGN_UP_URL
 import com.yapp.muckpot.common.security.AuthenticationUser
+import com.yapp.muckpot.common.utils.ResponseWriter
 import com.yapp.muckpot.domains.user.service.JwtService
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.authority.SimpleGrantedAuthority

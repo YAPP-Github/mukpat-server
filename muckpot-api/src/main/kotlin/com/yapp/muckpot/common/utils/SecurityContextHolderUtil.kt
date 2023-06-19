@@ -1,4 +1,4 @@
-package com.yapp.muckpot.common
+package com.yapp.muckpot.common.utils
 
 import com.yapp.muckpot.domains.user.controller.dto.UserResponse
 import org.springframework.security.authentication.AnonymousAuthenticationToken

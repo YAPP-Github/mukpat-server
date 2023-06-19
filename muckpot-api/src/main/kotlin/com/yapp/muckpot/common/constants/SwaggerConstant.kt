@@ -1,4 +1,4 @@
-package com.yapp.muckpot.swagger
+package com.yapp.muckpot.common.constants
 
 // User
 const val TEST_SAMPLE = """

@@ -1,13 +1,13 @@
 package com.yapp.muckpot.config
 
-import com.yapp.muckpot.common.ACCESS_TOKEN_KEY
-import com.yapp.muckpot.common.EMAIL_REQUEST_URL
-import com.yapp.muckpot.common.EMAIL_VERIFY_URL
-import com.yapp.muckpot.common.LOGIN_URL
-import com.yapp.muckpot.common.LOGOUT_URL
-import com.yapp.muckpot.common.REFRESH_TOKEN_KEY
-import com.yapp.muckpot.common.SIGN_UP_URL
-import com.yapp.muckpot.common.USER_PROFILE_URL
+import com.yapp.muckpot.common.constants.ACCESS_TOKEN_KEY
+import com.yapp.muckpot.common.constants.EMAIL_REQUEST_URL
+import com.yapp.muckpot.common.constants.EMAIL_VERIFY_URL
+import com.yapp.muckpot.common.constants.LOGIN_URL
+import com.yapp.muckpot.common.constants.LOGOUT_URL
+import com.yapp.muckpot.common.constants.REFRESH_TOKEN_KEY
+import com.yapp.muckpot.common.constants.SIGN_UP_URL
+import com.yapp.muckpot.common.constants.USER_PROFILE_URL
 import com.yapp.muckpot.domains.user.service.JwtService
 import com.yapp.muckpot.filter.AuthenticationFailHandler
 import com.yapp.muckpot.filter.JwtAuthorizationFilter

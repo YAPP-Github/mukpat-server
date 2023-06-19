@@ -1,9 +1,9 @@
 package com.yapp.muckpot.domains.user.service
 
-import com.yapp.muckpot.common.ACCESS_TOKEN_KEY
-import com.yapp.muckpot.common.CookieUtil
-import com.yapp.muckpot.common.REFRESH_TOKEN_KEY
-import com.yapp.muckpot.common.RandomCodeUtil
+import com.yapp.muckpot.common.constants.ACCESS_TOKEN_KEY
+import com.yapp.muckpot.common.constants.REFRESH_TOKEN_KEY
+import com.yapp.muckpot.common.utils.CookieUtil
+import com.yapp.muckpot.common.utils.RandomCodeUtil
 import com.yapp.muckpot.domains.user.controller.dto.EmailAuthResponse
 import com.yapp.muckpot.domains.user.controller.dto.LoginRequest
 import com.yapp.muckpot.domains.user.controller.dto.SendEmailAuthRequest

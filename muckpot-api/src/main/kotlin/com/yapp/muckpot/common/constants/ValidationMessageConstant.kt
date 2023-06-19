@@ -1,4 +1,4 @@
-package com.yapp.muckpot.common
+package com.yapp.muckpot.common.constants
 
 const val MAX_APPLY_MIN_INVALID = "참여 인원은 {value}명 이상 가능합니다."
 const val TITLE_MAX_INVALID = "제목은 {max}(자)를 넘을 수 없습니다."

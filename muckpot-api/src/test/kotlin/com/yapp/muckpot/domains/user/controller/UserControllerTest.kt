@@ -1,8 +1,8 @@
 package com.yapp.muckpot.domains.user.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.yapp.muckpot.common.ACCESS_TOKEN_KEY
-import com.yapp.muckpot.common.JWT_LOGOUT_VALUE
+import com.yapp.muckpot.common.constants.ACCESS_TOKEN_KEY
+import com.yapp.muckpot.common.constants.JWT_LOGOUT_VALUE
 import com.yapp.muckpot.common.enums.YesNo
 import com.yapp.muckpot.domains.user.controller.dto.LoginRequest
 import com.yapp.muckpot.domains.user.entity.MuckPotUser
@@ -74,6 +74,7 @@ class UserControllerTest @Autowired constructor(
         // then
         val blackList = redisService.getData(accessToken)
         val refreshToken = redisService.getData(loginUser.email)
+
         blackList shouldBe JWT_LOGOUT_VALUE
         refreshToken shouldBe null
     }
