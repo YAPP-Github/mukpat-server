@@ -1,6 +1,8 @@
 package com.yapp.muckpot.domains.user.service
 
-import com.yapp.muckpot.common.JwtCookieUtil
+import com.yapp.muckpot.common.ACCESS_TOKEN_KEY
+import com.yapp.muckpot.common.CookieUtil
+import com.yapp.muckpot.common.REFRESH_TOKEN_KEY
 import com.yapp.muckpot.common.RandomCodeUtil
 import com.yapp.muckpot.domains.user.controller.dto.EmailAuthResponse
 import com.yapp.muckpot.domains.user.controller.dto.LoginRequest
@@ -41,8 +43,8 @@ class UserService(
             val refreshToken = jwtService.generateRefreshToken(request.email, refreshTokenSeconds)
 
             redisService.setDataExpireWithNewest(request.email, refreshToken, refreshTokenSeconds)
-            JwtCookieUtil.addAccessTokenCookie(accessToken, accessTokenSeconds.toInt())
-            JwtCookieUtil.addRefreshTokenCookie(refreshToken, refreshTokenSeconds.toInt())
+            CookieUtil.addHttpOnlyCookie(ACCESS_TOKEN_KEY, accessToken, accessTokenSeconds.toInt())
+            CookieUtil.addHttpOnlyCookie(REFRESH_TOKEN_KEY, refreshToken, refreshTokenSeconds.toInt())
             return response
         } ?: run {
             throw MuckPotException(UserErrorCode.LOGIN_FAIL)
