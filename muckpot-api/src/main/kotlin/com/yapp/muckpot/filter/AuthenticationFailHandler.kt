@@ -1,4 +1,4 @@
-package com.yapp.muckpot.common.security
+package com.yapp.muckpot.filter
 
 import com.yapp.muckpot.common.ResponseWriter
 import mu.KLogging
@@ -8,7 +8,7 @@ import org.springframework.security.web.AuthenticationEntryPoint
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
-class CustomAuthenticationEntryPoint : AuthenticationEntryPoint {
+class AuthenticationFailHandler : AuthenticationEntryPoint {
     private val log = KLogging().logger
 
     override fun commence(
