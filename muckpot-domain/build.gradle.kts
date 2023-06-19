@@ -5,6 +5,7 @@ val containerVer = "1.17.6"
 plugins {
     kotlin("kapt")
     kotlin("plugin.noarg")
+    `java-test-fixtures`
 }
 
 dependencies {

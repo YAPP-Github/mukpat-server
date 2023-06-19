@@ -1,5 +1,3 @@
-package com.yapp.muckpot.fixture
-
 import com.yapp.muckpot.common.AGE_MAX
 import com.yapp.muckpot.common.AGE_MIN
 import com.yapp.muckpot.common.Location

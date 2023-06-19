@@ -2,7 +2,6 @@ package com.yapp.muckpot.domains.board.controller.dto
 
 import com.yapp.muckpot.domains.board.exception.BoardErrorCode
 import com.yapp.muckpot.exception.MuckPotException
-import com.yapp.muckpot.fixture.Fixture
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe

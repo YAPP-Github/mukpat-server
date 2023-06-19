@@ -7,7 +7,6 @@ import com.yapp.muckpot.common.enums.YesNo
 import com.yapp.muckpot.domains.user.controller.dto.LoginRequest
 import com.yapp.muckpot.domains.user.entity.MuckPotUser
 import com.yapp.muckpot.domains.user.repository.MuckPotUserRepository
-import com.yapp.muckpot.fixture.Fixture
 import com.yapp.muckpot.redis.RedisService
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe

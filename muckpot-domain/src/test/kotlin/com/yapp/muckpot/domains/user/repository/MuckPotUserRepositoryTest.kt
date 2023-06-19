@@ -1,7 +1,7 @@
 package com.yapp.muckpot.domains.user.repository
 
+import Fixture.createUser
 import com.yapp.muckpot.config.CustomDataJpaTest
-import com.yapp.muckpot.fixture.Fixture.createUser
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
