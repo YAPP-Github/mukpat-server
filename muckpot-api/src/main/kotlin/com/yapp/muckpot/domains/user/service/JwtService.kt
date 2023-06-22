@@ -157,7 +157,7 @@ class JwtService(
     }
 
     fun isTokenExpired(token: String): Boolean {
-        val decodedToken = jwtVerifier.verify(token)
+        val decodedToken = JWT.decode(token)
         return decodedToken.expiresAt <= Date()
     }
 }
