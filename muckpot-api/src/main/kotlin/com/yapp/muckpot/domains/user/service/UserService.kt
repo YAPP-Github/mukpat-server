@@ -96,7 +96,6 @@ class UserService(
             val newAccessToken = jwtService.generateAccessToken(response, accessTokenSeconds)
             val newRefreshToken = jwtService.generateNewRefreshFromOldRefresh(user.email, refreshToken)
 
-            redisService.deleteData(user.email)
             redisService.setDataExpireWithNewest(user.email, newRefreshToken, leftRefreshTokenSeconds)
             CookieUtil.addHttpOnlyCookie(ACCESS_TOKEN_KEY, newAccessToken, accessTokenSeconds.toInt())
             CookieUtil.addHttpOnlyCookie(REFRESH_TOKEN_KEY, newRefreshToken, leftRefreshTokenSeconds.toInt())
