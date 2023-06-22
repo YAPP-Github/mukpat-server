@@ -131,7 +131,7 @@ class JwtService(
 
     fun getLeftExpirationTime(token: String): Long {
         val decodedToken = jwtVerifier.verify(token)
-        return (decodedToken.expiresAt.time - Date().time) / MS
+        return getTokenExpirationDuration(decodedToken)
     }
 
     fun isLoginStay(refreshToken: String): YesNo {
