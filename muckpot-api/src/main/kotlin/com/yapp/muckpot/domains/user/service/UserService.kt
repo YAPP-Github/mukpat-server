@@ -88,10 +88,11 @@ class UserService(
         val email = jwtService.getCurrentUserEmail(refreshToken)
             ?: throw MuckPotException(UserErrorCode.FAIL_JWT_REISSUE)
         userRepository.findByEmail(email)?.let { user ->
-            val response = UserResponse.of(user)
-            val accessTokenSeconds = jwtService.getAccessTokenSecondsByLoginStay(refreshToken)
+            val isLoginStay = jwtService.isLoginStay(refreshToken)
+            val accessTokenSeconds = jwtService.getAccessTokenSeconds(isLoginStay)
             val leftRefreshTokenSeconds = jwtService.getLeftExpirationTime(refreshToken)
 
+            val response = UserResponse.of(user)
             val newAccessToken = jwtService.generateAccessToken(response, accessTokenSeconds)
             val newRefreshToken = jwtService.generateNewRefreshFromOldRefresh(user.email, refreshToken)
 

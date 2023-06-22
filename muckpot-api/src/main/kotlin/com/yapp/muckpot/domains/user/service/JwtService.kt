@@ -134,13 +134,13 @@ class JwtService(
         return (decodedToken.expiresAt.time - Date().time) / MS
     }
 
-    fun getAccessTokenSecondsByLoginStay(refreshToken: String): Long {
+    fun isLoginStay(refreshToken: String): YesNo {
         val decodedRefreshToken = jwtVerifier.verify(refreshToken)
         val duration = (decodedRefreshToken.expiresAt.time - decodedRefreshToken.issuedAt.time) / MS
         return if (duration == REFRESH_TOKEN_KEEP_SECONDS) {
-            ACCESS_TOKEN_KEEP_SECONDS
+            YesNo.Y
         } else {
-            ACCESS_TOKEN_BASIC_SECONDS
+            YesNo.N
         }
     }
 
