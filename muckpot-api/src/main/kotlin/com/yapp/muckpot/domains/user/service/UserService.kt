@@ -88,7 +88,8 @@ class UserService(
         if (!jwtService.isTokenExpired(accessToken)) throw MuckPotException(UserErrorCode.FAIL_JWT_REISSUE)
         val email = jwtService.getCurrentUserEmail(refreshToken)
             ?: throw MuckPotException(UserErrorCode.FAIL_JWT_REISSUE)
-        redisService.getData(email) ?: throw MuckPotException(UserErrorCode.FAIL_JWT_REISSUE)
+        val redisToken = redisService.getData(email) ?: throw MuckPotException(UserErrorCode.FAIL_JWT_REISSUE)
+        if (redisToken != refreshToken) throw MuckPotException(UserErrorCode.FAIL_JWT_REISSUE)
 
         userRepository.findByEmail(email)?.let { user ->
             val isLoginStay = jwtService.isLoginStay(refreshToken)
