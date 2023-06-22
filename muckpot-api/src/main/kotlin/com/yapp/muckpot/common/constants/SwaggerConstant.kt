@@ -28,7 +28,7 @@ const val EMAIL_AUTH_REQ_RESPONSE = """
 }
 """
 
-const val EMAIL_AUTH_RESPONSE = """
+const val NO_BODY_RESPONSE = """
 {
     "status": 204
 }

@@ -1,9 +1,11 @@
 package com.yapp.muckpot.domains.user.controller
 
 import com.yapp.muckpot.common.ResponseDto
+import com.yapp.muckpot.common.constants.ACCESS_TOKEN_KEY
 import com.yapp.muckpot.common.constants.EMAIL_AUTH_REQ_RESPONSE
-import com.yapp.muckpot.common.constants.EMAIL_AUTH_RESPONSE
 import com.yapp.muckpot.common.constants.LOGIN_RESPONSE
+import com.yapp.muckpot.common.constants.NO_BODY_RESPONSE
+import com.yapp.muckpot.common.constants.REFRESH_TOKEN_KEY
 import com.yapp.muckpot.common.constants.SIGN_UP_RESPONSE
 import com.yapp.muckpot.common.utils.ResponseEntityUtil
 import com.yapp.muckpot.common.utils.SecurityContextHolderUtil
@@ -20,6 +22,7 @@ import io.swagger.annotations.Example
 import io.swagger.annotations.ExampleProperty
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.CookieValue
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -86,7 +89,7 @@ class UserController(
                 code = 204,
                 examples = Example(
                     ExampleProperty(
-                        value = EMAIL_AUTH_RESPONSE,
+                        value = NO_BODY_RESPONSE,
                         mediaType = MediaType.APPLICATION_JSON_VALUE
                     )
                 ),
@@ -153,5 +156,26 @@ class UserController(
         request: SignUpRequest
     ): ResponseEntity<ResponseDto> {
         return ResponseEntityUtil.created(userService.signUp(request))
+    }
+
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                code = 204,
+                examples = Example(
+                    ExampleProperty(
+                        value = NO_BODY_RESPONSE,
+                        mediaType = MediaType.APPLICATION_JSON_VALUE
+                    )
+                ),
+                message = "성공"
+            )
+        ]
+    )
+    @ApiOperation(value = "JWT 재발급")
+    @PostMapping("/v1/users/refresh")
+    fun reissueJwt(@CookieValue(REFRESH_TOKEN_KEY) refreshToken: String, @CookieValue(ACCESS_TOKEN_KEY) accessToken: String): ResponseEntity<ResponseDto> {
+        userService.reissueJwt(refreshToken, accessToken)
+        return ResponseEntityUtil.noContent()
     }
 }

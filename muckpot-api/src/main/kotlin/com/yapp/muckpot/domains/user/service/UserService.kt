@@ -82,4 +82,29 @@ class UserService(
             return UserResponse.of(user)
         }
     }
+
+    @Transactional
+    fun reissueJwt(refreshToken: String, accessToken: String) {
+        if (!jwtService.isTokenExpired(accessToken)) throw MuckPotException(UserErrorCode.FAIL_JWT_REISSUE)
+        val email = jwtService.getCurrentUserEmail(refreshToken)
+            ?: throw MuckPotException(UserErrorCode.FAIL_JWT_REISSUE)
+        val redisToken = redisService.getData(email) ?: throw MuckPotException(UserErrorCode.FAIL_JWT_REISSUE)
+        if (redisToken != refreshToken) throw MuckPotException(UserErrorCode.FAIL_JWT_REISSUE)
+
+        userRepository.findByEmail(email)?.let { user ->
+            val isLoginStay = jwtService.isLoginStay(refreshToken)
+            val accessTokenSeconds = jwtService.getAccessTokenSeconds(isLoginStay)
+            val leftRefreshTokenSeconds = jwtService.getLeftExpirationTime(refreshToken)
+
+            val response = UserResponse.of(user)
+            val newAccessToken = jwtService.generateAccessToken(response, accessTokenSeconds)
+            val newRefreshToken = jwtService.generateNewRefreshFromOldRefresh(user.email, refreshToken)
+
+            redisService.setDataExpireWithNewest(user.email, newRefreshToken, leftRefreshTokenSeconds)
+            CookieUtil.addHttpOnlyCookie(ACCESS_TOKEN_KEY, newAccessToken, accessTokenSeconds.toInt())
+            CookieUtil.addHttpOnlyCookie(REFRESH_TOKEN_KEY, newRefreshToken, leftRefreshTokenSeconds.toInt())
+        } ?: run {
+            throw MuckPotException(UserErrorCode.USER_NOT_FOUND)
+        }
+    }
 }

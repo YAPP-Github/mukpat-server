@@ -51,6 +51,7 @@ class JwtService(
         val jwtBuilder = JWT.create()
             .withIssuer(issuer)
             .withClaim(USER_EMAIL_CLAIM, email)
+            .withIssuedAt(Date())
             .withExpiresAt(Date(Date().time + expiredSeconds * MS))
         return jwtBuilder.sign(algorithm)
     }
@@ -111,5 +112,52 @@ class JwtService(
 
     private fun getTokenExpirationDuration(decodedJwt: DecodedJWT): Long {
         return (decodedJwt.expiresAt.time - Date().time) / MS
+    }
+
+    /**
+     * 현재 HttpServletRequest의 RefreshToken 찾아 이메일 정보 반환
+     *
+     * @return Email? 유저 정보가 없는 경우 null 반환
+     */
+    fun getCurrentUserEmail(refreshToken: String): String? {
+        return try {
+            val decodedRefreshToken = jwtVerifier.verify(refreshToken)
+            decodedRefreshToken.getClaim(USER_EMAIL_CLAIM).asString()
+        } catch (exception: Exception) {
+            log.debug(exception) { "이메일 정보를 찾을 수 없습니다." }
+            null
+        }
+    }
+
+    fun getLeftExpirationTime(token: String): Long {
+        val decodedToken = jwtVerifier.verify(token)
+        return getTokenExpirationDuration(decodedToken)
+    }
+
+    fun isLoginStay(refreshToken: String): YesNo {
+        val decodedRefreshToken = jwtVerifier.verify(refreshToken)
+        val duration = (decodedRefreshToken.expiresAt.time - decodedRefreshToken.issuedAt.time) / MS
+        return if (duration == REFRESH_TOKEN_KEEP_SECONDS) {
+            YesNo.Y
+        } else {
+            YesNo.N
+        }
+    }
+
+    fun generateNewRefreshFromOldRefresh(email: String, oldRefreshToken: String): String {
+        val decodedOldRefreshToken = jwtVerifier.verify(oldRefreshToken)
+        val expiredAt = decodedOldRefreshToken.expiresAt
+        val issuedAt = decodedOldRefreshToken.issuedAt
+        val jwtBuilder = JWT.create()
+            .withIssuer(issuer)
+            .withClaim(USER_EMAIL_CLAIM, email)
+            .withIssuedAt(issuedAt)
+            .withExpiresAt(expiredAt)
+        return jwtBuilder.sign(algorithm)
+    }
+
+    fun isTokenExpired(token: String): Boolean {
+        val decodedToken = jwtVerifier.verify(token)
+        return decodedToken.expiresAt <= Date()
     }
 }
