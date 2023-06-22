@@ -155,4 +155,10 @@ class JwtService(
             .withExpiresAt(expiredAt)
         return jwtBuilder.sign(algorithm)
     }
+
+    fun isTokenExpired(token: String): Boolean {
+        val accessToken = CookieUtil.getToken(ACCESS_TOKEN_KEY)
+        val decodedAccessToken = jwtVerifier.verify(accessToken)
+        return decodedAccessToken.expiresAt <= Date()
+    }
 }

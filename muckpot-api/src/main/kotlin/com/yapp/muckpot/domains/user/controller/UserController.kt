@@ -1,6 +1,7 @@
 package com.yapp.muckpot.domains.user.controller
 
 import com.yapp.muckpot.common.ResponseDto
+import com.yapp.muckpot.common.constants.ACCESS_TOKEN_KEY
 import com.yapp.muckpot.common.constants.EMAIL_AUTH_REQ_RESPONSE
 import com.yapp.muckpot.common.constants.LOGIN_RESPONSE
 import com.yapp.muckpot.common.constants.NO_BODY_RESPONSE
@@ -173,8 +174,8 @@ class UserController(
     )
     @ApiOperation(value = "JWT 재발급")
     @PostMapping("/v1/users/refresh")
-    fun reissueJwt(@CookieValue(REFRESH_TOKEN_KEY) refreshToken: String): ResponseEntity<ResponseDto> {
-        userService.reissueJwt(refreshToken)
+    fun reissueJwt(@CookieValue(REFRESH_TOKEN_KEY) refreshToken: String, @CookieValue(ACCESS_TOKEN_KEY) accessToken: String): ResponseEntity<ResponseDto> {
+        userService.reissueJwt(refreshToken, accessToken)
         return ResponseEntityUtil.noContent()
     }
 }
