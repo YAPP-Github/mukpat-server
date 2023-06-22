@@ -1,7 +1,8 @@
-package com.yapp.muckpot.common
+package com.yapp.muckpot.common.utils
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.yapp.muckpot.common.ResponseDto
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import javax.servlet.http.HttpServletResponse

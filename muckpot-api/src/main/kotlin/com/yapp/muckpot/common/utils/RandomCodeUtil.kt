@@ -1,4 +1,4 @@
-package com.yapp.muckpot.common
+package com.yapp.muckpot.common.utils
 
 import java.security.SecureRandom
 

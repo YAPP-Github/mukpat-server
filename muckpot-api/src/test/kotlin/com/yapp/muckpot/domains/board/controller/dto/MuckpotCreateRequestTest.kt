@@ -2,8 +2,8 @@ package com.yapp.muckpot.domains.board.controller.dto
 
 import com.yapp.muckpot.common.CHAT_LINK_MAX
 import com.yapp.muckpot.common.CONTENT_MAX
-import com.yapp.muckpot.common.NOT_BLANK_COMMON
 import com.yapp.muckpot.common.TITLE_MAX
+import com.yapp.muckpot.common.constants.NOT_BLANK_COMMON
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import java.time.LocalDate

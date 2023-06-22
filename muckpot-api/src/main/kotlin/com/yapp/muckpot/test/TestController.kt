@@ -1,9 +1,9 @@
 package com.yapp.muckpot.test
 
 import com.yapp.muckpot.common.ResponseDto
-import com.yapp.muckpot.common.ResponseEntityUtil
+import com.yapp.muckpot.common.constants.TEST_SAMPLE
+import com.yapp.muckpot.common.utils.ResponseEntityUtil
 import com.yapp.muckpot.redis.RedisService
-import com.yapp.muckpot.swagger.TEST_SAMPLE
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiResponse

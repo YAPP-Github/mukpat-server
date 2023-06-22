@@ -1,5 +1,6 @@
-package com.yapp.muckpot.common
+package com.yapp.muckpot.common.utils
 
+import com.yapp.muckpot.common.ResponseDto
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 

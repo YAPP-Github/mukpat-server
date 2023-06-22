@@ -1,12 +1,12 @@
 package com.yapp.muckpot.domains.board.repository
 
+import Fixture
 import com.querydsl.jpa.impl.JPAQueryFactory
 import com.yapp.muckpot.config.CustomDataJpaTest
 import com.yapp.muckpot.domains.board.entity.Board
 import com.yapp.muckpot.domains.board.entity.Participant
 import com.yapp.muckpot.domains.user.entity.MuckPotUser
 import com.yapp.muckpot.domains.user.repository.MuckPotUserRepository
-import com.yapp.muckpot.fixture.Fixture
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe

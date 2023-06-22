@@ -3,7 +3,6 @@ package com.yapp.muckpot.domains.board.controller.dto
 import com.yapp.muckpot.domains.board.dto.ParticipantReadResponse
 import com.yapp.muckpot.domains.user.controller.dto.UserResponse
 import com.yapp.muckpot.domains.user.enums.JobGroupMain
-import com.yapp.muckpot.fixture.Fixture
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 

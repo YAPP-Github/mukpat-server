@@ -1,10 +1,10 @@
 package com.yapp.muckpot.domains.board.entity
 
+import Fixture
 import com.yapp.muckpot.common.Location
 import com.yapp.muckpot.common.MAX_APPLY_MIN
 import com.yapp.muckpot.domains.user.entity.MuckPotUser
 import com.yapp.muckpot.domains.user.enums.MuckPotStatus
-import com.yapp.muckpot.fixture.Fixture
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
