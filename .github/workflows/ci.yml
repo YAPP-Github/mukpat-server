@@ -22,10 +22,3 @@ jobs:
 
     - name: Gradle Clean & Build
       run: ./gradlew clean build
-
-    - name: Check ktlint format
-      run: ./gradlew ktlintCheck
-
-    - name: Test with Gradle
-      run: ./gradlew test
-

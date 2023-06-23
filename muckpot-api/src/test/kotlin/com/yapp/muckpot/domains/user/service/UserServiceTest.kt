@@ -41,7 +41,7 @@ class UserServiceTest @Autowired constructor(
         val user = userService.signUp(request)
         // then
         user shouldNotBe null
-        user.nickName shouldBe "request.nickname"
+        user.nickName shouldBe request.nickname
     }
 
     "중복 회원가입 불가 검증" {
