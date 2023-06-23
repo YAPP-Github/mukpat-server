@@ -1,10 +1,9 @@
 package com.yapp.muckpot
 
-import org.junit.jupiter.api.Test
+import io.kotest.core.spec.style.StringSpec
 import org.springframework.boot.test.context.SpringBootTest
 
 @SpringBootTest
-class ApplicationTest {
-    @Test
-    fun contextLoads() {}
-}
+class ApplicationTest : StringSpec({
+    "contextLoads" {}
+})

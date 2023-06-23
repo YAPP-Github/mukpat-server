@@ -1,5 +1,6 @@
 package com.yapp.muckpot.domains.board.service
 
+import Fixture
 import com.yapp.muckpot.common.Location
 import com.yapp.muckpot.common.enums.Gender
 import com.yapp.muckpot.common.redisson.ConcurrencyHelper
@@ -26,7 +27,6 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.repository.findByIdOrNull
 import java.time.LocalDate
 import java.time.LocalTime
-import java.util.*
 import java.util.concurrent.atomic.AtomicLong
 
 @SpringBootTest

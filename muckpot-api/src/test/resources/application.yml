@@ -1,15 +1,23 @@
 spring:
-  profiles:
-    active: local
-    include:
-      - domain
-      - infra
+  mail:
+    host: smtp.gmail.com
+    port: ${GOOGLE_SMTP_PORT:8080}
+    username: ${GOOGLE_SMTP_USERNAME:test}
+    password: ${GOOGLE_SMTP_PASSWORD:test}
+
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
 
   jpa:
-    open-in-view: false
+    hibernate:
+      ddl-auto: update
+    generate-ddl: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.spatial.dialect.mariadb.MariaDB103SpatialDialect
+        format_sql: true
+    show_sql: true
 
 jwt:
   issuer: "muckpot"

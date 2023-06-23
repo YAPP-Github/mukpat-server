@@ -1,7 +1,5 @@
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
-val containerVer = "1.17.6"
-
 plugins {
     kotlin("kapt")
     kotlin("plugin.noarg")
@@ -19,10 +17,6 @@ dependencies {
     implementation("org.hibernate:hibernate-spatial:5.6.15.Final")
 
     runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
-
-    testImplementation("org.testcontainers:testcontainers:$containerVer")
-    testImplementation("org.testcontainers:junit-jupiter:$containerVer")
-    testImplementation("org.testcontainers:mariadb:$containerVer")
 }
 
 allOpen {
