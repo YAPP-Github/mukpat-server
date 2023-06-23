@@ -9,7 +9,7 @@ import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.utility.DockerImageName
 
 @AutoScan
-object GlobalRedisContainer : BeforeProjectListener, AfterProjectListener {
+object TestContainerManager : BeforeProjectListener, AfterProjectListener {
     private const val REDIS_PORT = 6379
 
     @Container
