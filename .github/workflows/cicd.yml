@@ -64,6 +64,7 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           port: ${{ env.DEV_PORT }}
           script: |
+            cd /var/www/html/api
             sudo touch .env
             echo "${{ secrets.ENV_VARS }}" | sudo tee .env > /dev/null
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/muckpot-api:${{ github.run_number }}
