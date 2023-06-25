@@ -1,7 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val kotestVersion = "5.5.4"
-val testContainerVersion = "1.17.6"
 
 plugins {
     id("org.springframework.boot") version "2.7.11" apply false
@@ -55,9 +54,6 @@ subprojects {
         testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
         testImplementation("io.kotest:kotest-framework-datatest:$kotestVersion")
         testImplementation("io.kotest.extensions:kotest-extensions-spring:1.1.2")
-        testImplementation("org.testcontainers:testcontainers:$testContainerVersion")
-        testImplementation("org.testcontainers:junit-jupiter:$testContainerVersion")
-        testImplementation("org.testcontainers:mariadb:$testContainerVersion")
         testImplementation("io.mockk:mockk:1.12.4")
         testImplementation("com.ninja-squad:springmockk:3.1.2")
     }

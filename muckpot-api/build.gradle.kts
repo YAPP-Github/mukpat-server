@@ -10,4 +10,5 @@ dependencies {
     implementation("org.redisson:redisson:3.20.0")
 
     testImplementation(testFixtures(project(":muckpot-domain")))
+    testImplementation(testFixtures(project(":muckpot-infra")))
 }
