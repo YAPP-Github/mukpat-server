@@ -9,6 +9,8 @@ import org.testcontainers.utility.DockerImageName
 
 @AutoScan
 object DomainContainerManager : BeforeProjectListener, AfterProjectListener {
+    private val DOMAIN_PROPERTIES = DomainProperties
+
     @Container
     private val mariaDBContainer = MariaDBContainer(DockerImageName.parse("mariadb:10.5")).apply {
         withDatabaseName("muckpot_test")

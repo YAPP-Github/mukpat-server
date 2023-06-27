@@ -9,6 +9,7 @@ import org.testcontainers.utility.DockerImageName
 
 @AutoScan
 object InfraContainerManager : BeforeProjectListener, AfterProjectListener {
+    private val INFRA_PROPERTIES = InfraProperties
     private const val REDIS_PORT = 6379
 
     @Container
