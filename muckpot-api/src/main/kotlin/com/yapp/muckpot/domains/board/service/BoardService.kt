@@ -55,9 +55,11 @@ class BoardService(
 
     @Transactional
     fun findBoardDetailAndVisit(boardId: Long, loginUserInfo: UserResponse?): MuckpotDetailResponse {
-        boardRepository.findByIdOrNull(boardId)?.let {
-            it.visit()
-            return MuckpotDetailResponse.of(it, participantQuerydslRepository.findByBoardIds(listOf(boardId))).apply {
+        boardRepository.findByIdOrNull(boardId)?.let { board ->
+            if (board.user.id != loginUserInfo?.userId) {
+                board.visit()
+            }
+            return MuckpotDetailResponse.of(board, participantQuerydslRepository.findByBoardIds(listOf(boardId))).apply {
                 sortParticipantsByLoginUser(loginUserInfo)
             }
         } ?: run {

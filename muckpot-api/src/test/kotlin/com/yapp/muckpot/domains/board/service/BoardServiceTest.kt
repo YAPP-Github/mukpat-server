@@ -26,7 +26,6 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.repository.findByIdOrNull
 import java.time.LocalDate
 import java.time.LocalTime
-import java.util.*
 import java.util.concurrent.atomic.AtomicLong
 
 @SpringBootTest
@@ -68,12 +67,7 @@ class BoardServiceTest @Autowired constructor(
     )
 
     beforeEach {
-        user = userRepository.save(
-            MuckPotUser(
-                null, "test@naver.com", "pw", "nickname",
-                Gender.MEN, 2000, JobGroupMain.DEVELOPMENT, "sub", Location("location", 0.0, 0.0), "url"
-            )
-        )
+        user = userRepository.save(Fixture.createUser())
         userId = user.id!!
     }
 
@@ -97,7 +91,7 @@ class BoardServiceTest @Autowired constructor(
         participant shouldNotBe null
     }
 
-    "먹팟 상세 조회시 조회수가 증가한다." {
+    "자신의 글은 조회수가 증가하지 않는다." {
         // given
         val boardId = boardService.saveBoard(userId, createRequest)!!
         val loginUserInfo = UserResponse.of(user)
@@ -105,6 +99,20 @@ class BoardServiceTest @Autowired constructor(
         // when
         boardService.findBoardDetailAndVisit(boardId, loginUserInfo)
         boardService.findBoardDetailAndVisit(boardId, loginUserInfo)
+
+        // then
+        val findBoard = boardRepository.findByIdOrNull(boardId)!!
+        findBoard.views shouldBe 0
+    }
+
+    "먹팟 상세 조회시 조회수가 증가한다." {
+        // given
+        val boardId = boardService.saveBoard(userId, createRequest)!!
+        val otherUser = UserResponse.of(userRepository.save(Fixture.createUser()))
+
+        // when
+        boardService.findBoardDetailAndVisit(boardId, otherUser)
+        boardService.findBoardDetailAndVisit(boardId, otherUser)
 
         // then
         val findBoard = boardRepository.findByIdOrNull(boardId)!!

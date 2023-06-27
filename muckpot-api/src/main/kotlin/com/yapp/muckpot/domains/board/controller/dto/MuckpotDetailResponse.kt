@@ -19,8 +19,8 @@ data class MuckpotDetailResponse(
     val createDate: String,
     val maxApply: Int,
     val currentApply: Int,
-    val minAge: Int,
-    val maxAge: Int,
+    var minAge: Int? = null,
+    var maxAge: Int? = null,
     val locationName: String,
     val x: Double,
     val y: Double,
@@ -47,9 +47,14 @@ data class MuckpotDetailResponse(
         }
     }
 
+    private fun changeIsNotAgeLimit() {
+        this.minAge = null
+        this.maxAge = null
+    }
+
     companion object {
         fun of(board: Board, participants: List<ParticipantReadResponse>): MuckpotDetailResponse {
-            return MuckpotDetailResponse(
+            val response = MuckpotDetailResponse(
                 boardId = board.id ?: 0,
                 title = board.title,
                 content = board.content,
@@ -69,6 +74,10 @@ data class MuckpotDetailResponse(
                 views = board.views,
                 participants = participants
             )
+            if (board.isNotAgeLimit()) {
+                response.changeIsNotAgeLimit()
+            }
+            return response
         }
     }
 }

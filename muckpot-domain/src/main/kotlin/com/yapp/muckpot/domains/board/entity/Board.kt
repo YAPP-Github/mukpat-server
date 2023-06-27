@@ -131,4 +131,8 @@ class Board(
     fun cancelJoin() {
         this.currentApply--
     }
+
+    fun isNotAgeLimit(): Boolean {
+        return (this.minAge == AGE_MIN && this.maxAge == AGE_MAX)
+    }
 }
