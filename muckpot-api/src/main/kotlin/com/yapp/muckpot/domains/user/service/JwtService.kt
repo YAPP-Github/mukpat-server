@@ -6,9 +6,8 @@ import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.interfaces.DecodedJWT
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.yapp.muckpot.common.MS
-import com.yapp.muckpot.common.constants.ACCESS_TOKEN_BASIC_SECONDS
-import com.yapp.muckpot.common.constants.ACCESS_TOKEN_KEEP_SECONDS
 import com.yapp.muckpot.common.constants.ACCESS_TOKEN_KEY
+import com.yapp.muckpot.common.constants.ACCESS_TOKEN_SECONDS
 import com.yapp.muckpot.common.constants.JWT_LOGOUT_VALUE
 import com.yapp.muckpot.common.constants.REFRESH_TOKEN_BASIC_SECONDS
 import com.yapp.muckpot.common.constants.REFRESH_TOKEN_KEEP_SECONDS
@@ -39,11 +38,11 @@ class JwtService(
     private val algorithm: Algorithm by lazy { Algorithm.HMAC512(secretKey) }
     private val jwtVerifier: JWTVerifier by lazy { JWT.require(algorithm).build() }
 
-    fun generateAccessToken(response: UserResponse, expiredSeconds: Long): String {
+    fun generateAccessToken(response: UserResponse): String {
         val jwtBuilder = JWT.create()
             .withIssuer(issuer)
             .withClaim(USER_CLAIM, objectMapper.writeValueAsString(response))
-            .withExpiresAt(Date(Date().time + expiredSeconds * MS))
+            .withExpiresAt(Date(Date().time + ACCESS_TOKEN_SECONDS * MS))
         return jwtBuilder.sign(algorithm)
     }
 
@@ -72,14 +71,6 @@ class JwtService(
         } catch (exception: Exception) {
             log.debug(exception) { exception.message }
             null
-        }
-    }
-
-    fun getAccessTokenSeconds(keep: YesNo): Long {
-        return if (keep == YesNo.Y) {
-            ACCESS_TOKEN_KEEP_SECONDS
-        } else {
-            ACCESS_TOKEN_BASIC_SECONDS
         }
     }
 
