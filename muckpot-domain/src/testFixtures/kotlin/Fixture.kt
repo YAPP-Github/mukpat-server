@@ -46,7 +46,7 @@ object Fixture {
         title: String = "board_title",
         location: Location = Location("boardLocation", 40.7128, -74.0060),
         locationDetail: String? = null,
-        meetingTime: LocalDateTime = LocalDateTime.now(),
+        meetingTime: LocalDateTime = LocalDateTime.now().plusMinutes(30),
         content: String? = "content",
         views: Int = 0,
         currentApply: Int = 0,

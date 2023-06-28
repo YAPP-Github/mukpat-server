@@ -1,5 +1,7 @@
 package com.yapp.muckpot.domains.board.controller.dto
 
+import com.yapp.muckpot.common.AGE_MAX
+import com.yapp.muckpot.common.AGE_MIN
 import com.yapp.muckpot.domains.board.dto.ParticipantReadResponse
 import com.yapp.muckpot.domains.user.controller.dto.UserResponse
 import com.yapp.muckpot.domains.user.enums.JobGroupMain
@@ -34,5 +36,23 @@ class MuckpotDetailResponseTest : StringSpec({
         val response = MuckpotDetailResponse.of(Fixture.createBoard(), participants)
         // then
         response.participants[0].writer shouldBe true
+    }
+
+    "20 ~ 100은, 나이제한이 없는 경우" {
+        // given
+        val participants = listOf(
+            ParticipantReadResponse(1, 1, "user1", JobGroupMain.DEVELOPMENT)
+        )
+        // when
+        val response = MuckpotDetailResponse.of(
+            Fixture.createBoard(
+                minAge = AGE_MIN,
+                maxAge = AGE_MAX
+            ),
+            participants
+        )
+        // then
+        response.minAge shouldBe null
+        response.maxAge shouldBe null
     }
 })
