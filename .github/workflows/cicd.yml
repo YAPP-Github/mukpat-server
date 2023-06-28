@@ -23,17 +23,8 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
 
-      - name: Docker Container Run
-        run: docker-compose up -d
-
       - name: Gradle Clean & Build
         run: ./gradlew clean build
-
-      - name: Check ktlint format
-        run: ./gradlew ktlintCheck
-
-      - name: Test with Gradle
-        run: ./gradlew test
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2

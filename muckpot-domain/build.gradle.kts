@@ -1,6 +1,5 @@
-import org.springframework.boot.gradle.tasks.bundling.BootJar
-
-val containerVer = "1.17.6"
+val kotestVersion = "5.5.4"
+val testContainerVersion = "1.17.6"
 
 plugins {
     kotlin("kapt")
@@ -20,9 +19,10 @@ dependencies {
 
     runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
 
-    testImplementation("org.testcontainers:testcontainers:$containerVer")
-    testImplementation("org.testcontainers:junit-jupiter:$containerVer")
-    testImplementation("org.testcontainers:mariadb:$containerVer")
+    testFixturesImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
+    testFixturesImplementation("org.testcontainers:testcontainers:$testContainerVersion")
+    testFixturesImplementation("org.testcontainers:junit-jupiter:$testContainerVersion")
+    testFixturesImplementation("org.testcontainers:mariadb:$testContainerVersion")
 }
 
 allOpen {
@@ -39,5 +39,5 @@ noArg {
 
 tasks {
     withType<Jar> { enabled = true }
-    withType<BootJar> { enabled = false }
+    withType<org.springframework.boot.gradle.tasks.bundling.BootJar> { enabled = false }
 }
