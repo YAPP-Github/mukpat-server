@@ -125,16 +125,6 @@ class JwtService(
         return getTokenExpirationDuration(decodedToken)
     }
 
-    fun isLoginStay(refreshToken: String): YesNo {
-        val decodedRefreshToken = jwtVerifier.verify(refreshToken)
-        val duration = (decodedRefreshToken.expiresAt.time - decodedRefreshToken.issuedAt.time) / MS
-        return if (duration == REFRESH_TOKEN_KEEP_SECONDS) {
-            YesNo.Y
-        } else {
-            YesNo.N
-        }
-    }
-
     fun generateNewRefreshFromOldRefresh(email: String, oldRefreshToken: String): String {
         val decodedOldRefreshToken = jwtVerifier.verify(oldRefreshToken)
         val expiredAt = decodedOldRefreshToken.expiresAt
