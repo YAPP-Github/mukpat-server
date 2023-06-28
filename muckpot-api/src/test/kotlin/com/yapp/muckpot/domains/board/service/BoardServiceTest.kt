@@ -112,11 +112,20 @@ class BoardServiceTest @Autowired constructor(
 
         // when
         boardService.findBoardDetailAndVisit(boardId, otherUser)
-        boardService.findBoardDetailAndVisit(boardId, otherUser)
 
         // then
         val findBoard = boardRepository.findByIdOrNull(boardId)!!
-        findBoard.views shouldBe 2
+        findBoard.views shouldBe 1
+    }
+
+    "비로그인 유저도 조회수가 증가한다." {
+        // given
+        val boardId = boardService.saveBoard(userId, createRequest)!!
+        // when
+        boardService.findBoardDetailAndVisit(boardId, null)
+        // then
+        val findBoard = boardRepository.findByIdOrNull(boardId)!!
+        findBoard.views shouldBe 1
     }
 
     "먹팟 수정 성공" {
