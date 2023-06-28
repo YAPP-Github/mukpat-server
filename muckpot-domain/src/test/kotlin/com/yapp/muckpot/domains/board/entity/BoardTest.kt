@@ -9,7 +9,6 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.mockk
-import java.lang.IllegalArgumentException
 import java.time.LocalDateTime
 
 class BoardTest : FunSpec({
@@ -25,7 +24,7 @@ class BoardTest : FunSpec({
                     title = "title",
                     location = location,
                     locationDetail = null,
-                    meetingTime = LocalDateTime.now(),
+                    meetingTime = LocalDateTime.now().plusMinutes(30),
                     content = "content",
                     views = 0,
                     currentApply = 0,
@@ -46,7 +45,7 @@ class BoardTest : FunSpec({
                     title = "title",
                     location = location,
                     locationDetail = null,
-                    meetingTime = LocalDateTime.now(),
+                    meetingTime = LocalDateTime.now().plusMinutes(30),
                     content = "content",
                     views = 0,
                     currentApply = 0,
@@ -59,6 +58,27 @@ class BoardTest : FunSpec({
             }.message shouldBe "최대 인원은 ${MAX_APPLY_MIN}명 이상 가능합니다."
         }
 
+        test("만날 시간은 현재시간 이후로만 가능하다.") {
+            shouldThrow<IllegalArgumentException> {
+                Board(
+                    id = null,
+                    user = user,
+                    title = "title",
+                    location = location,
+                    locationDetail = null,
+                    meetingTime = LocalDateTime.now().minusMinutes(30),
+                    content = "content",
+                    views = 0,
+                    currentApply = 1,
+                    maxApply = 2,
+                    chatLink = "link",
+                    status = MuckPotStatus.IN_PROGRESS,
+                    minAge = 21,
+                    maxAge = 25
+                )
+            }.message shouldBe "만날 시간은 현재시간 이후에 가능합니다."
+        }
+
         test("정원이 초과된 경우 참여할 수 없다.") {
             val board = Board(
                 id = null,
@@ -66,7 +86,7 @@ class BoardTest : FunSpec({
                 title = "title",
                 location = location,
                 locationDetail = null,
-                meetingTime = LocalDateTime.now(),
+                meetingTime = LocalDateTime.now().plusMinutes(30),
                 content = "content",
                 views = 0,
                 currentApply = 1,
@@ -89,7 +109,7 @@ class BoardTest : FunSpec({
                 title = "title",
                 location = location,
                 locationDetail = null,
-                meetingTime = LocalDateTime.now(),
+                meetingTime = LocalDateTime.now().plusMinutes(30),
                 content = "content",
                 views = 0,
                 currentApply = 1,
