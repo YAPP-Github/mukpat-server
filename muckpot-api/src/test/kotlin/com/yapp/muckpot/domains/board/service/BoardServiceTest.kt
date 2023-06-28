@@ -38,7 +38,7 @@ class BoardServiceTest @Autowired constructor(
     lateinit var user: MuckPotUser
     var userId: Long = 0
     val createRequest = MuckpotCreateRequest(
-        meetingDate = LocalDate.now(),
+        meetingDate = LocalDate.now().plusDays(1),
         meetingTime = LocalTime.of(12, 0),
         maxApply = 70,
         minAge = 20,
@@ -52,7 +52,7 @@ class BoardServiceTest @Autowired constructor(
         chatLink = "chatLink"
     )
     val updateRequest = MuckpotUpdateRequest(
-        meetingDate = LocalDate.now(),
+        meetingDate = LocalDate.now().plusDays(1),
         meetingTime = LocalTime.of(12, 0),
         maxApply = 6,
         minAge = 25,
@@ -126,6 +126,18 @@ class BoardServiceTest @Autowired constructor(
         // then
         val findBoard = boardRepository.findByIdOrNull(boardId)!!
         findBoard.views shouldBe 1
+    }
+
+    "이전, 이후 아이디도 함께 응답에 반환한다." {
+        // given
+        val prevBoardId = boardService.saveBoard(userId, createRequest)!!
+        val boardId = boardService.saveBoard(userId, createRequest)!!
+        val nextBoardId = boardService.saveBoard(userId, createRequest)!!
+        // when
+        val actual = boardService.findBoardDetailAndVisit(boardId, null)
+        // then
+        actual.prevId shouldBe prevBoardId
+        actual.nextId shouldBe nextBoardId
     }
 
     "먹팟 수정 성공" {

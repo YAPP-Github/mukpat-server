@@ -10,6 +10,8 @@ import com.yapp.muckpot.domains.user.controller.dto.UserResponse
 
 data class MuckpotDetailResponse(
     val boardId: Long,
+    val prevId: Long?,
+    val nextId: Long?,
     val title: String,
     val content: String? = null,
     val chatLink: String,
@@ -53,9 +55,16 @@ data class MuckpotDetailResponse(
     }
 
     companion object {
-        fun of(board: Board, participants: List<ParticipantReadResponse>): MuckpotDetailResponse {
+        fun of(
+            board: Board,
+            participants: List<ParticipantReadResponse>,
+            prevId: Long? = null,
+            nextId: Long? = null
+        ): MuckpotDetailResponse {
             val response = MuckpotDetailResponse(
                 boardId = board.id ?: 0,
+                prevId = prevId,
+                nextId = nextId,
                 title = board.title,
                 content = board.content,
                 chatLink = board.chatLink,

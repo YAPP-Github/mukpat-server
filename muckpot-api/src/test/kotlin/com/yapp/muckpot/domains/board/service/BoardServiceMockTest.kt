@@ -1,6 +1,6 @@
 package com.yapp.muckpot.domains.board.service
 
-import com.fasterxml.jackson.databind.ObjectMapper
+import Fixture
 import com.ninjasquad.springmockk.MockkBean
 import com.yapp.muckpot.common.dto.CursorPaginationRequest
 import com.yapp.muckpot.domains.board.dto.ParticipantReadResponse
@@ -31,7 +31,7 @@ class BoardServiceMockTest @Autowired constructor(
     context("findAllMuckpot 테스트") {
         val allBoardSize = 3
         val allBoard = listOf(
-            Fixture.createBoard(id = 1, title = "board1"),
+            Fixture.createBoard(id = 1, title = "board1").apply { meetingTime = LocalDateTime.MIN },
             Fixture.createBoard(id = 2, title = "board2"),
             Fixture.createBoard(id = 3, title = "board3")
         )
@@ -69,6 +69,7 @@ class BoardServiceMockTest @Autowired constructor(
         }
 
         test("현재 시간 이전인 경우 모집마감 으로 바꾸어 응답한다.") {
+
             // when
             val actual = boardService.findAllMuckpot(CursorPaginationRequest(null, allBoardSize.toLong()))
             // then
@@ -81,9 +82,9 @@ class BoardServiceMockTest @Autowired constructor(
         val board = Fixture.createBoard(
             id = 1,
             title = "board1",
-            meetingTime = LocalDateTime.of(2020, 12, 25, 12, 20, 30)
+            meetingTime = LocalDateTime.of(2100, 12, 25, 12, 20, 30)
         ).apply {
-            createdAt = LocalDateTime.of(2020, 12, 23, 12, 20, 30)
+            createdAt = LocalDateTime.of(2100, 12, 23, 12, 20, 30)
         }
         val participantResponses = listOf(
             ParticipantReadResponse(boardId = 1, userId = 1, nickName = "user1"),
@@ -94,18 +95,18 @@ class BoardServiceMockTest @Autowired constructor(
             // given
             every { boardRepository.findByIdOrNull(any()) } returns board
             every { participantQuerydslRepository.findByBoardIds(any()) } returns participantResponses
+            every { boardQuerydslRepository.findPrevId(any()) } returns null
+            every { boardQuerydslRepository.findNextId(any()) } returns null
         }
 
         test("먹팟 상세조회 성공") {
             // when
             val actual = boardService.findBoardDetailAndVisit(1, loginUser)
 
-            val result = ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(actual)
-            println(result)
             // then
-            actual.meetingDate shouldBe "12월 25일 (금)"
+            actual.meetingDate shouldBe "12월 25일 (토)"
             actual.meetingTime shouldBe "오후 12:20"
-            actual.createDate shouldBe "2020년 12월 23일"
+            actual.createDate shouldBe "2100년 12월 23일"
             actual.status shouldBe MuckPotStatus.IN_PROGRESS.korNm
             actual.participants shouldHaveSize participantResponses.size
         }

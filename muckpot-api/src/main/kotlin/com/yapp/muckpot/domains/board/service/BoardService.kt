@@ -59,7 +59,12 @@ class BoardService(
             if (board.user.id != loginUserInfo?.userId) {
                 board.visit()
             }
-            return MuckpotDetailResponse.of(board, participantQuerydslRepository.findByBoardIds(listOf(boardId))).apply {
+            return MuckpotDetailResponse.of(
+                board = board,
+                participants = participantQuerydslRepository.findByBoardIds(listOf(boardId)),
+                prevId = boardQuerydslRepository.findPrevId(boardId),
+                nextId = boardQuerydslRepository.findNextId(boardId)
+            ).apply {
                 sortParticipantsByLoginUser(loginUserInfo)
             }
         } ?: run {
