@@ -39,7 +39,7 @@ class BoardServiceTest @Autowired constructor(
     lateinit var user: MuckPotUser
     var userId: Long = 0
     val createRequest = MuckpotCreateRequest(
-        meetingDate = LocalDate.now(),
+        meetingDate = LocalDate.now().plusDays(1),
         meetingTime = LocalTime.of(12, 0),
         maxApply = 70,
         minAge = 20,
@@ -53,7 +53,7 @@ class BoardServiceTest @Autowired constructor(
         chatLink = "chatLink"
     )
     val updateRequest = MuckpotUpdateRequest(
-        meetingDate = LocalDate.now(),
+        meetingDate = LocalDate.now().plusDays(1),
         meetingTime = LocalTime.of(12, 0),
         maxApply = 6,
         minAge = 25,
@@ -68,12 +68,7 @@ class BoardServiceTest @Autowired constructor(
     )
 
     beforeEach {
-        user = userRepository.save(
-            MuckPotUser(
-                null, "test@naver.com", "pw", "nickname",
-                Gender.MEN, 2000, JobGroupMain.DEVELOPMENT, "sub", Location("location", 0.0, 0.0), "url"
-            )
-        )
+        user = userRepository.save(Fixture.createUser())
         userId = user.id!!
     }
 
@@ -97,7 +92,7 @@ class BoardServiceTest @Autowired constructor(
         participant shouldNotBe null
     }
 
-    "먹팟 상세 조회시 조회수가 증가한다." {
+    "자신의 글은 조회수가 증가하지 않는다." {
         // given
         val boardId = boardService.saveBoard(userId, createRequest)!!
         val loginUserInfo = UserResponse.of(user)
@@ -108,7 +103,42 @@ class BoardServiceTest @Autowired constructor(
 
         // then
         val findBoard = boardRepository.findByIdOrNull(boardId)!!
-        findBoard.views shouldBe 2
+        findBoard.views shouldBe 0
+    }
+
+    "먹팟 상세 조회시 조회수가 증가한다." {
+        // given
+        val boardId = boardService.saveBoard(userId, createRequest)!!
+        val otherUser = UserResponse.of(userRepository.save(Fixture.createUser()))
+
+        // when
+        boardService.findBoardDetailAndVisit(boardId, otherUser)
+
+        // then
+        val findBoard = boardRepository.findByIdOrNull(boardId)!!
+        findBoard.views shouldBe 1
+    }
+
+    "비로그인 유저도 조회수가 증가한다." {
+        // given
+        val boardId = boardService.saveBoard(userId, createRequest)!!
+        // when
+        boardService.findBoardDetailAndVisit(boardId, null)
+        // then
+        val findBoard = boardRepository.findByIdOrNull(boardId)!!
+        findBoard.views shouldBe 1
+    }
+
+    "이전, 이후 아이디도 함께 응답에 반환한다." {
+        // given
+        val prevBoardId = boardService.saveBoard(userId, createRequest)!!
+        val boardId = boardService.saveBoard(userId, createRequest)!!
+        val nextBoardId = boardService.saveBoard(userId, createRequest)!!
+        // when
+        val actual = boardService.findBoardDetailAndVisit(boardId, null)
+        // then
+        actual.prevId shouldBe prevBoardId
+        actual.nextId shouldBe nextBoardId
     }
 
     "먹팟 수정 성공" {

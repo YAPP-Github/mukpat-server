@@ -1,6 +1,7 @@
 package com.yapp.muckpot.domains.user.service
 
 import com.yapp.muckpot.common.constants.ACCESS_TOKEN_KEY
+import com.yapp.muckpot.common.constants.ACCESS_TOKEN_SECONDS
 import com.yapp.muckpot.common.constants.REFRESH_TOKEN_KEY
 import com.yapp.muckpot.common.utils.CookieUtil
 import com.yapp.muckpot.common.utils.RandomCodeUtil
@@ -37,13 +38,12 @@ class UserService(
                 throw MuckPotException(UserErrorCode.LOGIN_FAIL)
             }
             val response = UserResponse.of(it)
-            val accessTokenSeconds = jwtService.getAccessTokenSeconds(request.keep)
             val refreshTokenSeconds = jwtService.getRefreshTokenSeconds(request.keep)
-            val accessToken = jwtService.generateAccessToken(response, accessTokenSeconds)
+            val accessToken = jwtService.generateAccessToken(response)
             val refreshToken = jwtService.generateRefreshToken(request.email, refreshTokenSeconds)
 
             redisService.setDataExpireWithNewest(request.email, refreshToken, refreshTokenSeconds)
-            CookieUtil.addHttpOnlyCookie(ACCESS_TOKEN_KEY, accessToken, accessTokenSeconds.toInt())
+            CookieUtil.addHttpOnlyCookie(ACCESS_TOKEN_KEY, accessToken, ACCESS_TOKEN_SECONDS.toInt())
             CookieUtil.addHttpOnlyCookie(REFRESH_TOKEN_KEY, refreshToken, refreshTokenSeconds.toInt())
             return response
         } ?: run {
@@ -92,16 +92,13 @@ class UserService(
         if (redisToken != refreshToken) throw MuckPotException(UserErrorCode.FAIL_JWT_REISSUE)
 
         userRepository.findByEmail(email)?.let { user ->
-            val isLoginStay = jwtService.isLoginStay(refreshToken)
-            val accessTokenSeconds = jwtService.getAccessTokenSeconds(isLoginStay)
             val leftRefreshTokenSeconds = jwtService.getLeftExpirationTime(refreshToken)
-
             val response = UserResponse.of(user)
-            val newAccessToken = jwtService.generateAccessToken(response, accessTokenSeconds)
+            val newAccessToken = jwtService.generateAccessToken(response)
             val newRefreshToken = jwtService.generateNewRefreshFromOldRefresh(user.email, refreshToken)
 
             redisService.setDataExpireWithNewest(user.email, newRefreshToken, leftRefreshTokenSeconds)
-            CookieUtil.addHttpOnlyCookie(ACCESS_TOKEN_KEY, newAccessToken, accessTokenSeconds.toInt())
+            CookieUtil.addHttpOnlyCookie(ACCESS_TOKEN_KEY, newAccessToken, ACCESS_TOKEN_SECONDS.toInt())
             CookieUtil.addHttpOnlyCookie(REFRESH_TOKEN_KEY, newRefreshToken, leftRefreshTokenSeconds.toInt())
         } ?: run {
             throw MuckPotException(UserErrorCode.USER_NOT_FOUND)
