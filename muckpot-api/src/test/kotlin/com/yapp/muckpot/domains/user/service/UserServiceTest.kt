@@ -1,6 +1,7 @@
 package com.yapp.muckpot.domains.user.service
 
 import com.yapp.muckpot.common.enums.Gender
+import com.yapp.muckpot.domains.user.controller.dto.SendEmailAuthRequest
 import com.yapp.muckpot.domains.user.controller.dto.SignUpRequest
 import com.yapp.muckpot.domains.user.exception.UserErrorCode
 import com.yapp.muckpot.domains.user.repository.MuckPotUserRepository
@@ -45,10 +46,19 @@ class UserServiceTest @Autowired constructor(
     }
 
     "중복 회원가입 불가 검증" {
-
         userService.signUp(request)
+
         shouldThrow<MuckPotException> {
             userService.signUp(request)
+        }.errorCode shouldBe UserErrorCode.ALREADY_EXISTS_USER
+    }
+
+    "인증 메일 받기 단계에서 중복이메일 유효성 검사를 한다." {
+        // given
+        userService.signUp(request)
+        // when & then
+        shouldThrow<MuckPotException> {
+            userService.sendEmailAuth(SendEmailAuthRequest(request.email))
         }.errorCode shouldBe UserErrorCode.ALREADY_EXISTS_USER
     }
 })
