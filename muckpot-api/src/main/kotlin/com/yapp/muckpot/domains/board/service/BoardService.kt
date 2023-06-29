@@ -59,11 +59,14 @@ class BoardService(
             if (board.user.id != loginUserInfo?.userId) {
                 board.visit()
             }
+            val userAge: Int? = loginUserInfo?.let { userRepository.findByIdOrNull(it.userId)?.getAge() }
+
             return MuckpotDetailResponse.of(
                 board = board,
                 participants = participantQuerydslRepository.findByBoardIds(listOf(boardId)),
                 prevId = boardQuerydslRepository.findPrevId(boardId),
-                nextId = boardQuerydslRepository.findNextId(boardId)
+                nextId = boardQuerydslRepository.findNextId(boardId),
+                userAge = userAge
             ).apply {
                 sortParticipantsByLoginUser(loginUserInfo)
             }
