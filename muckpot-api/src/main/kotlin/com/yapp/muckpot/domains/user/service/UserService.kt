@@ -53,10 +53,14 @@ class UserService(
 
     @Transactional
     fun sendEmailAuth(request: SendEmailAuthRequest): EmailAuthResponse {
-        val authKey = RandomCodeUtil.generateRandomCode()
-        emailService.sendAuthMail(authKey = authKey, to = request.email)
-        redisService.setDataExpireWithNewest(key = request.email, value = authKey, duration = THIRTY_MINS)
-        return EmailAuthResponse(authKey)
+        userRepository.findByEmail(request.email)?.let {
+            throw MuckPotException(UserErrorCode.ALREADY_EXISTS_USER)
+        } ?: run {
+            val authKey = RandomCodeUtil.generateRandomCode()
+            emailService.sendAuthMail(authKey = authKey, to = request.email)
+            redisService.setDataExpireWithNewest(key = request.email, value = authKey, duration = THIRTY_MINS)
+            return EmailAuthResponse(authKey)
+        }
     }
 
     @Transactional

@@ -1,5 +1,6 @@
 package com.yapp.muckpot.domains.user.controller.dto
 
+import com.yapp.muckpot.common.constants.PASSWORD_PATTERN_INVALID
 import com.yapp.muckpot.common.enums.Gender
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
@@ -53,7 +54,7 @@ class SignUpRequestTest : StringSpec({
         val violations: MutableSet<ConstraintViolation<SignUpRequest>> = validator.validate(request)
         violations.size shouldBe 1
         for (violation in violations) {
-            violation.message shouldBe "비밀번호는 영문, 숫자 포함 8-20자입니다."
+            violation.message shouldBe PASSWORD_PATTERN_INVALID
         }
     }
 
@@ -74,7 +75,7 @@ class SignUpRequestTest : StringSpec({
         val violations: MutableSet<ConstraintViolation<SignUpRequest>> = validator.validate(request)
         violations.size shouldBe 1
         for (violation in violations) {
-            violation.message shouldBe "닉네임은 2자 이상 10자 이하여야 합니다."
+            violation.message shouldBe "2~10자로 입력해 주세요."
         }
     }
 
@@ -95,7 +96,7 @@ class SignUpRequestTest : StringSpec({
         val violations: MutableSet<ConstraintViolation<SignUpRequest>> = validator.validate(request)
         violations.size shouldBe 1
         for (violation in violations) {
-            violation.message shouldBe "직군 소분류는 최대 10자입니다."
+            violation.message shouldBe "10자 이하로 입력해 주세요."
         }
     }
 })
