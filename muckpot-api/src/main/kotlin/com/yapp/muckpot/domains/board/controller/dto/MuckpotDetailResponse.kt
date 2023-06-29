@@ -28,6 +28,7 @@ data class MuckpotDetailResponse(
     val y: Double,
     val locationDetail: String? = null,
     val views: Int,
+    val userAge: Int?,
     var participants: List<ParticipantReadResponse>
 ) {
     init {
@@ -59,7 +60,8 @@ data class MuckpotDetailResponse(
             board: Board,
             participants: List<ParticipantReadResponse>,
             prevId: Long? = null,
-            nextId: Long? = null
+            nextId: Long? = null,
+            userAge: Int? = null
         ): MuckpotDetailResponse {
             val response = MuckpotDetailResponse(
                 boardId = board.id ?: 0,
@@ -81,6 +83,7 @@ data class MuckpotDetailResponse(
                 y = board.getY(),
                 locationDetail = board.locationDetail,
                 views = board.views,
+                userAge = userAge,
                 participants = participants
             )
             if (board.isNotAgeLimit()) {
