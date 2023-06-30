@@ -2,6 +2,7 @@ package com.yapp.muckpot.domains.user.controller.dto
 
 import com.yapp.muckpot.common.ONLY_NAVER
 import com.yapp.muckpot.common.PW_PATTERN
+import com.yapp.muckpot.common.constants.PASSWORD_PATTERN_INVALID
 import com.yapp.muckpot.common.enums.YesNo
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
@@ -16,7 +17,7 @@ data class LoginRequest(
     @field:ApiModelProperty(notes = "비밀번호", required = true, example = "abcd1234")
     @field:Pattern(
         regexp = PW_PATTERN,
-        message = "비밀 번호는 영문과 숫자를 포함하여 8 ~ 20자로 입력해 주세요."
+        message = PASSWORD_PATTERN_INVALID
     )
     val password: String,
     @field:ApiModelProperty(notes = "로그인 유지하기", required = true, example = "Y")
