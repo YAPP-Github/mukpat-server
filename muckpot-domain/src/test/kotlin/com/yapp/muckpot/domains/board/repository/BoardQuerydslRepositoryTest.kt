@@ -8,6 +8,7 @@ import com.yapp.muckpot.domains.user.entity.MuckPotUser
 import com.yapp.muckpot.domains.user.enums.MuckPotStatus
 import com.yapp.muckpot.domains.user.repository.MuckPotUserRepository
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import java.time.LocalDateTime
@@ -104,19 +105,18 @@ class BoardQuerydslRepositoryTest(
         nextId shouldBe null
     }
 
-    "이전, 이후 아이디는 IN_PROGRESS 인것만 조회해야 한다." {
+    "현재시간 미만의 먹팟 상태 업데이트" {
         // given
-        val board4 = Fixture.createBoard(title = "board4", user = user)
-        boards[0].status = MuckPotStatus.DONE
-        boards[2].status = MuckPotStatus.DONE
-        boardRepository.save(boards[0])
-        boardRepository.save(boards[2])
-        boardRepository.save(board4)
+        boards[0].apply { meetingTime = LocalDateTime.now().minusDays(1) }
+        boards[1].apply { meetingTime = LocalDateTime.now().minusDays(1) }
+        boards[2].apply { meetingTime = LocalDateTime.now().plusDays(1) }
+        boardRepository.saveAll(boards)
         // when
-        val prevId = boardQuerydslRepository.findPrevId(boards[1].id!!)
-        val nextId = boardQuerydslRepository.findNextId(boards[1].id!!)
+        boardQuerydslRepository.updateLessThanCurrentTime()
         // then
-        prevId shouldBe null
-        nextId shouldBe board4.id
+        val actual = boardRepository.findByStatus(MuckPotStatus.IN_PROGRESS)
+        actual shouldHaveSize 1
     }
-})
+}) {
+    override fun extensions() = listOf(SpringExtension)
+}
