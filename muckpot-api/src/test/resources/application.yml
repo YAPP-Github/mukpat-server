@@ -10,3 +10,4 @@ jwt:
 api:
   option:
     permit-all: false
+    allowed-origins:

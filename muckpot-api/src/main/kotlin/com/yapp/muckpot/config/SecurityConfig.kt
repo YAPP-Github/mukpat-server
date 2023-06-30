@@ -34,7 +34,9 @@ import javax.servlet.http.HttpServletResponse
 class SecurityConfig(
     private val jwtService: JwtService,
     @Value("\${api.option.permit-all}")
-    private val permitAll: Boolean
+    private val permitAll: Boolean,
+    @Value("\${api.option.allowed-origins}")
+    private val allowedOrigins: List<String>
 ) {
     @Bean
     @Throws(Exception::class)
@@ -72,7 +74,6 @@ class SecurityConfig(
             .logoutSuccessHandler { _, response, _ ->
                 response.status = HttpServletResponse.SC_NO_CONTENT
             }
-
         return http.build()
     }
 
@@ -83,7 +84,7 @@ class SecurityConfig(
 
         configuration.allowedMethods = listOf("*")
         configuration.allowedHeaders = listOf("*")
-        configuration.allowedOrigins = ALLOWED_ORIGINS
+        configuration.allowedOrigins = allowedOrigins
         configuration.allowCredentials = true
         source.registerCorsConfiguration("/**", configuration)
         return source
@@ -115,10 +116,6 @@ class SecurityConfig(
             EMAIL_VERIFY_URL,
             USER_PROFILE_URL,
             REISSUE_JWT_URL
-        )
-
-        val ALLOWED_ORIGINS = listOf(
-            "http://localhost:3000"
         )
     }
 }
