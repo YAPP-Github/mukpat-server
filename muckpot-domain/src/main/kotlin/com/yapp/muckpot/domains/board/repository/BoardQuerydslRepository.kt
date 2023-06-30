@@ -28,14 +28,14 @@ class BoardQuerydslRepository(
     fun findPrevId(boardId: Long): Long? {
         return queryFactory.from(board)
             .select(board.id.max())
-            .where(board.id.lt(boardId), board.status.eq(MuckPotStatus.IN_PROGRESS))
+            .where(board.id.lt(boardId))
             .fetchOne()
     }
 
     fun findNextId(boardId: Long): Long? {
         return queryFactory.from(board)
             .select(board.id.min())
-            .where(board.id.gt(boardId), board.status.eq(MuckPotStatus.IN_PROGRESS))
+            .where(board.id.gt(boardId))
             .fetchOne()
     }
 

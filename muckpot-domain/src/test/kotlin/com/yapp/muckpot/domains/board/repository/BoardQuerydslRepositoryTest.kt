@@ -17,7 +17,7 @@ import java.time.LocalDateTime
 class BoardQuerydslRepositoryTest(
     private val userRepository: MuckPotUserRepository,
     private val boardRepository: BoardRepository,
-    private val jpaQueryFactory: JPAQueryFactory,
+    private val jpaQueryFactory: JPAQueryFactory
 ) : StringSpec({
     val boardQuerydslRepository = BoardQuerydslRepository(jpaQueryFactory)
 
@@ -103,22 +103,6 @@ class BoardQuerydslRepositoryTest(
         // then
         prevId shouldBe null
         nextId shouldBe null
-    }
-
-    "이전, 이후 아이디는 IN_PROGRESS 인것만 조회해야 한다." {
-        // given
-        val board4 = Fixture.createBoard(title = "board4", user = user)
-        boards[0].status = MuckPotStatus.DONE
-        boards[2].status = MuckPotStatus.DONE
-        boardRepository.save(boards[0])
-        boardRepository.save(boards[2])
-        boardRepository.save(board4)
-        // when
-        val prevId = boardQuerydslRepository.findPrevId(boards[1].id!!)
-        val nextId = boardQuerydslRepository.findNextId(boards[1].id!!)
-        // then
-        prevId shouldBe null
-        nextId shouldBe board4.id
     }
 
     "현재시간 미만의 먹팟 상태 업데이트" {
