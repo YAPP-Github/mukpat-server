@@ -21,3 +21,6 @@ logging:
 api:
   option:
     permit-all: false # 배포: false, 테스트 : true
+    allowed-origins:
+      ${LOCAL_ORIGIN:localOrigin},
+      ${PROD_ORIGIN:prodOrigin}
