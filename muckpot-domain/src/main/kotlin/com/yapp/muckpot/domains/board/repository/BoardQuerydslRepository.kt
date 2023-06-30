@@ -7,6 +7,7 @@ import com.yapp.muckpot.domains.board.entity.QBoard.board
 import com.yapp.muckpot.domains.user.enums.MuckPotStatus
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Repository
 @Transactional(readOnly = true)
@@ -36,6 +37,15 @@ class BoardQuerydslRepository(
             .select(board.id.min())
             .where(board.id.gt(boardId), board.status.eq(MuckPotStatus.IN_PROGRESS))
             .fetchOne()
+    }
+
+    @Transactional
+    fun updateLessThanCurrentTime() {
+        queryFactory
+            .update(board)
+            .set(board.status, MuckPotStatus.DONE)
+            .where(board.meetingTime.lt(LocalDateTime.now()), board.status.eq(MuckPotStatus.IN_PROGRESS))
+            .execute()
     }
 
     private fun lessThanLastId(lastId: Long?): BooleanExpression? {

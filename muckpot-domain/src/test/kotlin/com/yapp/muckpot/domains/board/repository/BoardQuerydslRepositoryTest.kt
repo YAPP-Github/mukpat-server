@@ -8,6 +8,7 @@ import com.yapp.muckpot.domains.user.entity.MuckPotUser
 import com.yapp.muckpot.domains.user.enums.MuckPotStatus
 import com.yapp.muckpot.domains.user.repository.MuckPotUserRepository
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import java.time.LocalDateTime
@@ -16,7 +17,7 @@ import java.time.LocalDateTime
 class BoardQuerydslRepositoryTest(
     private val userRepository: MuckPotUserRepository,
     private val boardRepository: BoardRepository,
-    private val jpaQueryFactory: JPAQueryFactory
+    private val jpaQueryFactory: JPAQueryFactory,
 ) : StringSpec({
     val boardQuerydslRepository = BoardQuerydslRepository(jpaQueryFactory)
 
@@ -119,4 +120,19 @@ class BoardQuerydslRepositoryTest(
         prevId shouldBe null
         nextId shouldBe board4.id
     }
-})
+
+    "현재시간 미만의 먹팟 상태 업데이트" {
+        // given
+        boards[0].apply { meetingTime = LocalDateTime.now().minusDays(1) }
+        boards[1].apply { meetingTime = LocalDateTime.now().minusDays(1) }
+        boards[2].apply { meetingTime = LocalDateTime.now().plusDays(1) }
+        boardRepository.saveAll(boards)
+        // when
+        boardQuerydslRepository.updateLessThanCurrentTime()
+        // then
+        val actual = boardRepository.findByStatus(MuckPotStatus.IN_PROGRESS)
+        actual shouldHaveSize 1
+    }
+}) {
+    override fun extensions() = listOf(SpringExtension)
+}
