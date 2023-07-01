@@ -1,19 +1,19 @@
 package com.yapp.muckpot.domains.board.controller.dto
 
 import com.fasterxml.jackson.annotation.JsonFormat
-import com.yapp.muckpot.common.AGE_MAX
-import com.yapp.muckpot.common.AGE_MIN
-import com.yapp.muckpot.common.CHAT_LINK_MAX
-import com.yapp.muckpot.common.CONTENT_MAX
-import com.yapp.muckpot.common.HHmm
 import com.yapp.muckpot.common.Location
-import com.yapp.muckpot.common.TITLE_MAX
-import com.yapp.muckpot.common.YYYYMMDD
+import com.yapp.muckpot.common.constants.AGE_MAX
+import com.yapp.muckpot.common.constants.AGE_MIN
+import com.yapp.muckpot.common.constants.CHAT_LINK_MAX
+import com.yapp.muckpot.common.constants.CONTENT_MAX
 import com.yapp.muckpot.common.constants.CONTENT_MAX_INVALID
+import com.yapp.muckpot.common.constants.HHmm
 import com.yapp.muckpot.common.constants.LINK_MAX_INVALID
 import com.yapp.muckpot.common.constants.MAX_APPLY_MIN_INVALID
 import com.yapp.muckpot.common.constants.NOT_BLANK_COMMON
+import com.yapp.muckpot.common.constants.TITLE_MAX
 import com.yapp.muckpot.common.constants.TITLE_MAX_INVALID
+import com.yapp.muckpot.common.constants.YYYYMMDD
 import com.yapp.muckpot.domains.board.entity.Board
 import com.yapp.muckpot.domains.user.entity.MuckPotUser
 import io.swagger.annotations.ApiModel

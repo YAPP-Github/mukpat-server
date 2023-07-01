@@ -1,9 +1,9 @@
 package com.yapp.muckpot.domains.board.controller.dto
 
-import com.yapp.muckpot.common.CHAT_LINK_MAX
-import com.yapp.muckpot.common.CONTENT_MAX
-import com.yapp.muckpot.common.TITLE_MAX
+import com.yapp.muckpot.common.constants.CHAT_LINK_MAX
+import com.yapp.muckpot.common.constants.CONTENT_MAX
 import com.yapp.muckpot.common.constants.NOT_BLANK_COMMON
+import com.yapp.muckpot.common.constants.TITLE_MAX
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import java.time.LocalDate
@@ -14,31 +14,43 @@ import javax.validation.Validator
 
 class MuckpotCreateRequestTest : StringSpec({
     lateinit var validator: Validator
-    lateinit var request: MuckpotCreateRequest
+
+    fun createMuckpotCreateRequest(
+        meetingDate: LocalDate = LocalDate.now(),
+        meetingTime: LocalTime = LocalTime.of(12, 1),
+        maxApply: Int = 10,
+        minAge: Int = 20,
+        maxAge: Int = 100,
+        locationName: String = "location",
+        locationDetail: String? = null,
+        x: Double = 0.0,
+        y: Double = 0.0,
+        title: String = "title",
+        content: String? = null,
+        chatLink: String = "chat_link"
+    ): MuckpotCreateRequest {
+        return MuckpotCreateRequest(
+            meetingDate = meetingDate,
+            meetingTime = meetingTime,
+            maxApply = maxApply,
+            minAge = minAge,
+            maxAge = maxAge,
+            locationName = locationName,
+            locationDetail = locationDetail,
+            x = x,
+            y = y,
+            title = title,
+            content = content,
+            chatLink = chatLink
+        )
+    }
 
     beforeTest {
         validator = Validation.buildDefaultValidatorFactory().validator
     }
 
-    beforeEach {
-        request = MuckpotCreateRequest(
-            meetingDate = LocalDate.now(),
-            meetingTime = LocalTime.of(12, 1),
-            maxApply = 10,
-            minAge = 20,
-            maxAge = 100,
-            locationName = "location",
-            locationDetail = null,
-            x = 0.0,
-            y = 0.0,
-            title = "title",
-            content = null,
-            chatLink = "chat_link"
-        )
-    }
-
     "제목은 최대 100자" {
-        request.title = "X".repeat(TITLE_MAX + 1)
+        val request = createMuckpotCreateRequest(title = "X".repeat(TITLE_MAX + 1))
 
         val violations: MutableSet<ConstraintViolation<MuckpotCreateRequest>> = validator.validate(request)
         violations.size shouldBe 1
@@ -48,7 +60,7 @@ class MuckpotCreateRequestTest : StringSpec({
     }
 
     "내용은 최대 2000자" {
-        request.content = "X".repeat(CONTENT_MAX + 1)
+        val request = createMuckpotCreateRequest(content = "X".repeat(CONTENT_MAX + 1))
 
         val violations: MutableSet<ConstraintViolation<MuckpotCreateRequest>> = validator.validate(request)
         violations.size shouldBe 1
@@ -58,7 +70,7 @@ class MuckpotCreateRequestTest : StringSpec({
     }
 
     "링크는 최대 300자" {
-        request.chatLink = "X".repeat(CHAT_LINK_MAX + 1)
+        val request = createMuckpotCreateRequest(chatLink = "X".repeat(CHAT_LINK_MAX + 1))
 
         val violations: MutableSet<ConstraintViolation<MuckpotCreateRequest>> = validator.validate(request)
         violations.size shouldBe 1
@@ -68,7 +80,8 @@ class MuckpotCreateRequestTest : StringSpec({
     }
 
     "chatLink는 공백이 될 수 없다." {
-        request.chatLink = "  "
+        val request = createMuckpotCreateRequest(chatLink = "  ")
+
         val violations: MutableSet<ConstraintViolation<MuckpotCreateRequest>> = validator.validate(request)
         violations.size shouldBe 1
         for (violation in violations) {

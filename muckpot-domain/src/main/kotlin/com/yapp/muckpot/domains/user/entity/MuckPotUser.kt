@@ -1,8 +1,8 @@
 package com.yapp.muckpot.domains.user.entity
 
 import com.yapp.muckpot.common.BaseTimeEntity
-import com.yapp.muckpot.common.EMAIL
 import com.yapp.muckpot.common.Location
+import com.yapp.muckpot.common.constants.EMAIL
 import com.yapp.muckpot.common.enums.Gender
 import com.yapp.muckpot.common.enums.State
 import com.yapp.muckpot.domains.user.enums.JobGroupMain

@@ -1,8 +1,8 @@
 package com.yapp.muckpot.domains.board.controller.dto
 
-import com.yapp.muckpot.common.KR_MM_DD_E
 import com.yapp.muckpot.common.TimeUtil
-import com.yapp.muckpot.common.a_hhmm
+import com.yapp.muckpot.common.constants.KR_MM_DD_E
+import com.yapp.muckpot.common.constants.a_hhmm
 import com.yapp.muckpot.domains.board.dto.ParticipantReadResponse
 import com.yapp.muckpot.domains.board.entity.Board
 import com.yapp.muckpot.domains.user.enums.MuckPotStatus

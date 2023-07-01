@@ -1,7 +1,7 @@
 package com.yapp.muckpot.domains.board.controller.dto
 
-import com.yapp.muckpot.common.AGE_MAX
-import com.yapp.muckpot.common.AGE_MIN
+import com.yapp.muckpot.common.constants.AGE_MAX
+import com.yapp.muckpot.common.constants.AGE_MIN
 import com.yapp.muckpot.domains.board.dto.ParticipantReadResponse
 import com.yapp.muckpot.domains.user.controller.dto.UserResponse
 import com.yapp.muckpot.domains.user.enums.JobGroupMain
