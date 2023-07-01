@@ -10,25 +10,39 @@ import javax.validation.Validator
 
 class SignUpRequestTest : StringSpec({
     lateinit var validator: Validator
-    lateinit var request: SignUpRequest
 
-    beforeSpec {
+    fun createSignUpRequest(
+        email: String = "email@naver.com",
+        password: String = "abc1234!",
+        nickname: String = "닉네임",
+        jobGroupMain: String = "개발",
+        jobGroupSub: String = "직군 소분류",
+        locationName: String = "삼전 본사",
+        x: Double = 0.0,
+        y: Double = 0.0,
+        gender: Gender = Gender.WOMEN,
+        yearOfBirth: Int = 1996
+    ): SignUpRequest {
+        return SignUpRequest(
+            email = email,
+            password = password,
+            nickname = nickname,
+            jobGroupMain = jobGroupMain,
+            jobGroupSub = jobGroupSub,
+            locationName = locationName,
+            x = x,
+            y = y,
+            gender = gender,
+            yearOfBirth = yearOfBirth
+        )
+    }
+
+    beforeTest {
         validator = Validation.buildDefaultValidatorFactory().validator
     }
 
     "이메일 형식 유효 검사" {
-        request = SignUpRequest(
-            email = "email@validation.com",
-            password = "abc1234!",
-            nickname = "닉네임",
-            jobGroupMain = "개발",
-            jobGroupSub = null,
-            locationName = "삼전 본사",
-            x = 0.0,
-            y = 0.0,
-            gender = Gender.WOMEN,
-            yearOfBirth = 1996
-        )
+        val request = createSignUpRequest(email = "email@validation.com")
 
         val violations: MutableSet<ConstraintViolation<SignUpRequest>> = validator.validate(request)
         violations.size shouldBe 1
@@ -38,18 +52,24 @@ class SignUpRequestTest : StringSpec({
     }
 
     "비밀번호 형식 검사" {
-        request = SignUpRequest(
-            email = "email@naver.com",
-            password = "12",
-            nickname = "닉네임",
-            jobGroupMain = "개발",
-            jobGroupSub = null,
-            locationName = "삼전 본사",
-            x = 0.0,
-            y = 0.0,
-            gender = Gender.WOMEN,
-            yearOfBirth = 1996
-        )
+        val request = createSignUpRequest(password = "12")
+
+        val violations: MutableSet<ConstraintViolation<SignUpRequest>> = validator.validate(request)
+        violations.size shouldBe 1
+        for (violation in violations) {
+            violation.message shouldBe PASSWORD_PATTERN_INVALID
+        }
+    }
+
+    "비밀번호에 특수문자를 포함할 수 있다." {
+        val request = createSignUpRequest(password = "ab@cd!12$34#")
+
+        val violations: MutableSet<ConstraintViolation<SignUpRequest>> = validator.validate(request)
+        violations.size shouldBe 0
+    }
+
+    "비밀번호에는 영어, 숫자를 최소한 1개 포함해야 한다" {
+        val request = createSignUpRequest(password = "abcdefgh!!")
 
         val violations: MutableSet<ConstraintViolation<SignUpRequest>> = validator.validate(request)
         violations.size shouldBe 1
@@ -59,18 +79,7 @@ class SignUpRequestTest : StringSpec({
     }
 
     "닉네임 글자수 2-10자 제한" {
-        request = SignUpRequest(
-            email = "email@naver.com",
-            password = "abc1234!",
-            nickname = "팟",
-            jobGroupMain = "개발",
-            jobGroupSub = null,
-            locationName = "삼전 본사",
-            x = 0.0,
-            y = 0.0,
-            gender = Gender.WOMEN,
-            yearOfBirth = 1996
-        )
+        val request = createSignUpRequest(nickname = "팟")
 
         val violations: MutableSet<ConstraintViolation<SignUpRequest>> = validator.validate(request)
         violations.size shouldBe 1
@@ -80,18 +89,7 @@ class SignUpRequestTest : StringSpec({
     }
 
     "직군 소분류 최대 10자 제한" {
-        request = SignUpRequest(
-            email = "email@naver.com",
-            password = "abc1234!",
-            nickname = "닉네임",
-            jobGroupMain = "개발",
-            jobGroupSub = "아아아아아아아아아아아아아아",
-            locationName = "삼전 본사",
-            x = 0.0,
-            y = 0.0,
-            gender = Gender.WOMEN,
-            yearOfBirth = 1996
-        )
+        val request = createSignUpRequest(jobGroupSub = "아아아아아아아아아아아아아아")
 
         val violations: MutableSet<ConstraintViolation<SignUpRequest>> = validator.validate(request)
         violations.size shouldBe 1

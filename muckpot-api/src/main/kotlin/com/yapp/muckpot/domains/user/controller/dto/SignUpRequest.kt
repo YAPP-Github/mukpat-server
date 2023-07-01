@@ -1,8 +1,9 @@
 package com.yapp.muckpot.domains.user.controller.dto
 
 import com.yapp.muckpot.common.Location
-import com.yapp.muckpot.common.ONLY_NAVER
+import com.yapp.muckpot.common.constants.ONLY_NAVER
 import com.yapp.muckpot.common.constants.PASSWORD_PATTERN_INVALID
+import com.yapp.muckpot.common.constants.PW_PATTERN
 import com.yapp.muckpot.common.enums.Gender
 import com.yapp.muckpot.domains.user.entity.MuckPotUser
 import com.yapp.muckpot.domains.user.enums.JobGroupMain
@@ -18,7 +19,10 @@ data class SignUpRequest(
     val email: String,
 
     @field:ApiModelProperty(notes = "비밀번호", required = true, example = "abc12345")
-    @field:Pattern(regexp = "^(?=.*[0-9])(?=.*[a-zA-Z]).{8,20}\$", message = PASSWORD_PATTERN_INVALID)
+    @field:Pattern(
+        regexp = PW_PATTERN,
+        message = PASSWORD_PATTERN_INVALID
+    )
     val password: String,
 
     @field:ApiModelProperty(notes = "닉네임", required = true, example = "맛도리")
