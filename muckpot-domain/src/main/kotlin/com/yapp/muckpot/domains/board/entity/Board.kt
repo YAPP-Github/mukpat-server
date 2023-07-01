@@ -1,11 +1,11 @@
 package com.yapp.muckpot.domains.board.entity
 
-import com.yapp.muckpot.common.AGE_EXP_MSG
-import com.yapp.muckpot.common.AGE_MAX
-import com.yapp.muckpot.common.AGE_MIN
 import com.yapp.muckpot.common.BaseTimeEntity
 import com.yapp.muckpot.common.Location
-import com.yapp.muckpot.common.MAX_APPLY_MIN
+import com.yapp.muckpot.common.constants.AGE_EXP_MSG
+import com.yapp.muckpot.common.constants.AGE_MAX
+import com.yapp.muckpot.common.constants.AGE_MIN
+import com.yapp.muckpot.common.constants.MAX_APPLY_MIN
 import com.yapp.muckpot.common.enums.State
 import com.yapp.muckpot.domains.user.entity.MuckPotUser
 import com.yapp.muckpot.domains.user.enums.MuckPotStatus

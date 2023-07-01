@@ -1,4 +1,4 @@
-package com.yapp.muckpot.common
+package com.yapp.muckpot.common.constants
 
 // 상수
 const val AGE_MIN = 20

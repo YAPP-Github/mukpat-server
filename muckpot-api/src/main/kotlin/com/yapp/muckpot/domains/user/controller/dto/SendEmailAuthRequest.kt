@@ -1,6 +1,6 @@
 package com.yapp.muckpot.domains.user.controller.dto
 
-import com.yapp.muckpot.common.ONLY_NAVER
+import com.yapp.muckpot.common.constants.ONLY_NAVER
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 import javax.validation.constraints.Pattern

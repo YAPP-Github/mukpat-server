@@ -1,6 +1,6 @@
-import com.yapp.muckpot.common.AGE_MAX
-import com.yapp.muckpot.common.AGE_MIN
 import com.yapp.muckpot.common.Location
+import com.yapp.muckpot.common.constants.AGE_MAX
+import com.yapp.muckpot.common.constants.AGE_MIN
 import com.yapp.muckpot.common.enums.Gender
 import com.yapp.muckpot.common.enums.State
 import com.yapp.muckpot.domains.board.entity.Board

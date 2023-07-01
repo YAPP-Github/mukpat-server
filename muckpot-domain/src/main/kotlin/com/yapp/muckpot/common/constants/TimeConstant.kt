@@ -1,4 +1,4 @@
-package com.yapp.muckpot.common
+package com.yapp.muckpot.common.constants
 
 val NOT_TODAY_OR_TOMORROW = null
 const val TODAY_KR = "오늘"
