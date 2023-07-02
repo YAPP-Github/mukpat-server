@@ -43,8 +43,8 @@ object CookieUtil {
             domain = COOKIE_DOMAIN
         }
         // TODO 서버가 분리되면 해당 로직은 제거, (로컬에서 접근을 위한 설정)
-        currentRequest.serverName?.let { hostName ->
-            if (hostName == "localhost") {
+        currentRequest.getHeader("Origin")?.let { originName ->
+            if (originName == "http://localhost:3000") {
                 cookie.domain = "localhost"
             }
         }
