@@ -13,6 +13,8 @@ import javax.servlet.http.HttpServletResponse
  * Cookie 접근 위한 공통 클래스
  */
 object CookieUtil {
+    private const val COOKIE_DOMAIN = ".mukpat.com"
+
     private val currentRequest: HttpServletRequest
         get() = (RequestContextHolder.currentRequestAttributes() as ServletRequestAttributes).request
     private val currentResponse: HttpServletResponse
@@ -34,12 +36,18 @@ object CookieUtil {
      * 현재 응답에 HttpOnly=true 쿠키 추가.
      */
     fun addHttpOnlyCookie(name: String, value: String, expiredSeconds: Int) {
-        currentResponse.addCookie(
-            Cookie(name, value).apply {
-                path = "/"
-                isHttpOnly = true
-                maxAge = expiredSeconds
+        val cookie = Cookie(name, value).apply {
+            path = "/"
+            isHttpOnly = true
+            maxAge = expiredSeconds
+            domain = COOKIE_DOMAIN
+        }
+        // TODO 서버가 분리되면 해당 로직은 제거, (로컬에서 접근을 위한 설정)
+        currentRequest.serverName?.let { hostName ->
+            if (hostName == "localhost") {
+                cookie.domain = "localhost"
             }
-        )
+        }
+        currentResponse.addCookie(cookie)
     }
 }
