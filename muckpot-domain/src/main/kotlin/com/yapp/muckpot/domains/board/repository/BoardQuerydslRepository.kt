@@ -27,15 +27,15 @@ class BoardQuerydslRepository(
 
     fun findPrevId(boardId: Long): Long? {
         return queryFactory.from(board)
-            .select(board.id.max())
-            .where(board.id.lt(boardId))
+            .select(board.id.min())
+            .where(board.id.gt(boardId))
             .fetchOne()
     }
 
     fun findNextId(boardId: Long): Long? {
         return queryFactory.from(board)
-            .select(board.id.min())
-            .where(board.id.gt(boardId))
+            .select(board.id.max())
+            .where(board.id.lt(boardId))
             .fetchOne()
     }
 
