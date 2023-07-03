@@ -1,7 +1,6 @@
 package com.yapp.muckpot.domains.board.repository
 
 import com.querydsl.core.types.dsl.BooleanExpression
-import com.querydsl.jpa.JPAExpressions
 import com.querydsl.jpa.impl.JPAQueryFactory
 import com.yapp.muckpot.domains.board.entity.Board
 import com.yapp.muckpot.domains.board.entity.QBoard.board
@@ -28,33 +27,15 @@ class BoardQuerydslRepository(
 
     fun findPrevId(boardId: Long): Long? {
         return queryFactory.from(board)
-            .select(board.id)
-            .where(
-                board.createdAt.gt(
-                    JPAExpressions
-                        .select(board.createdAt)
-                        .from(board)
-                        .where(board.id.eq(boardId))
-                )
-            )
-            .orderBy(board.createdAt.asc())
-            .limit(1)
+            .select(board.id.min())
+            .where(board.id.gt(boardId))
             .fetchOne()
     }
 
     fun findNextId(boardId: Long): Long? {
         return queryFactory.from(board)
-            .select(board.id)
-            .where(
-                board.createdAt.lt(
-                    JPAExpressions
-                        .select(board.createdAt)
-                        .from(board)
-                        .where(board.id.eq(boardId))
-                )
-            )
-            .orderBy(board.createdAt.desc())
-            .limit(1)
+            .select(board.id.max())
+            .where(board.id.lt(boardId))
             .fetchOne()
     }
 

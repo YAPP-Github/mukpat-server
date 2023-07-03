@@ -24,16 +24,12 @@ class BoardQuerydslRepositoryTest(
     lateinit var user: MuckPotUser
     lateinit var boards: List<Board>
 
-    val todaySeq = 0
-    val twoDaysAgoSeq = 1
-    val aDayAgoSeq = 2
-
     beforeEach {
         user = Fixture.createUser()
         boards = listOf(
             Fixture.createBoard(title = "board1", user = user).apply { createdAt = LocalDateTime.now() },
-            Fixture.createBoard(title = "board2", user = user).apply { createdAt = LocalDateTime.now().minusDays(2) },
-            Fixture.createBoard(title = "board3", user = user).apply { createdAt = LocalDateTime.now().minusDays(1) }
+            Fixture.createBoard(title = "board2", user = user).apply { createdAt = LocalDateTime.now().plusDays(1) },
+            Fixture.createBoard(title = "board3", user = user).apply { createdAt = LocalDateTime.now().plusDays(2) }
         )
 
         userRepository.save(user)
@@ -57,29 +53,31 @@ class BoardQuerydslRepositoryTest(
         // when
         val result = boardQuerydslRepository.findAllWithPagination(null, 3)
         // then
-        result.last().id shouldBe boards[1].id
+        result[0].id shouldBe boards[2].id
+        result[1].id shouldBe boards[1].id
+        result[2].id shouldBe boards[0].id
     }
 
     "이전 아이디는 현재 게시글 이후에 등록된 첫번째 글이다." {
         // when
-        val todayPrev = boardQuerydslRepository.findPrevId(boards[todaySeq].id!!)
-        val aDayAgoPrev = boardQuerydslRepository.findPrevId(boards[aDayAgoSeq].id!!)
-        val twoDayAgoPrev = boardQuerydslRepository.findPrevId(boards[twoDaysAgoSeq].id!!)
+        val todayPrev = boardQuerydslRepository.findPrevId(boards[0].id!!)
+        val tomorrowPrev = boardQuerydslRepository.findPrevId(boards[1].id!!)
+        val twoDaysLaterPrev = boardQuerydslRepository.findPrevId(boards[2].id!!)
         // then
-        todayPrev shouldBe null
-        aDayAgoPrev shouldBe boards[todaySeq].id
-        twoDayAgoPrev shouldBe boards[aDayAgoSeq].id
+        todayPrev shouldBe boards[1].id
+        tomorrowPrev shouldBe boards[2].id
+        twoDaysLaterPrev shouldBe null
     }
 
     "다음 아이디는 현재 게시글 이전에 등록된 마지막 글이다." {
         // when
-        val todayNext = boardQuerydslRepository.findNextId(boards[todaySeq].id!!)
-        val aDayAgoNext = boardQuerydslRepository.findNextId(boards[aDayAgoSeq].id!!)
-        val twoDayAgoNext = boardQuerydslRepository.findNextId(boards[twoDaysAgoSeq].id!!)
+        val todayNext = boardQuerydslRepository.findNextId(boards[0].id!!)
+        val tomorrowNext = boardQuerydslRepository.findNextId(boards[1].id!!)
+        val twoDaysLaterNext = boardQuerydslRepository.findNextId(boards[2].id!!)
         // then
-        todayNext shouldBe boards[aDayAgoSeq].id
-        aDayAgoNext shouldBe boards[twoDaysAgoSeq].id
-        twoDayAgoNext shouldBe null
+        todayNext shouldBe null
+        tomorrowNext shouldBe boards[0].id
+        twoDaysLaterNext shouldBe boards[1].id
     }
 
     "현재시간 미만의 먹팟 상태 업데이트" {
