@@ -24,16 +24,16 @@ class BoardQuerydslRepositoryTest(
     lateinit var user: MuckPotUser
     lateinit var boards: List<Board>
 
-    val today = LocalDateTime.now()
-    val aDayAgo = LocalDateTime.now().minusDays(1)
-    val twoDaysAgo = LocalDateTime.now().minusDays(2)
+    val todaySeq = 0
+    val twoDaysAgoSeq = 1
+    val aDayAgoSeq = 2
 
     beforeEach {
         user = Fixture.createUser()
         boards = listOf(
-            Fixture.createBoard(title = "board1", user = user).apply { createdAt = today },
-            Fixture.createBoard(title = "board2", user = user).apply { createdAt = twoDaysAgo },
-            Fixture.createBoard(title = "board3", user = user).apply { createdAt = aDayAgo }
+            Fixture.createBoard(title = "board1", user = user).apply { createdAt = LocalDateTime.now() },
+            Fixture.createBoard(title = "board2", user = user).apply { createdAt = LocalDateTime.now().minusDays(2) },
+            Fixture.createBoard(title = "board3", user = user).apply { createdAt = LocalDateTime.now().minusDays(1) }
         )
 
         userRepository.save(user)
@@ -60,49 +60,26 @@ class BoardQuerydslRepositoryTest(
         result.last().id shouldBe boards[1].id
     }
 
-    "첫번째 글은 이전 아이디 null" {
-        // given
-        val boardSeq = 0
+    "이전 아이디는 현재 게시글 이후에 등록된 첫번째 글이다." {
         // when
-        val prevId = boardQuerydslRepository.findPrevId(boards[boardSeq].id!!)
-        val nextId = boardQuerydslRepository.findNextId(boards[boardSeq].id!!)
+        val todayPrev = boardQuerydslRepository.findPrevId(boards[todaySeq].id!!)
+        val aDayAgoPrev = boardQuerydslRepository.findPrevId(boards[aDayAgoSeq].id!!)
+        val twoDayAgoPrev = boardQuerydslRepository.findPrevId(boards[twoDaysAgoSeq].id!!)
         // then
-        prevId shouldBe null
-        nextId shouldBe boards[boardSeq + 1].id
+        todayPrev shouldBe null
+        aDayAgoPrev shouldBe boards[todaySeq].id
+        twoDayAgoPrev shouldBe boards[aDayAgoSeq].id
     }
 
-    "이전, 이후 아이디 모두 존재하는 경우" {
-        // given
-        val boardSeq = 1
+    "다음 아이디는 현재 게시글 이전에 등록된 마지막 글이다." {
         // when
-        val prevId = boardQuerydslRepository.findPrevId(boards[boardSeq].id!!)
-        val nextId = boardQuerydslRepository.findNextId(boards[boardSeq].id!!)
+        val todayNext = boardQuerydslRepository.findNextId(boards[todaySeq].id!!)
+        val aDayAgoNext = boardQuerydslRepository.findNextId(boards[aDayAgoSeq].id!!)
+        val twoDayAgoNext = boardQuerydslRepository.findNextId(boards[twoDaysAgoSeq].id!!)
         // then
-        prevId shouldBe boards[boardSeq - 1].id
-        nextId shouldBe boards[boardSeq + 1].id
-    }
-
-    "마지막 글은 다음 아이디 null" {
-        // given
-        val boardSeq = 2
-        // when
-        val prevId = boardQuerydslRepository.findPrevId(boards[boardSeq].id!!)
-        val nextId = boardQuerydslRepository.findNextId(boards[boardSeq].id!!)
-        // then
-        prevId shouldBe boards[boardSeq - 1].id
-        nextId shouldBe null
-    }
-
-    "이전, 이후 아이디가 없는 경우" {
-        // given
-        boardRepository.delete(boards[0])
-        boardRepository.delete(boards[2])
-        // when
-        val prevId = boardQuerydslRepository.findPrevId(boards[1].id!!)
-        val nextId = boardQuerydslRepository.findNextId(boards[1].id!!)
-        // then
-        prevId shouldBe null
-        nextId shouldBe null
+        todayNext shouldBe boards[aDayAgoSeq].id
+        aDayAgoNext shouldBe boards[twoDaysAgoSeq].id
+        twoDayAgoNext shouldBe null
     }
 
     "현재시간 미만의 먹팟 상태 업데이트" {

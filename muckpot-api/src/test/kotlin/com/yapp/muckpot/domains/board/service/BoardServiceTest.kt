@@ -137,8 +137,8 @@ class BoardServiceTest @Autowired constructor(
         // when
         val actual = boardService.findBoardDetailAndVisit(boardId, null)
         // then
-        actual.prevId shouldBe prevBoardId
-        actual.nextId shouldBe nextBoardId
+        actual.prevId shouldBe nextBoardId
+        actual.nextId shouldBe prevBoardId
     }
 
     "먹팟 수정 성공" {
