@@ -14,7 +14,7 @@ import com.yapp.muckpot.domains.user.controller.dto.VerifyEmailAuthRequest
 import com.yapp.muckpot.domains.user.enums.JobGroupMain
 import com.yapp.muckpot.domains.user.exception.UserErrorCode
 import com.yapp.muckpot.domains.user.repository.MuckPotUserRepository
-import com.yapp.muckpot.email.EmailService
+import com.yapp.muckpot.email.AwsSesService
 import com.yapp.muckpot.exception.MuckPotException
 import com.yapp.muckpot.redis.RedisService
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -27,7 +27,7 @@ class UserService(
     private val jwtService: JwtService,
     private val redisService: RedisService,
     private val passwordEncoder: PasswordEncoder,
-    private val emailService: EmailService
+    private val awsSesService: AwsSesService
 ) {
     val THIRTY_MINS: Long = 60 * 30L
 
@@ -57,7 +57,7 @@ class UserService(
             throw MuckPotException(UserErrorCode.ALREADY_EXISTS_USER)
         } ?: run {
             val authKey = RandomCodeUtil.generateRandomCode()
-            emailService.sendAuthMail(authKey = authKey, to = request.email)
+            awsSesService.sendAuthMail(authKey = authKey, to = request.email)
             redisService.setDataExpireWithNewest(key = request.email, value = authKey, duration = THIRTY_MINS)
             return EmailAuthResponse(authKey)
         }
