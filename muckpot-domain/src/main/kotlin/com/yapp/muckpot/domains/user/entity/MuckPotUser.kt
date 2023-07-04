@@ -53,8 +53,9 @@ class MuckPotUser(
     @Column(name = "sub_category")
     var subCategory: String? = null,
 
+    @Deprecated("V2 배포 후 제거")
     @Embedded
-    var location: Location,
+    var location: Location? = null,
 
     @Column(name = "image_url")
     var imageUrl: String? = null,

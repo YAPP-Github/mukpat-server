@@ -12,6 +12,7 @@ import com.yapp.muckpot.common.utils.SecurityContextHolderUtil
 import com.yapp.muckpot.domains.user.controller.dto.LoginRequest
 import com.yapp.muckpot.domains.user.controller.dto.SendEmailAuthRequest
 import com.yapp.muckpot.domains.user.controller.dto.SignUpRequest
+import com.yapp.muckpot.domains.user.controller.dto.SignUpRequestV1
 import com.yapp.muckpot.domains.user.controller.dto.VerifyEmailAuthRequest
 import com.yapp.muckpot.domains.user.service.UserService
 import io.swagger.annotations.Api
@@ -150,7 +151,7 @@ class UserController(
         ]
     )
     @ApiOperation(value = "회원가입")
-    @PostMapping("/v1/users")
+    @PostMapping("/v2/users")
     fun signUp(
         @RequestBody @Valid
         request: SignUpRequest
@@ -177,5 +178,29 @@ class UserController(
     fun reissueJwt(@CookieValue(REFRESH_TOKEN_KEY) refreshToken: String, @CookieValue(ACCESS_TOKEN_KEY) accessToken: String): ResponseEntity<ResponseDto> {
         userService.reissueJwt(refreshToken, accessToken)
         return ResponseEntityUtil.noContent()
+    }
+
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                code = 201,
+                examples = Example(
+                    ExampleProperty(
+                        value = SIGN_UP_RESPONSE,
+                        mediaType = MediaType.APPLICATION_JSON_VALUE
+                    )
+                ),
+                message = "성공"
+            )
+        ]
+    )
+    @ApiOperation(value = "회원가입 - v1")
+    @PostMapping("/v1/users")
+    @Deprecated("V2 배포 후 제거")
+    fun signUpV1(
+        @RequestBody @Valid
+        request: SignUpRequestV1
+    ): ResponseEntity<ResponseDto> {
+        return ResponseEntityUtil.created(userService.signUpV1(request))
     }
 }

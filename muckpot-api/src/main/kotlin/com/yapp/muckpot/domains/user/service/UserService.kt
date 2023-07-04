@@ -9,6 +9,7 @@ import com.yapp.muckpot.domains.user.controller.dto.EmailAuthResponse
 import com.yapp.muckpot.domains.user.controller.dto.LoginRequest
 import com.yapp.muckpot.domains.user.controller.dto.SendEmailAuthRequest
 import com.yapp.muckpot.domains.user.controller.dto.SignUpRequest
+import com.yapp.muckpot.domains.user.controller.dto.SignUpRequestV1
 import com.yapp.muckpot.domains.user.controller.dto.UserResponse
 import com.yapp.muckpot.domains.user.controller.dto.VerifyEmailAuthRequest
 import com.yapp.muckpot.domains.user.enums.JobGroupMain
@@ -106,6 +107,19 @@ class UserService(
             CookieUtil.addHttpOnlyCookie(REFRESH_TOKEN_KEY, newRefreshToken, leftRefreshTokenSeconds.toInt())
         } ?: run {
             throw MuckPotException(UserErrorCode.USER_NOT_FOUND)
+        }
+    }
+
+    @Deprecated("V2 배포 후 제거")
+    @Transactional
+    fun signUpV1(request: SignUpRequestV1): UserResponse {
+        userRepository.findByEmail(request.email)?.let {
+            throw MuckPotException(UserErrorCode.ALREADY_EXISTS_USER)
+        } ?: run {
+            val jobGroupMain = JobGroupMain.findByKorName(request.jobGroupMain)
+            val encodePw = passwordEncoder.encode(request.password)
+            val user = userRepository.save(request.toUser(jobGroupMain, encodePw))
+            return UserResponse.of(user)
         }
     }
 }

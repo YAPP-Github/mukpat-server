@@ -1,6 +1,7 @@
 package com.yapp.muckpot.domains.user.controller.dto
 
-import com.yapp.muckpot.common.constants.ONLY_SAMSUNG
+import com.yapp.muckpot.common.Location
+import com.yapp.muckpot.common.constants.ONLY_NAVER
 import com.yapp.muckpot.common.constants.PASSWORD_PATTERN_INVALID
 import com.yapp.muckpot.common.constants.PW_PATTERN
 import com.yapp.muckpot.common.enums.Gender
@@ -11,10 +12,11 @@ import io.swagger.annotations.ApiModelProperty
 import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
 
-@ApiModel(value = "회원가입")
-data class SignUpRequest(
-    @field:ApiModelProperty(notes = "이메일", required = true, example = "user@samsung.com")
-    @field:Pattern(regexp = ONLY_SAMSUNG, message = "현재 버전은 삼성전자 사우만 이용 가능합니다.")
+@Deprecated("V2 배포 후 제거")
+@ApiModel(value = "회원가입 V1")
+data class SignUpRequestV1(
+    @field:ApiModelProperty(notes = "이메일", required = true, example = "co@naver.com")
+    @field:Pattern(regexp = ONLY_NAVER, message = "현재 버전은 네이버 사우만 이용 가능합니다.")
     val email: String,
 
     @field:ApiModelProperty(notes = "비밀번호", required = true, example = "abc12345")
@@ -35,6 +37,15 @@ data class SignUpRequest(
     @field:Size(max = 10, message = "{max}자 이하로 입력해 주세요.")
     val jobGroupSub: String?,
 
+    @field:ApiModelProperty(notes = "먹팟 위치 이름", required = true, example = "삼성전자 본사")
+    val locationName: String,
+
+    @field:ApiModelProperty(notes = "x 좌표", required = true, example = "0.0")
+    val x: Double,
+
+    @field:ApiModelProperty(notes = "y 좌표", required = true, example = "0.0")
+    val y: Double,
+
     @field:ApiModelProperty(notes = "성별", required = true, example = "WOMEN")
     val gender: Gender,
 
@@ -49,7 +60,8 @@ data class SignUpRequest(
             gender = gender,
             yearOfBirth = yearOfBirth,
             mainCategory = jobGroupMain,
-            subCategory = jobGroupSub
+            subCategory = jobGroupSub,
+            location = Location(locationName, x, y)
         )
     }
 }
