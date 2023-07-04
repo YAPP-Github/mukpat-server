@@ -1,7 +1,6 @@
 package com.yapp.muckpot.domains.board.service
 
 import Fixture
-import com.yapp.muckpot.common.Location
 import com.yapp.muckpot.common.enums.Gender
 import com.yapp.muckpot.common.redisson.ConcurrencyHelper
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateRequest
@@ -175,7 +174,7 @@ class BoardServiceTest @Autowired constructor(
         val applyUser = userRepository.save(
             MuckPotUser(
                 null, "test1@naver.com", "pw", "nickname1",
-                Gender.MEN, 2000, JobGroupMain.DEVELOPMENT, "sub", Location("location", 0.0, 0.0), "url"
+                Gender.MEN, 2000, JobGroupMain.DEVELOPMENT, "sub", "url"
             )
         )
         val applyUserId = applyUser.id!!
@@ -203,7 +202,7 @@ class BoardServiceTest @Autowired constructor(
         val applyUser = userRepository.save(
             MuckPotUser(
                 null, "test1@naver.com", "pw", "nickname1",
-                Gender.MEN, 2000, JobGroupMain.DEVELOPMENT, "sub", Location("location", 0.0, 0.0), "url"
+                Gender.MEN, 2000, JobGroupMain.DEVELOPMENT, "sub", "url"
             )
         )
         val applyId = applyUser.id!!

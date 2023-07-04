@@ -2,6 +2,7 @@ package com.yapp.muckpot.filter
 
 import com.yapp.muckpot.common.constants.LOGIN_URL
 import com.yapp.muckpot.common.constants.SIGN_UP_URL
+import com.yapp.muckpot.common.constants.SIGN_UP_URL_V1
 import com.yapp.muckpot.common.security.AuthenticationUser
 import com.yapp.muckpot.common.utils.ResponseWriter
 import com.yapp.muckpot.domains.user.service.JwtService
@@ -20,8 +21,7 @@ class JwtAuthorizationFilter(private val jwtService: JwtService) : OncePerReques
         filterChain: FilterChain
     ) {
         jwtService.getCurrentUserClaim()?.let {
-            val requestURI = request.requestURI.toString()
-            if (LOGIN_URL == requestURI || SIGN_UP_URL == requestURI) {
+            if (ALREADY_LOGIN_REJECT_URLS.contains(request.requestURI.toString())) {
                 ResponseWriter.writeResponse(response, HttpStatus.BAD_REQUEST, "이미 로그인한 유저 입니다.")
                 return
             }
@@ -33,5 +33,10 @@ class JwtAuthorizationFilter(private val jwtService: JwtService) : OncePerReques
 
     companion object {
         private val LOGIN_USER_AUTHORITIES = listOf(SimpleGrantedAuthority("ROLE_USER"))
+        private val ALREADY_LOGIN_REJECT_URLS = listOf(
+            LOGIN_URL,
+            SIGN_UP_URL,
+            SIGN_UP_URL_V1
+        )
     }
 }

@@ -21,7 +21,6 @@ object Fixture {
         yearOfBirth: Int = 2000,
         mainCategory: JobGroupMain = JobGroupMain.DEVELOPMENT,
         subCategory: String? = "subCategory",
-        location: Location = Location("userLocation", 40.7128, -74.0060),
         imageUrl: String? = "image_url",
         state: State = State.ACTIVE
     ): MuckPotUser {
@@ -34,7 +33,6 @@ object Fixture {
             yearOfBirth,
             mainCategory,
             subCategory,
-            location,
             imageUrl,
             state
         )

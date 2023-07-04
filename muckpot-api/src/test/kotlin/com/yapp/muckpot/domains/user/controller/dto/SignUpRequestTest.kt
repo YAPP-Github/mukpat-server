@@ -12,14 +12,11 @@ class SignUpRequestTest : StringSpec({
     lateinit var validator: Validator
 
     fun createSignUpRequest(
-        email: String = "email@naver.com",
+        email: String = "email@samsung.com",
         password: String = "abc1234!",
         nickname: String = "닉네임",
         jobGroupMain: String = "개발",
         jobGroupSub: String = "직군 소분류",
-        locationName: String = "삼전 본사",
-        x: Double = 0.0,
-        y: Double = 0.0,
         gender: Gender = Gender.WOMEN,
         yearOfBirth: Int = 1996
     ): SignUpRequest {
@@ -29,9 +26,6 @@ class SignUpRequestTest : StringSpec({
             nickname = nickname,
             jobGroupMain = jobGroupMain,
             jobGroupSub = jobGroupSub,
-            locationName = locationName,
-            x = x,
-            y = y,
             gender = gender,
             yearOfBirth = yearOfBirth
         )
@@ -47,7 +41,7 @@ class SignUpRequestTest : StringSpec({
         val violations: MutableSet<ConstraintViolation<SignUpRequest>> = validator.validate(request)
         violations.size shouldBe 1
         for (violation in violations) {
-            violation.message shouldBe "현재 버전은 네이버 사우만 이용 가능합니다."
+            violation.message shouldBe "현재 버전은 삼성전자 사우만 이용 가능합니다."
         }
     }
 
