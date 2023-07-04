@@ -14,11 +14,11 @@ import org.springframework.stereotype.Service
 @Service
 class AwsSesService(
     private val amazonSimpleEmailService: AmazonSimpleEmailService
-) {
+) : EmailService {
     private val log = KLogging().logger
 
     @Async
-    fun sendAuthMail(authKey: String, to: String) {
+    override fun sendAuthMail(authKey: String, to: String) {
         try {
             val subject = EmailTemplates.AUTH_EMAIL_SUBJECT
             val text = EmailTemplates.AUTH_EMAIL_TEXT
