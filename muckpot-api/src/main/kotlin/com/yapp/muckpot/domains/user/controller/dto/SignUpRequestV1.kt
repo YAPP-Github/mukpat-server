@@ -1,6 +1,5 @@
 package com.yapp.muckpot.domains.user.controller.dto
 
-import com.yapp.muckpot.common.Location
 import com.yapp.muckpot.common.constants.ONLY_NAVER
 import com.yapp.muckpot.common.constants.PASSWORD_PATTERN_INVALID
 import com.yapp.muckpot.common.constants.PW_PATTERN
@@ -60,8 +59,7 @@ data class SignUpRequestV1(
             gender = gender,
             yearOfBirth = yearOfBirth,
             mainCategory = jobGroupMain,
-            subCategory = jobGroupSub,
-            location = Location(locationName, x, y)
+            subCategory = jobGroupSub
         )
     }
 }

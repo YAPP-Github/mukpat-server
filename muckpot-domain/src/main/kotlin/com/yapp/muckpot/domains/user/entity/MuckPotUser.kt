@@ -1,7 +1,6 @@
 package com.yapp.muckpot.domains.user.entity
 
 import com.yapp.muckpot.common.BaseTimeEntity
-import com.yapp.muckpot.common.Location
 import com.yapp.muckpot.common.constants.EMAIL
 import com.yapp.muckpot.common.enums.Gender
 import com.yapp.muckpot.common.enums.State
@@ -11,7 +10,6 @@ import org.hibernate.annotations.Where
 import java.time.LocalDate
 import java.time.Period
 import javax.persistence.Column
-import javax.persistence.Embedded
 import javax.persistence.Entity
 import javax.persistence.EnumType
 import javax.persistence.Enumerated
@@ -52,10 +50,6 @@ class MuckPotUser(
 
     @Column(name = "sub_category")
     var subCategory: String? = null,
-
-    @Deprecated("V2 배포 후 제거")
-    @Embedded
-    var location: Location? = null,
 
     @Column(name = "image_url")
     var imageUrl: String? = null,
