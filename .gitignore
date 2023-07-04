@@ -36,5 +36,9 @@ out/
 ### VS Code ###
 .vscode/
 
-### dcoker mysql ###
-.mysqldata/
+### dcoker mariadb ###
+.mariadata/
+
+### .env ###
+.env
+.env.*

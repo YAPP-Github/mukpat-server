@@ -1,0 +1,27 @@
+spring:
+  profiles:
+    include:
+      - domain
+      - infra
+
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+  jpa:
+    open-in-view: false
+
+jwt:
+  issuer: "muckpot"
+  secret-key: ${JWT_SECRET_KEY:secret}
+
+logging:
+  config: classpath:logback-${spring.config.activate.on-profile}.xml
+
+api:
+  option:
+    permit-all: false # 배포: false, 테스트 : true
+    allowed-origins:
+      ${LOCAL_ORIGIN:localOrigin},
+      ${PROD_ORIGIN:prodOrigin},
+      ${PROD_ORIGIN_2:prodOrigin2}

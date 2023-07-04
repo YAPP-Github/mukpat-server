@@ -1,0 +1,13 @@
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+jwt:
+  issuer: "muckpot"
+  secret-key: "test-secret"
+
+api:
+  option:
+    permit-all: false
+    allowed-origins:
