@@ -8,6 +8,7 @@ import com.yapp.muckpot.common.constants.LOGOUT_URL
 import com.yapp.muckpot.common.constants.REFRESH_TOKEN_KEY
 import com.yapp.muckpot.common.constants.REISSUE_JWT_URL
 import com.yapp.muckpot.common.constants.SIGN_UP_URL
+import com.yapp.muckpot.common.constants.SIGN_UP_URL_V1
 import com.yapp.muckpot.common.constants.USER_PROFILE_URL
 import com.yapp.muckpot.domains.user.service.JwtService
 import com.yapp.muckpot.filter.AuthenticationFailHandler
@@ -111,6 +112,7 @@ class SecurityConfig(
     companion object {
         val POST_PERMIT_ALL_URLS = listOf(
             LOGIN_URL,
+            SIGN_UP_URL_V1,
             SIGN_UP_URL,
             EMAIL_REQUEST_URL,
             EMAIL_VERIFY_URL,
