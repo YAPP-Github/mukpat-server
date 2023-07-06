@@ -16,6 +16,7 @@ import com.yapp.muckpot.common.constants.TITLE_MAX_INVALID
 import com.yapp.muckpot.common.constants.YYYYMMDD
 import com.yapp.muckpot.domains.board.entity.Board
 import com.yapp.muckpot.domains.board.exception.BoardErrorCode
+import com.yapp.muckpot.email.EmailTemplate
 import com.yapp.muckpot.exception.MuckPotException
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
@@ -81,5 +82,62 @@ data class MuckpotUpdateRequest(
         board.maxAge = maxAge ?: AGE_MAX
         board.maxApply = this.maxApply
         board.chatLink = this.chatLink
+    }
+
+    fun createBoardUpdateMailBody(board: Board): String {
+        val modifyBody = StringBuffer()
+        if (this.title != board.title) {
+            modifyBody.append(
+                EmailTemplate.createBoardUpdateRow("제목이", board.title, this.title)
+            )
+        }
+        val meetingLocalTime = board.meetingTime.toLocalTime()
+        if (this.meetingTime != meetingLocalTime) {
+            modifyBody.append(
+                EmailTemplate.createBoardUpdateRow("시간이", meetingLocalTime, this.meetingTime)
+            )
+        }
+        val meetingLocalDate = board.meetingTime.toLocalDate()
+        if (this.meetingDate != meetingLocalDate) {
+            modifyBody.append(
+                EmailTemplate.createBoardUpdateRow("날짜가", meetingLocalDate, this.meetingDate)
+            )
+        }
+        if (this.maxApply != board.maxApply) {
+            modifyBody.append(
+                EmailTemplate.createBoardUpdateRow("인원이", board.maxApply, this.maxApply)
+            )
+        }
+        if (this.locationName != board.location.locationName) {
+            modifyBody.append(
+                EmailTemplate.createBoardUpdateRow("만날 위치가", board.location.locationName, this.locationName)
+            )
+        }
+        if (this.locationDetail != board.locationDetail) {
+            modifyBody.append(
+                EmailTemplate.createBoardUpdateRow("상세 주소가", board.locationDetail, this.locationDetail)
+            )
+        }
+        if (this.content != board.content) {
+            modifyBody.append(
+                EmailTemplate.createBoardUpdateRow("내용이", board.content, this.content)
+            )
+        }
+        if (this.chatLink != board.chatLink) {
+            modifyBody.append(
+                EmailTemplate.createBoardUpdateRow("오픈 채팅방 링크가", board.chatLink, this.chatLink)
+            )
+        }
+        if ((this.minAge != board.minAge) || (this.maxAge != board.maxAge)) {
+            val ageLimitFormat = "%d ~ %d"
+            modifyBody.append(
+                EmailTemplate.createBoardUpdateRow(
+                    "나이 제한이",
+                    ageLimitFormat.format(board.minAge, board.maxAge),
+                    ageLimitFormat.format(this.minAge, this.maxAge)
+                )
+            )
+        }
+        return modifyBody.toString()
     }
 }
