@@ -8,6 +8,7 @@ import com.yapp.muckpot.domains.board.entity.Participant
 import com.yapp.muckpot.domains.user.entity.MuckPotUser
 import com.yapp.muckpot.domains.user.repository.MuckPotUserRepository
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import java.time.LocalDateTime
@@ -69,5 +70,14 @@ class ParticipantQuerydslRepositoryTest(
         // then
         actual.boardId shouldBe participants[3].board.id
         actual.userId shouldBe participants[3].user.id
+    }
+
+    "참여자 이메일 조회 성공" {
+        // when
+        val actual = participantQuerydslRepository.findParticipantEmails(boards[0])
+        // then
+        actual shouldHaveSize 2
+        actual shouldContain users[0].email
+        actual shouldContain users[1].email
     }
 })
