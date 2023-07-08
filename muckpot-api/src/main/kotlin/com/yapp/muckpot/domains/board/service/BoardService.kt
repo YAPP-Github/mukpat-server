@@ -90,7 +90,7 @@ class BoardService(
                 request.createBoardUpdateMailBody(board)
             )
             request.updateBoard(board)
-            participantService.sendEmailToParticipants(
+            participantService.sendEmailToParticipantsWithoutWriter(
                 board = board,
                 mailTitle = mailTitle,
                 mailBody = mailBody
@@ -121,7 +121,7 @@ class BoardService(
                 throw MuckPotException(BoardErrorCode.BOARD_UNAUTHORIZED)
             }
             // DELETE 이전에 수행되어야 함.
-            participantService.sendEmailToParticipants(
+            participantService.sendEmailToParticipantsWithoutWriter(
                 board = board,
                 mailTitle = EmailTemplate.BOARD_DELETE_EMAIL.formatSubject(board.title),
                 mailBody = EmailTemplate.BOARD_DELETE_EMAIL.formatBody(board.title)

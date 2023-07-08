@@ -12,7 +12,7 @@ class ParticipantService(
     private val emailService: EmailService
 ) {
     @Transactional
-    fun sendEmailToParticipants(board: Board, mailTitle: String, mailBody: String) {
+    fun sendEmailToParticipantsWithoutWriter(board: Board, mailTitle: String, mailBody: String) {
         // TODO MQ 적용
         participantQuerydslRepository.findParticipantEmails(board).forEach { email ->
             if (board.user.email != email) {
