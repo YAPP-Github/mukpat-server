@@ -84,7 +84,7 @@ class Board(
 
     // TODO 1.0 개발 완료 후 null 제거
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "province_id", referencedColumnName = "province_id")
+    @JoinColumn(name = "location_id", referencedColumnName = "province_id")
     var province: Province? = null
 ) : BaseTimeEntity() {
     init {
