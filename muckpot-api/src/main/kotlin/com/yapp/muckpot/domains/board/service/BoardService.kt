@@ -41,13 +41,16 @@ class BoardService(
     private val cityRepository: CityRepository,
     private val provinceRepository: ProvinceRepository
 ) {
+    fun getMuckpotProvince(depth1: String, depth2: String): Province {
+        val city = cityRepository.findByName(depth1) ?: cityRepository.save(City(depth1))
+        return provinceRepository.findByName(depth2) ?: provinceRepository.save(Province(depth2, city))
+    }
+
     @Transactional
     fun saveBoard(userId: Long, request: MuckpotCreateRequest): Long? {
-        // TODO 먹팟 등록 시 같은 회사 인원에게 메일 전송
         val user = userRepository.findByIdOrNull(userId)
             ?: throw MuckPotException(UserErrorCode.USER_NOT_FOUND)
-        val city = cityRepository.findByName(request.region_1depth_name) ?: cityRepository.save(City(request.region_1depth_name))
-        val province = provinceRepository.findByName(request.region_2depth_name) ?: provinceRepository.save(Province(request.region_2depth_name, city))
+        val province = getMuckpotProvince(request.region_1depth_name, request.region_2depth_name)
         val board = boardRepository.save(request.toBoard(user, province))
         participantRepository.save(Participant(user, board))
         return board.id
