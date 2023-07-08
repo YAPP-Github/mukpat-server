@@ -14,7 +14,7 @@ import javax.validation.constraints.Size
 @Deprecated("V2 배포 후 제거")
 @ApiModel(value = "회원가입 V1")
 data class SignUpRequestV1(
-    @field:ApiModelProperty(notes = "이메일", required = true, example = "co@naver.com")
+    @field:ApiModelProperty(notes = "이메일", required = true, example = "user@naver.com")
     @field:Pattern(regexp = ONLY_NAVER, message = "현재 버전은 네이버 사우만 이용 가능합니다.")
     val email: String,
 
