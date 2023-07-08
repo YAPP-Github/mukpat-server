@@ -34,4 +34,5 @@ class City(
     init {
         require(name.isNotBlank()) { "name은 필수입니다" }
     }
+    constructor(name: String) : this(null, name = name)
 }
