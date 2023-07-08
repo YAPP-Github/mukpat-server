@@ -27,6 +27,18 @@ enum class EmailTemplate(
                 "  %s" +
                 "  <br>\n"
         )
+    ),
+
+    // 먹팟 기존 글 제목, 변경 내용
+    BOARD_DELETE_EMAIL(
+        "신청하신 \"%s\"을 작성자가 삭제했습니다.",
+        MAIL_BASIC_FORMAT.format(
+            "  <br>\n" +
+                "  <br>\n" +
+                "  <span style=\"font-size:18px;\">신청하신 \"%s\"을 작성자가 삭제했습니다. </span>\n" +
+                "  <br>\n" +
+                "  <br>\n"
+        )
     );
 
     fun formatSubject(vararg args: Any): String {
