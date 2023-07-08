@@ -4,7 +4,9 @@ enum class EmailTemplate(
     val subject: String,
     private val body: String
 ) {
-    // 인증 번호
+    /**
+     * body: 인증 번호
+     */
     AUTH_EMAIL(
         "먹팟 이메일 인증 요청입니다.",
         MAIL_BASIC_FORMAT.format(
@@ -17,7 +19,10 @@ enum class EmailTemplate(
         )
     ),
 
-    // 먹팟 기존 글 제목, 변경 내용
+    /**
+     * subject: 먹팟 기존 글 제목
+     * body: 먹팟 기존 글 제목, 변경 내용
+     */
     BOARD_UPDATE_EMAIL(
         "신청하신 \"%s\"을 작성자가 수정했습니다.",
         MAIL_BASIC_FORMAT.format(
@@ -29,7 +34,10 @@ enum class EmailTemplate(
         )
     ),
 
-    // 먹팟 기존 글 제목, 변경 내용
+    /**
+     * subject: 먹팟 기존 글 제목
+     * body: 먹팟 기존 글 제목
+     */
     BOARD_DELETE_EMAIL(
         "신청하신 \"%s\"을 작성자가 삭제했습니다.",
         MAIL_BASIC_FORMAT.format(
