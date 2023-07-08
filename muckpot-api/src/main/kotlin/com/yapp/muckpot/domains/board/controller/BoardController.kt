@@ -121,7 +121,7 @@ class BoardController(
         @RequestBody @Valid
         request: MuckpotUpdateRequest
     ): ResponseEntity<ResponseDto> {
-        boardService.updateBoard(userId, boardId, request)
+        boardService.updateBoardAndSendEmail(userId, boardId, request)
         return ResponseEntityUtil.noContent()
     }
 

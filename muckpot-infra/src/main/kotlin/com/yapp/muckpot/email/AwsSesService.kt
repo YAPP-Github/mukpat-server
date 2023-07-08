@@ -18,24 +18,26 @@ class AwsSesService(
     private val log = KLogging().logger
 
     @Async
-    override fun sendAuthMail(authKey: String, to: String) {
+    override fun sendMail(subject: String, body: String, to: String) {
         try {
-            val subject = EmailTemplates.AUTH_EMAIL_SUBJECT
-            val text = EmailTemplates.AUTH_EMAIL_TEXT
-            val textSetting = text.formatText(authKey)
-
-            val message = Message()
-            message.withSubject(Content(subject))
-            message.withBody(Body().withHtml(Content(textSetting)))
             val destination = Destination().withToAddresses(to)
+            val message = Message().apply {
+                withSubject(Content(subject))
+                withBody(Body().withHtml(Content(body)))
+            }
+
             amazonSimpleEmailService.sendEmail(
                 SendEmailRequest()
-                    .withSource("noreply@mukpat.com")
+                    .withSource(SENDER_EMAIL)
                     .withDestination(destination)
                     .withMessage(message)
             )
         } catch (e: MailException) {
-            log.error { "Failed to send email: ${e.message}" }
+            log.error(e) { "Failed to send email: ${e.message}" }
         }
+    }
+
+    companion object {
+        private const val SENDER_EMAIL = "noreply@mukpat.com"
     }
 }

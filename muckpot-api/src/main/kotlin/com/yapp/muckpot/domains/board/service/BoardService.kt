@@ -18,6 +18,8 @@ import com.yapp.muckpot.domains.user.controller.dto.UserResponse
 import com.yapp.muckpot.domains.user.enums.MuckPotStatus
 import com.yapp.muckpot.domains.user.exception.UserErrorCode
 import com.yapp.muckpot.domains.user.repository.MuckPotUserRepository
+import com.yapp.muckpot.email.EmailService
+import com.yapp.muckpot.email.EmailTemplate
 import com.yapp.muckpot.exception.MuckPotException
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -29,7 +31,8 @@ class BoardService(
     private val boardRepository: BoardRepository,
     private val boardQuerydslRepository: BoardQuerydslRepository,
     private val participantRepository: ParticipantRepository,
-    private val participantQuerydslRepository: ParticipantQuerydslRepository
+    private val participantQuerydslRepository: ParticipantQuerydslRepository,
+    private val emailService: EmailService
 ) {
     @Transactional
     fun saveBoard(userId: Long, request: MuckpotCreateRequest): Long? {
@@ -76,13 +79,28 @@ class BoardService(
     }
 
     @Transactional
-    fun updateBoard(userId: Long, boardId: Long, request: MuckpotUpdateRequest) {
-        // TODO 먹팟 수정 시 참여 인원에게 메일 전송
+    fun updateBoardAndSendEmail(userId: Long, boardId: Long, request: MuckpotUpdateRequest) {
         boardRepository.findByIdOrNull(boardId)?.let { board ->
             if (board.isNotMyBoard(userId)) {
                 throw MuckPotException(BoardErrorCode.BOARD_UNAUTHORIZED)
             }
+            // Update 이전에 수행되어야 함.
+            val mailTitle = EmailTemplate.BOARD_UPDATE_EMAIL.formatSubject(board.title)
+            val mailBody = EmailTemplate.BOARD_UPDATE_EMAIL.formatBody(
+                board.title,
+                request.createBoardUpdateMailBody(board)
+            )
             request.updateBoard(board)
+            // TODO MQ 적용
+            participantQuerydslRepository.findParticipantEmails(board).forEach { email ->
+                if (board.user.email != email) {
+                    emailService.sendMail(
+                        subject = mailTitle,
+                        body = mailBody,
+                        to = email
+                    )
+                }
+            }
         } ?: run {
             throw MuckPotException(BoardErrorCode.BOARD_NOT_FOUND)
         }
