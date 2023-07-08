@@ -144,7 +144,7 @@ class BoardServiceTest @Autowired constructor(
         // given
         val boardId = boardService.saveBoard(userId, createRequest)!!
         // when
-        boardService.updateBoard(userId, boardId, updateRequest)
+        boardService.updateBoardAndSendEmail(userId, boardId, updateRequest)
         // then
         val actual = boardRepository.findByIdOrNull(boardId)!!
         actual.maxApply shouldBe updateRequest.maxApply
@@ -164,7 +164,7 @@ class BoardServiceTest @Autowired constructor(
         val boardId = boardService.saveBoard(userId, createRequest)!!
         // when & then
         shouldThrow<MuckPotException> {
-            boardService.updateBoard(otherUserId, boardId, updateRequest)
+            boardService.updateBoardAndSendEmail(otherUserId, boardId, updateRequest)
         }.errorCode shouldBe BoardErrorCode.BOARD_UNAUTHORIZED
     }
 
