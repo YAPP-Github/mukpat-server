@@ -47,6 +47,21 @@ enum class EmailTemplate(
                 "  <br>\n" +
                 "  <br>\n"
         )
+    ),
+
+    /**
+     * subject: 취소자 닉네임, 먹팟 제목
+     * body: 취소자 닉네임, 먹팟 제목
+     */
+    PARTICIPANT_CANCEL_EMAIL(
+        "%s님이 \"%s\"의 참여를 취소했습니다.",
+        MAIL_BASIC_FORMAT.format(
+            "  <br>\n" +
+                "  <br>\n" +
+                "  <span style=\"font-size:18px;\">%s님이 \"%s\"의 참여를 취소했습니다.</span>\n" +
+                "  <br>\n" +
+                "  <br>\n"
+        )
     );
 
     fun formatSubject(vararg args: Any): String {
