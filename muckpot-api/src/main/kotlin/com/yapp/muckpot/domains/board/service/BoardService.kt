@@ -18,7 +18,6 @@ import com.yapp.muckpot.domains.user.controller.dto.UserResponse
 import com.yapp.muckpot.domains.user.enums.MuckPotStatus
 import com.yapp.muckpot.domains.user.exception.UserErrorCode
 import com.yapp.muckpot.domains.user.repository.MuckPotUserRepository
-import com.yapp.muckpot.email.EmailService
 import com.yapp.muckpot.email.EmailTemplate
 import com.yapp.muckpot.exception.MuckPotException
 import org.springframework.data.repository.findByIdOrNull
@@ -32,7 +31,7 @@ class BoardService(
     private val boardQuerydslRepository: BoardQuerydslRepository,
     private val participantRepository: ParticipantRepository,
     private val participantQuerydslRepository: ParticipantQuerydslRepository,
-    private val emailService: EmailService
+    private val participantService: ParticipantService
 ) {
     @Transactional
     fun saveBoard(userId: Long, request: MuckpotCreateRequest): Long? {
@@ -91,16 +90,11 @@ class BoardService(
                 request.createBoardUpdateMailBody(board)
             )
             request.updateBoard(board)
-            // TODO MQ 적용
-            participantQuerydslRepository.findParticipantEmails(board).forEach { email ->
-                if (board.user.email != email) {
-                    emailService.sendMail(
-                        subject = mailTitle,
-                        body = mailBody,
-                        to = email
-                    )
-                }
-            }
+            participantService.sendEmailToParticipantsWithoutWriter(
+                board = board,
+                mailTitle = mailTitle,
+                mailBody = mailBody
+            )
         } ?: run {
             throw MuckPotException(BoardErrorCode.BOARD_NOT_FOUND)
         }
@@ -126,6 +120,12 @@ class BoardService(
             if (board.isNotMyBoard(userId)) {
                 throw MuckPotException(BoardErrorCode.BOARD_UNAUTHORIZED)
             }
+            // DELETE 이전에 수행되어야 함.
+            participantService.sendEmailToParticipantsWithoutWriter(
+                board = board,
+                mailTitle = EmailTemplate.BOARD_DELETE_EMAIL.formatSubject(board.title),
+                mailBody = EmailTemplate.BOARD_DELETE_EMAIL.formatBody(board.title)
+            )
             participantRepository.deleteByBoard(board)
             boardRepository.delete(board)
         } ?: run {
