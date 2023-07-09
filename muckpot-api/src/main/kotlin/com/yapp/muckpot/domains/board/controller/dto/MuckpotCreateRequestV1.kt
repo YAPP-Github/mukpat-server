@@ -15,7 +15,6 @@ import com.yapp.muckpot.common.constants.TITLE_MAX
 import com.yapp.muckpot.common.constants.TITLE_MAX_INVALID
 import com.yapp.muckpot.common.constants.YYYYMMDD
 import com.yapp.muckpot.domains.board.entity.Board
-import com.yapp.muckpot.domains.board.entity.Province
 import com.yapp.muckpot.domains.user.entity.MuckPotUser
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
@@ -26,8 +25,9 @@ import java.time.LocalTime
 import javax.validation.constraints.Min
 import javax.validation.constraints.NotBlank
 
-@ApiModel(value = "먹팟생성 요청")
-data class MuckpotCreateRequest(
+@Deprecated("V2 배포 후 제거")
+@ApiModel(value = "먹팟 글 생성 V1")
+data class MuckpotCreateRequestV1(
     @field:ApiModelProperty(notes = "만날 날짜", required = true, example = "2023-05-21")
     @field:JsonFormat(shape = JsonFormat.Shape.STRING, pattern = YYYYMMDD)
     val meetingDate: LocalDate,
@@ -59,24 +59,16 @@ data class MuckpotCreateRequest(
     @field:ApiModelProperty(notes = "오픈채팅방 링크", required = true, example = "https://open.kakao.com/o/gSIkvvHc")
     @field:Length(max = CHAT_LINK_MAX, message = LINK_MAX_INVALID)
     @field:NotBlank(message = NOT_BLANK_COMMON)
-    var chatLink: String,
-    @field:ApiModelProperty(notes = "시/도", required = true, example = "경기도")
-    @field:NotBlank(message = NOT_BLANK_COMMON)
-    var region_1depth_name: String,
-    @field:ApiModelProperty(notes = "구/군", required = true, example = "용인시 기흥구")
-    @field:NotBlank(message = NOT_BLANK_COMMON)
-    var region_2depth_name: String
+    var chatLink: String
 ) {
     init {
         title = title.trim()
         content = content?.trim()
         chatLink = chatLink.trim()
         locationDetail = locationDetail?.trim()
-        region_1depth_name = region_1depth_name.trim()
-        region_2depth_name = region_2depth_name.trim()
     }
 
-    fun toBoard(user: MuckPotUser, province: Province): Board {
+    fun toBoard(user: MuckPotUser): Board {
         return Board(
             user = user,
             title = title,
@@ -88,8 +80,7 @@ data class MuckpotCreateRequest(
             maxAge = maxAge ?: AGE_MAX,
             maxApply = maxApply,
             chatLink = chatLink,
-            currentApply = 1,
-            province = province
+            currentApply = 1
         )
     }
 }

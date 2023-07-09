@@ -4,6 +4,7 @@ import com.yapp.muckpot.common.dto.CursorPaginationRequest
 import com.yapp.muckpot.common.dto.CursorPaginationResponse
 import com.yapp.muckpot.common.redisson.DistributedLock
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateRequest
+import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateRequestV1
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotDetailResponse
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotReadResponse
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotUpdateRequest
@@ -34,14 +35,15 @@ class BoardService(
     private val participantRepository: ParticipantRepository,
     private val participantQuerydslRepository: ParticipantQuerydslRepository,
     private val emailService: EmailService,
-    private val participantService: ParticipantService
+    private val participantService: ParticipantService,
+    private val provinceService: ProvinceService
 ) {
     @Transactional
     fun saveBoard(userId: Long, request: MuckpotCreateRequest): Long? {
-        // TODO 먹팟 등록 시 같은 회사 인원에게 메일 전송
         val user = userRepository.findByIdOrNull(userId)
             ?: throw MuckPotException(UserErrorCode.USER_NOT_FOUND)
-        val board = boardRepository.save(request.toBoard(user))
+        val province = provinceService.saveProvinceIfNot(request.region_1depth_name, request.region_2depth_name)
+        val board = boardRepository.save(request.toBoard(user, province))
         participantRepository.save(Participant(user, board))
         return board.id
     }
@@ -171,5 +173,15 @@ class BoardService(
         } ?: run {
             throw MuckPotException(BoardErrorCode.BOARD_NOT_FOUND)
         }
+    }
+
+    @Transactional
+    fun saveBoardV1(userId: Long, request: MuckpotCreateRequestV1): Long? {
+        // TODO 먹팟 등록 시 같은 회사 인원에게 메일 전송
+        val user = userRepository.findByIdOrNull(userId)
+            ?: throw MuckPotException(UserErrorCode.USER_NOT_FOUND)
+        val board = boardRepository.save(request.toBoard(user))
+        participantRepository.save(Participant(user, board))
+        return board.id
     }
 }

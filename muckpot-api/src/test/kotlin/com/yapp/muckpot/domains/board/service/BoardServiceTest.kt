@@ -9,7 +9,9 @@ import com.yapp.muckpot.domains.board.entity.Participant
 import com.yapp.muckpot.domains.board.exception.BoardErrorCode
 import com.yapp.muckpot.domains.board.exception.ParticipantErrorCode
 import com.yapp.muckpot.domains.board.repository.BoardRepository
+import com.yapp.muckpot.domains.board.repository.CityRepository
 import com.yapp.muckpot.domains.board.repository.ParticipantRepository
+import com.yapp.muckpot.domains.board.repository.ProvinceRepository
 import com.yapp.muckpot.domains.user.controller.dto.UserResponse
 import com.yapp.muckpot.domains.user.entity.MuckPotUser
 import com.yapp.muckpot.domains.user.enums.JobGroupMain
@@ -33,7 +35,9 @@ class BoardServiceTest @Autowired constructor(
     private val boardService: BoardService,
     private val boardRepository: BoardRepository,
     private val userRepository: MuckPotUserRepository,
-    private val participantRepository: ParticipantRepository
+    private val participantRepository: ParticipantRepository,
+    private val cityRepository: CityRepository,
+    private val provinceRepository: ProvinceRepository
 ) : StringSpec({
     lateinit var user: MuckPotUser
     var userId: Long = 0
@@ -49,7 +53,9 @@ class BoardServiceTest @Autowired constructor(
         y = 0.0,
         title = "title",
         content = null,
-        chatLink = "chatLink"
+        chatLink = "chatLink",
+        region_1depth_name = "서울특별시",
+        region_2depth_name = "강남구"
     )
     val updateRequest = MuckpotUpdateRequest(
         meetingDate = LocalDate.now().plusDays(1),
@@ -84,11 +90,15 @@ class BoardServiceTest @Autowired constructor(
         // then
         val findBoard = boardRepository.findByIdOrNull(boardId)!!
         val participant = participantRepository.findByBoard(findBoard)
+        val findCity = cityRepository.findByName(createRequest.region_1depth_name)
+        val findProvince = provinceRepository.findByName(createRequest.region_2depth_name)
 
         findBoard shouldNotBe null
         findBoard.user.id shouldBe userId
         findBoard.currentApply shouldBe 1
         participant shouldNotBe null
+        findCity shouldNotBe null
+        findProvince shouldNotBe null
     }
 
     "자신의 글은 조회수가 증가하지 않는다." {
@@ -291,5 +301,21 @@ class BoardServiceTest @Autowired constructor(
         shouldThrow<MuckPotException> {
             boardService.cancelJoin(user.id!!, board.id!!)
         }.errorCode shouldBe ParticipantErrorCode.WRITER_MUST_JOIN
+    }
+
+    "먹팟 생성 시 시/도,군/구 값은 최초 1번만 디비에 값 저장 후 재사용" {
+        // when
+        val boardId1 = boardService.saveBoard(userId, createRequest)
+        val boardId2 = boardService.saveBoard(userId, createRequest)
+        // then
+        val findBoard1 = boardRepository.findByIdOrNull(boardId1)!!
+        val findBoard2 = boardRepository.findByIdOrNull(boardId2)!!
+        val findCity = cityRepository.findByName(createRequest.region_1depth_name)
+        val findProvince = provinceRepository.findByName(createRequest.region_2depth_name)
+
+        findBoard1 shouldNotBe null
+        findBoard1.province!!.id.shouldBe(findBoard2.province!!.id)
+        findCity shouldNotBe null
+        findProvince shouldNotBe null
     }
 })
