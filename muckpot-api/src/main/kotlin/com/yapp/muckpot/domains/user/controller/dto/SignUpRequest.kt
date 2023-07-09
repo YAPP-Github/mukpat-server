@@ -1,6 +1,7 @@
 package com.yapp.muckpot.domains.user.controller.dto
 
 import com.yapp.muckpot.common.constants.ONLY_SAMSUNG
+import com.yapp.muckpot.common.constants.ONLY_SAMSUNG_EXP_MSG
 import com.yapp.muckpot.common.constants.PASSWORD_PATTERN_INVALID
 import com.yapp.muckpot.common.constants.PW_PATTERN
 import com.yapp.muckpot.common.enums.Gender
@@ -14,7 +15,7 @@ import javax.validation.constraints.Size
 @ApiModel(value = "회원가입")
 data class SignUpRequest(
     @field:ApiModelProperty(notes = "이메일", required = true, example = "user@samsung.com")
-    @field:Pattern(regexp = ONLY_SAMSUNG, message = "현재 버전은 삼성전자 사우만 이용 가능합니다.")
+    @field:Pattern(regexp = ONLY_SAMSUNG, message = ONLY_SAMSUNG_EXP_MSG)
     val email: String,
 
     @field:ApiModelProperty(notes = "비밀번호", required = true, example = "abc12345")
