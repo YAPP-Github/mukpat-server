@@ -41,4 +41,5 @@ class Province(
     init {
         require(name.isNotBlank()) { "name은 필수입니다" }
     }
+    constructor(name: String, city: City) : this(null, name = name, city = city)
 }

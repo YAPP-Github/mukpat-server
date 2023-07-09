@@ -9,6 +9,7 @@ import com.yapp.muckpot.common.dto.CursorPaginationRequest
 import com.yapp.muckpot.common.utils.ResponseEntityUtil
 import com.yapp.muckpot.common.utils.SecurityContextHolderUtil
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateRequest
+import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateRequestV1
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateResponse
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotUpdateRequest
 import com.yapp.muckpot.domains.board.service.BoardService
@@ -55,7 +56,7 @@ class BoardController(
         ]
     )
     @ApiOperation(value = "먹팟 글 생성")
-    @PostMapping("/v1/boards")
+    @PostMapping("/v2/boards")
     fun saveBoard(
         @AuthenticationPrincipal userId: Long,
         @RequestBody @Valid
@@ -203,5 +204,34 @@ class BoardController(
     ): ResponseEntity<ResponseDto> {
         boardService.cancelJoin(userId, boardId)
         return ResponseEntityUtil.noContent()
+    }
+
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                code = 201,
+                examples = Example(
+                    ExampleProperty(
+                        value = MUCKPOT_SAVE_RESPONSE,
+                        mediaType = MediaType.APPLICATION_JSON_VALUE
+                    )
+                ),
+                message = "성공"
+            )
+        ]
+    )
+    @ApiOperation(value = "먹팟 글 생성 - v1")
+    @PostMapping("/v1/boards")
+    @Deprecated("V2 배포 후 제거")
+    fun saveBoardV1(
+        @AuthenticationPrincipal userId: Long,
+        @RequestBody @Valid
+        request: MuckpotCreateRequestV1
+    ): ResponseEntity<ResponseDto> {
+        return ResponseEntityUtil.created(
+            MuckpotCreateResponse(
+                boardService.saveBoardV1(userId, request)
+            )
+        )
     }
 }
