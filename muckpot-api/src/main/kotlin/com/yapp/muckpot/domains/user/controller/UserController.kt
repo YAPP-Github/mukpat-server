@@ -12,7 +12,6 @@ import com.yapp.muckpot.common.utils.SecurityContextHolderUtil
 import com.yapp.muckpot.domains.user.controller.dto.LoginRequest
 import com.yapp.muckpot.domains.user.controller.dto.SendEmailAuthRequest
 import com.yapp.muckpot.domains.user.controller.dto.SignUpRequest
-import com.yapp.muckpot.domains.user.controller.dto.SignUpRequestV1
 import com.yapp.muckpot.domains.user.controller.dto.VerifyEmailAuthRequest
 import com.yapp.muckpot.domains.user.service.UserService
 import io.swagger.annotations.Api
@@ -53,7 +52,7 @@ class UserController(
         ]
     )
     @ApiOperation(value = "로그인")
-    @PostMapping("/v1/users/login")
+    @PostMapping("/v2/users/login")
     fun login(
         @RequestBody @Valid
         request: LoginRequest
@@ -76,7 +75,7 @@ class UserController(
         ]
     )
     @ApiOperation(value = "이메일 인증 요청")
-    @PostMapping("/v1/emails/request")
+    @PostMapping("/v2/emails/request")
     fun sendEmailAuth(
         @RequestBody @Valid
         request: SendEmailAuthRequest
@@ -99,7 +98,7 @@ class UserController(
         ]
     )
     @ApiOperation(value = "이메일 인증 검증")
-    @PostMapping("/v1/emails/verify")
+    @PostMapping("/v2/emails/verify")
     fun verifyEmailAuth(
         @RequestBody @Valid
         request: VerifyEmailAuthRequest
@@ -178,29 +177,5 @@ class UserController(
     fun reissueJwt(@CookieValue(REFRESH_TOKEN_KEY) refreshToken: String, @CookieValue(ACCESS_TOKEN_KEY) accessToken: String): ResponseEntity<ResponseDto> {
         userService.reissueJwt(refreshToken, accessToken)
         return ResponseEntityUtil.noContent()
-    }
-
-    @ApiResponses(
-        value = [
-            ApiResponse(
-                code = 201,
-                examples = Example(
-                    ExampleProperty(
-                        value = SIGN_UP_RESPONSE,
-                        mediaType = MediaType.APPLICATION_JSON_VALUE
-                    )
-                ),
-                message = "성공"
-            )
-        ]
-    )
-    @ApiOperation(value = "회원가입 - v1")
-    @PostMapping("/v1/users")
-    @Deprecated("V2 배포 후 제거")
-    fun signUpV1(
-        @RequestBody @Valid
-        request: SignUpRequestV1
-    ): ResponseEntity<ResponseDto> {
-        return ResponseEntityUtil.created(userService.signUpV1(request))
     }
 }

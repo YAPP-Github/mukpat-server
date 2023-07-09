@@ -1,4 +1,4 @@
-package com.yapp.muckpot.domains.user.controller.dto
+package com.yapp.muckpot.domains.user.controller.dto.deprecated
 
 import com.yapp.muckpot.common.constants.ONLY_NAVER
 import com.yapp.muckpot.common.constants.PASSWORD_PATTERN_INVALID
@@ -12,7 +12,7 @@ import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
 
 @Deprecated("V2 배포 후 제거")
-@ApiModel(value = "회원가입 V1")
+@ApiModel(value = "회원가입 - v1")
 data class SignUpRequestV1(
     @field:ApiModelProperty(notes = "이메일", required = true, example = "co@naver.com")
     @field:Pattern(regexp = ONLY_NAVER, message = "현재 버전은 네이버 사우만 이용 가능합니다.")
