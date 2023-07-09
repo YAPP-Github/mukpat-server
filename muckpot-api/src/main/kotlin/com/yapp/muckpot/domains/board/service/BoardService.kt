@@ -8,17 +8,13 @@ import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateRequestV1
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotDetailResponse
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotReadResponse
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotUpdateRequest
-import com.yapp.muckpot.domains.board.entity.City
 import com.yapp.muckpot.domains.board.entity.Participant
-import com.yapp.muckpot.domains.board.entity.Province
 import com.yapp.muckpot.domains.board.exception.BoardErrorCode
 import com.yapp.muckpot.domains.board.exception.ParticipantErrorCode
 import com.yapp.muckpot.domains.board.repository.BoardQuerydslRepository
 import com.yapp.muckpot.domains.board.repository.BoardRepository
-import com.yapp.muckpot.domains.board.repository.CityRepository
 import com.yapp.muckpot.domains.board.repository.ParticipantQuerydslRepository
 import com.yapp.muckpot.domains.board.repository.ParticipantRepository
-import com.yapp.muckpot.domains.board.repository.ProvinceRepository
 import com.yapp.muckpot.domains.user.controller.dto.UserResponse
 import com.yapp.muckpot.domains.user.enums.MuckPotStatus
 import com.yapp.muckpot.domains.user.exception.UserErrorCode
@@ -40,19 +36,13 @@ class BoardService(
     private val participantQuerydslRepository: ParticipantQuerydslRepository,
     private val emailService: EmailService,
     private val participantService: ParticipantService,
-    private val cityRepository: CityRepository,
-    private val provinceRepository: ProvinceRepository
+    private val provinceService: ProvinceService
 ) {
-    fun getMuckpotProvince(depth1: String, depth2: String): Province {
-        val city = cityRepository.findByName(depth1) ?: cityRepository.save(City(depth1))
-        return provinceRepository.findByName(depth2) ?: provinceRepository.save(Province(depth2, city))
-    }
-
     @Transactional
     fun saveBoard(userId: Long, request: MuckpotCreateRequest): Long? {
         val user = userRepository.findByIdOrNull(userId)
             ?: throw MuckPotException(UserErrorCode.USER_NOT_FOUND)
-        val province = getMuckpotProvince(request.region_1depth_name, request.region_2depth_name)
+        val province = provinceService.saveProvinceIfNot(request.region_1depth_name, request.region_2depth_name)
         val board = boardRepository.save(request.toBoard(user, province))
         participantRepository.save(Participant(user, board))
         return board.id
