@@ -15,7 +15,7 @@ data class LoginRequestV1(
     @field:ApiModelProperty(notes = "이메일", required = true, example = "user@naver.com")
     @field:Pattern(regexp = ONLY_NAVER, message = "현재 버전은 네이버 사우만 이용 가능합니다.")
     val email: String,
-    @field:ApiModelProperty(notes = "비밀번호", required = true, example = "abcd1234")
+    @field:ApiModelProperty(notes = "비밀번호", required = true, example = "abc12345")
     @field:Pattern(
         regexp = PW_PATTERN,
         message = PASSWORD_PATTERN_INVALID
