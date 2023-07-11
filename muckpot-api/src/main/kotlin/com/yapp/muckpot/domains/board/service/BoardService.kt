@@ -23,6 +23,9 @@ import com.yapp.muckpot.domains.user.repository.MuckPotUserRepository
 import com.yapp.muckpot.email.EmailService
 import com.yapp.muckpot.email.EmailTemplate
 import com.yapp.muckpot.exception.MuckPotException
+import com.yapp.muckpot.redis.constants.ALL_KEY
+import com.yapp.muckpot.redis.constants.REGIONS_CACHE_NAME
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -175,6 +178,7 @@ class BoardService(
         }
     }
 
+    @Cacheable(value = [REGIONS_CACHE_NAME], key = ALL_KEY)
     @Transactional(readOnly = true)
     fun findAllRegions(): List<MuckpotCityResponse> {
         val muckpotCityResponses = mutableListOf<MuckpotCityResponse>()
