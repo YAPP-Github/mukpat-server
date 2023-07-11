@@ -1,9 +1,11 @@
 package com.yapp.muckpot.domains.board.dto
 
 import com.querydsl.core.annotations.QueryProjection
+import com.yapp.muckpot.domains.user.enums.MuckPotStatus
 
 data class RegionDto @QueryProjection constructor(
     val boardId: Long,
+    val status: MuckPotStatus,
     val city: CityDto,
     val province: ProvinceDto
 ) {

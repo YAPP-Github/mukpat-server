@@ -58,6 +58,7 @@ class BoardQuerydslRepository(
         return queryFactory.select(
             QRegionDto(
                 board.id,
+                board.status,
                 QRegionDto_CityDto(
                     province.city.id,
                     province.city.name
