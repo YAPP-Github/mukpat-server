@@ -6,6 +6,9 @@ import com.yapp.muckpot.common.constants.TODAY_KR
 import com.yapp.muckpot.common.constants.TOMORROW_KR
 import com.yapp.muckpot.common.dto.CursorPaginationRequest
 import com.yapp.muckpot.domains.board.dto.ParticipantReadResponse
+import com.yapp.muckpot.domains.board.dto.RegionDto
+import com.yapp.muckpot.domains.board.dto.RegionDto.CityDto
+import com.yapp.muckpot.domains.board.dto.RegionDto.ProvinceDto
 import com.yapp.muckpot.domains.board.repository.BoardQuerydslRepository
 import com.yapp.muckpot.domains.board.repository.BoardRepository
 import com.yapp.muckpot.domains.board.repository.ParticipantQuerydslRepository
@@ -111,6 +114,45 @@ class BoardServiceMockTest @Autowired constructor(
             actual.createDate shouldBe "2100년 12월 23일"
             actual.status shouldBe MuckPotStatus.IN_PROGRESS.korNm
             actual.participants shouldHaveSize participantResponses.size
+        }
+    }
+
+    context("findAllRegions 테스트") {
+        // given
+        val allRegions = listOf(
+            RegionDto(1, CityDto(1, "경기도"), ProvinceDto(1, "용인시 기흥구")),
+            RegionDto(2, CityDto(1, "경기도"), ProvinceDto(1, "용인시 기흥구")),
+            RegionDto(3, CityDto(1, "경기도"), ProvinceDto(1, "용인시 기흥구")),
+            RegionDto(6, CityDto(1, "경기도"), ProvinceDto(2, "용인시 수지구")),
+            RegionDto(4, CityDto(1, "서울특별시"), ProvinceDto(3, "강남구")),
+            RegionDto(4, CityDto(1, "서울특별시"), ProvinceDto(3, "강남구")),
+            RegionDto(5, CityDto(1, "서울특별시"), ProvinceDto(4, "강동구"))
+        )
+
+        beforeTest {
+            every { boardQuerydslRepository.findAllRegions() } returns allRegions
+        }
+
+        test("등록된 먹팟을 기준으로 필터링 지역 조회") {
+            // when
+            val actual = boardService.findAllRegions()
+
+            // then
+            actual shouldHaveSize 2
+            actual[0].cityName shouldBe "경기도"
+            actual[0].sumByCity shouldBe 4
+            actual[0].provinces shouldHaveSize 2
+            actual[0].provinces[0].provinceName shouldBe "용인시 기흥구"
+            actual[0].provinces[0].sumByProvince shouldBe 3
+            actual[0].provinces[1].provinceName shouldBe "용인시 수지구"
+            actual[0].provinces[1].sumByProvince shouldBe 1
+            actual[1].cityName shouldBe "서울특별시"
+            actual[1].sumByCity shouldBe 3
+            actual[1].provinces shouldHaveSize 2
+            actual[1].provinces[0].provinceName shouldBe "강남구"
+            actual[1].provinces[0].sumByProvince shouldBe 2
+            actual[1].provinces[1].provinceName shouldBe "강동구"
+            actual[1].provinces[1].sumByProvince shouldBe 1
         }
     }
 })

@@ -4,6 +4,7 @@ import com.yapp.muckpot.common.ResponseDto
 import com.yapp.muckpot.common.constants.MUCKPOT_FIND_ALL
 import com.yapp.muckpot.common.constants.MUCKPOT_FIND_BY_ID
 import com.yapp.muckpot.common.constants.MUCKPOT_JOIN_RESPONSE
+import com.yapp.muckpot.common.constants.MUCKPOT_REGIONS
 import com.yapp.muckpot.common.constants.MUCKPOT_SAVE_RESPONSE
 import com.yapp.muckpot.common.dto.CursorPaginationRequest
 import com.yapp.muckpot.common.utils.ResponseEntityUtil
@@ -204,6 +205,26 @@ class BoardController(
     ): ResponseEntity<ResponseDto> {
         boardService.cancelJoin(userId, boardId)
         return ResponseEntityUtil.noContent()
+    }
+
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                code = 200,
+                examples = Example(
+                    ExampleProperty(
+                        value = MUCKPOT_REGIONS,
+                        mediaType = MediaType.APPLICATION_JSON_VALUE
+                    )
+                ),
+                message = "성공"
+            )
+        ]
+    )
+    @ApiOperation(value = "필터링 지역 카테고리 조회")
+    @GetMapping("/v1/boards/regions")
+    fun findAllRegions(): ResponseEntity<ResponseDto> {
+        return ResponseEntityUtil.ok(boardService.findAllRegions())
     }
 
     @ApiResponses(

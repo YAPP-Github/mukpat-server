@@ -3,6 +3,7 @@ package com.yapp.muckpot.domains.board.service
 import com.yapp.muckpot.common.dto.CursorPaginationRequest
 import com.yapp.muckpot.common.dto.CursorPaginationResponse
 import com.yapp.muckpot.common.redisson.DistributedLock
+import com.yapp.muckpot.domains.board.controller.dto.MuckpotCityResponse
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateRequest
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateRequestV1
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotDetailResponse
@@ -173,6 +174,16 @@ class BoardService(
         } ?: run {
             throw MuckPotException(BoardErrorCode.BOARD_NOT_FOUND)
         }
+    }
+
+    @Transactional(readOnly = true)
+    fun findAllRegions(): List<MuckpotCityResponse> {
+        val muckpotCityResponses = mutableListOf<MuckpotCityResponse>()
+        boardQuerydslRepository.findAllRegions().groupBy { it.city }
+            .mapValues { (city, provinces) ->
+                muckpotCityResponses.add(MuckpotCityResponse.of(city, provinces))
+            }
+        return muckpotCityResponses
     }
 
     @Transactional
