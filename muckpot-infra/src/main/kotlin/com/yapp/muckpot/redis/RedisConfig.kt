@@ -12,7 +12,7 @@ import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory
 import org.springframework.data.redis.core.RedisTemplate
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair
 import org.springframework.data.redis.serializer.StringRedisSerializer
 
@@ -52,7 +52,7 @@ class RedisConfig(
                 SerializationPair.fromSerializer(StringRedisSerializer())
             )
             .serializeValuesWith(
-                SerializationPair.fromSerializer(Jackson2JsonRedisSerializer(Any::class.java))
+                SerializationPair.fromSerializer(GenericJackson2JsonRedisSerializer())
             )
         return RedisCacheManager.builder(connectionFactory)
             .cacheDefaults(cacheConfiguration)

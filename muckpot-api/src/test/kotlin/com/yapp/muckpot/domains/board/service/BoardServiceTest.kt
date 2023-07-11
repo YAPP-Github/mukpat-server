@@ -78,7 +78,6 @@ class BoardServiceTest @Autowired constructor(
 
     beforeEach {
         user = userRepository.save(Fixture.createUser())
-        redisService.deleteData(regionsRedisKey)
         userId = user.id!!
     }
 
