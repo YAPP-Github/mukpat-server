@@ -12,7 +12,7 @@ import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory
 import org.springframework.data.redis.core.RedisTemplate
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair
 import org.springframework.data.redis.serializer.StringRedisSerializer
 
@@ -28,7 +28,6 @@ class RedisConfig(
     fun redisConnectionFactory(): RedisConnectionFactory {
         return LettuceConnectionFactory(redisHost, redisPort)
     }
-    private val REDISSON_HOST_PREFIX = "redis://"
 
     @Bean
     fun redisTemplate(): RedisTemplate<String, Any> {
@@ -48,13 +47,19 @@ class RedisConfig(
 
     @Bean
     fun cacheManager(connectionFactory: RedisConnectionFactory): CacheManager {
-        val jsonSerializer = SerializationPair.fromSerializer(GenericJackson2JsonRedisSerializer())
-        val stringSerializer = SerializationPair.fromSerializer(StringRedisSerializer())
         val cacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
-            .serializeKeysWith(stringSerializer)
-            .serializeValuesWith(jsonSerializer)
+            .serializeKeysWith(
+                SerializationPair.fromSerializer(StringRedisSerializer())
+            )
+            .serializeValuesWith(
+                SerializationPair.fromSerializer(Jackson2JsonRedisSerializer(Any::class.java))
+            )
         return RedisCacheManager.builder(connectionFactory)
             .cacheDefaults(cacheConfiguration)
             .build()
+    }
+
+    companion object {
+        private const val REDISSON_HOST_PREFIX = "redis://"
     }
 }

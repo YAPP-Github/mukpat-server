@@ -74,9 +74,11 @@ class BoardServiceTest @Autowired constructor(
         content = "content",
         chatLink = "modify chatLink"
     )
+    val regionsRedisKey = "$REGIONS_CACHE_NAME::all"
 
     beforeEach {
         user = userRepository.save(Fixture.createUser())
+        redisService.deleteData(regionsRedisKey)
         userId = user.id!!
     }
 
@@ -327,7 +329,7 @@ class BoardServiceTest @Autowired constructor(
         boardService.findAllRegions()
 
         // then
-        val actual = redisService.getData("$REGIONS_CACHE_NAME::all")
+        val actual = redisService.getData(regionsRedisKey)
         actual shouldNotBe null
     }
 
@@ -339,7 +341,7 @@ class BoardServiceTest @Autowired constructor(
         boardService.saveBoard(userId, createRequest)
 
         // then
-        val actual = redisService.getData("$REGIONS_CACHE_NAME::all")
+        val actual = redisService.getData(regionsRedisKey)
         actual shouldBe null
     }
 })

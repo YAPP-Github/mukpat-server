@@ -9,6 +9,7 @@ import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateRequestV1
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotDetailResponse
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotReadResponse
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotUpdateRequest
+import com.yapp.muckpot.domains.board.controller.dto.RegionResponse
 import com.yapp.muckpot.domains.board.entity.Participant
 import com.yapp.muckpot.domains.board.exception.BoardErrorCode
 import com.yapp.muckpot.domains.board.exception.ParticipantErrorCode
@@ -182,13 +183,13 @@ class BoardService(
 
     @Cacheable(value = [REGIONS_CACHE_NAME], key = ALL_KEY)
     @Transactional(readOnly = true)
-    fun findAllRegions(): List<MuckpotCityResponse> {
-        val muckpotCityResponses = mutableListOf<MuckpotCityResponse>()
+    fun findAllRegions(): RegionResponse {
+        val muckpotCityResponses: MutableList<MuckpotCityResponse> = mutableListOf()
         boardQuerydslRepository.findAllRegions().groupBy { it.city }
             .mapValues { (city, provinces) ->
                 muckpotCityResponses.add(MuckpotCityResponse.of(city, provinces))
             }
-        return muckpotCityResponses
+        return RegionResponse(muckpotCityResponses)
     }
 
     @Transactional

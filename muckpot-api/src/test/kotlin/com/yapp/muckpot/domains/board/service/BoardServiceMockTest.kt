@@ -136,20 +136,20 @@ class BoardServiceMockTest @Autowired constructor(
             // when
             val actual = boardService.findAllRegions()
             // then
-            actual shouldHaveSize 2
-            actual[0].sumByCity shouldBe 1
-            actual[0].provinces shouldHaveSize 2
-            actual[0].provinces[0].provinceName shouldBe "용인시 기흥구"
-            actual[0].provinces[0].sumByProvince shouldBe 1
-            actual[0].provinces[1].provinceName shouldBe "용인시 수지구"
-            actual[0].provinces[1].sumByProvince shouldBe 0
-            actual[1].cityName shouldBe "서울특별시"
-            actual[1].sumByCity shouldBe 0
-            actual[1].provinces shouldHaveSize 2
-            actual[1].provinces[0].provinceName shouldBe "강남구"
-            actual[1].provinces[0].sumByProvince shouldBe 0
-            actual[1].provinces[1].provinceName shouldBe "강동구"
-            actual[1].provinces[1].sumByProvince shouldBe 0
+            actual.list shouldHaveSize 2
+            actual.list[0].sumByCity shouldBe 1
+            actual.list[0].provinces shouldHaveSize 2
+            actual.list[0].provinces[0].provinceName shouldBe "용인시 기흥구"
+            actual.list[0].provinces[0].sumByProvince shouldBe 1
+            actual.list[0].provinces[1].provinceName shouldBe "용인시 수지구"
+            actual.list[0].provinces[1].sumByProvince shouldBe 0
+            actual.list[1].cityName shouldBe "서울특별시"
+            actual.list[1].sumByCity shouldBe 0
+            actual.list[1].provinces shouldHaveSize 2
+            actual.list[1].provinces[0].provinceName shouldBe "강남구"
+            actual.list[1].provinces[0].sumByProvince shouldBe 0
+            actual.list[1].provinces[1].provinceName shouldBe "강동구"
+            actual.list[1].provinces[1].sumByProvince shouldBe 0
         }
     }
 })

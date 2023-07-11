@@ -123,31 +123,33 @@ const val MUCKPOT_JOIN_RESPONSE = """
 const val MUCKPOT_REGIONS = """
 {
   "status": 200,
-  "result": [
-    {
-      "cityId": 2,
-      "cityName": "경기도",
-      "sumByCity": 1,
-      "provinces": [
-        {
-          "provinceId": 2,
-          "provinceName": "용인시 기흥구",
-          "sumByProvince": 1
-        }
-      ]
-    },
-    {
-      "cityId": 3,
-      "cityName": "서울특별시",
-      "sumByCity": 2,
-      "provinces": [
-        {
-          "provinceId": 3,
-          "provinceName": "성북구",
-          "sumByProvince": 2
-        }
-      ]
-    }
-  ]
+  "result": {
+    "list": [
+      {
+        "cityId": 2,
+        "cityName": "경기도",
+        "sumByCity": 5,
+        "provinces": [
+          {
+            "provinceId": 2,
+            "provinceName": "용인시 기흥구",
+            "sumByProvince": 5
+          }
+        ]
+      },
+      {
+        "cityId": 3,
+        "cityName": "서울특별시",
+        "sumByCity": 2,
+        "provinces": [
+          {
+            "provinceId": 3,
+            "provinceName": "성북구",
+            "sumByProvince": 2
+          }
+        ]
+      }
+    ]
+  }
 }
 """
