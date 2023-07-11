@@ -18,6 +18,8 @@ import com.yapp.muckpot.domains.user.enums.JobGroupMain
 import com.yapp.muckpot.domains.user.enums.MuckPotStatus
 import com.yapp.muckpot.domains.user.repository.MuckPotUserRepository
 import com.yapp.muckpot.exception.MuckPotException
+import com.yapp.muckpot.redis.RedisService
+import com.yapp.muckpot.redis.constants.REGIONS_CACHE_NAME
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldHaveSize
@@ -37,7 +39,8 @@ class BoardServiceTest @Autowired constructor(
     private val userRepository: MuckPotUserRepository,
     private val participantRepository: ParticipantRepository,
     private val cityRepository: CityRepository,
-    private val provinceRepository: ProvinceRepository
+    private val provinceRepository: ProvinceRepository,
+    private val redisService: RedisService
 ) : StringSpec({
     lateinit var user: MuckPotUser
     var userId: Long = 0
@@ -317,5 +320,26 @@ class BoardServiceTest @Autowired constructor(
         findBoard1.province!!.id.shouldBe(findBoard2.province!!.id)
         findCity shouldNotBe null
         findProvince shouldNotBe null
+    }
+
+    "지역 조회정보는 최초1회 redis에 저장한다." {
+        // when
+        boardService.findAllRegions()
+
+        // then
+        val actual = redisService.getData("$REGIONS_CACHE_NAME::all")
+        actual shouldNotBe null
+    }
+
+    "먹팟 생성시 지역정보는 redis에서 삭제된다." {
+        // given
+        boardService.findAllRegions()
+
+        // when
+        boardService.saveBoard(userId, createRequest)
+
+        // then
+        val actual = redisService.getData("$REGIONS_CACHE_NAME::all")
+        actual shouldBe null
     }
 })
