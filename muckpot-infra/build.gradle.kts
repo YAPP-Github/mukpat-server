@@ -7,6 +7,7 @@ plugins {
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.redisson:redisson:3.20.0")
 
     testFixturesImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
