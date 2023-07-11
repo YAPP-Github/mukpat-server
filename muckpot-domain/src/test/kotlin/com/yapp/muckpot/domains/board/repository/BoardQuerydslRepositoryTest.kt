@@ -4,6 +4,8 @@ import Fixture
 import com.querydsl.jpa.impl.JPAQueryFactory
 import com.yapp.muckpot.config.CustomDataJpaTest
 import com.yapp.muckpot.domains.board.entity.Board
+import com.yapp.muckpot.domains.board.entity.City
+import com.yapp.muckpot.domains.board.entity.Province
 import com.yapp.muckpot.domains.user.entity.MuckPotUser
 import com.yapp.muckpot.domains.user.enums.MuckPotStatus
 import com.yapp.muckpot.domains.user.repository.MuckPotUserRepository
@@ -17,22 +19,35 @@ import java.time.LocalDateTime
 class BoardQuerydslRepositoryTest(
     private val userRepository: MuckPotUserRepository,
     private val boardRepository: BoardRepository,
+    private val cityRepository: CityRepository,
+    private val provinceRepository: ProvinceRepository,
     private val jpaQueryFactory: JPAQueryFactory
 ) : StringSpec({
     val boardQuerydslRepository = BoardQuerydslRepository(jpaQueryFactory)
 
     lateinit var user: MuckPotUser
     lateinit var boards: List<Board>
+    lateinit var cities: List<City>
+    lateinit var provinces: List<Province>
 
     beforeEach {
         user = Fixture.createUser()
-        boards = listOf(
-            Fixture.createBoard(title = "board1", user = user).apply { createdAt = LocalDateTime.now() },
-            Fixture.createBoard(title = "board2", user = user).apply { createdAt = LocalDateTime.now().plusDays(1) },
-            Fixture.createBoard(title = "board3", user = user).apply { createdAt = LocalDateTime.now().plusDays(2) }
+        cities = listOf(
+            City("경기도"),
+            City("서울특별시")
         )
-
+        provinces = listOf(
+            Province("용인시 기흥구", cities[0]),
+            Province("서초구", cities[1])
+        )
+        boards = listOf(
+            Fixture.createBoard(title = "board1", user = user, province = provinces[0]).apply { createdAt = LocalDateTime.now() },
+            Fixture.createBoard(title = "board2", user = user, province = provinces[0]).apply { createdAt = LocalDateTime.now().plusDays(1) },
+            Fixture.createBoard(title = "board3", user = user, province = provinces[1]).apply { createdAt = LocalDateTime.now().plusDays(2) }
+        )
         userRepository.save(user)
+        cityRepository.saveAll(cities)
+        provinceRepository.saveAll(provinces)
         boardRepository.saveAll(boards)
     }
 
@@ -91,6 +106,12 @@ class BoardQuerydslRepositoryTest(
         // then
         val actual = boardRepository.findByStatus(MuckPotStatus.IN_PROGRESS)
         actual shouldHaveSize 1
+    }
+
+    "먹팟에 등록된 모든 지역정보 조회" {
+        val actual = boardQuerydslRepository.findAllRegions()
+
+        actual shouldHaveSize 3
     }
 }) {
     override fun extensions() = listOf(SpringExtension)

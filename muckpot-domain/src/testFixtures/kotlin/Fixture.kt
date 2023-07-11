@@ -2,9 +2,9 @@ import com.yapp.muckpot.common.Location
 import com.yapp.muckpot.common.constants.AGE_MAX
 import com.yapp.muckpot.common.constants.AGE_MIN
 import com.yapp.muckpot.common.enums.Gender
-import com.yapp.muckpot.common.enums.State
 import com.yapp.muckpot.domains.board.entity.Board
 import com.yapp.muckpot.domains.board.entity.Participant
+import com.yapp.muckpot.domains.board.entity.Province
 import com.yapp.muckpot.domains.user.entity.MuckPotUser
 import com.yapp.muckpot.domains.user.enums.JobGroupMain
 import com.yapp.muckpot.domains.user.enums.MuckPotStatus
@@ -21,8 +21,7 @@ object Fixture {
         yearOfBirth: Int = 2000,
         mainCategory: JobGroupMain = JobGroupMain.DEVELOPMENT,
         subCategory: String? = "subCategory",
-        imageUrl: String? = "image_url",
-        state: State = State.ACTIVE
+        imageUrl: String? = "image_url"
     ): MuckPotUser {
         return MuckPotUser(
             id,
@@ -33,8 +32,7 @@ object Fixture {
             yearOfBirth,
             mainCategory,
             subCategory,
-            imageUrl,
-            state
+            imageUrl
         )
     }
 
@@ -53,24 +51,24 @@ object Fixture {
         status: MuckPotStatus = MuckPotStatus.IN_PROGRESS,
         minAge: Int = AGE_MIN,
         maxAge: Int = AGE_MAX,
-        state: State = State.ACTIVE
+        province: Province? = null
     ): Board {
         return Board(
-            id,
-            user,
-            title,
-            location,
-            locationDetail,
-            meetingTime,
-            content,
-            views,
-            currentApply,
-            maxApply,
-            chatLink,
-            status,
-            minAge,
-            maxAge,
-            state
+            id = id,
+            user = user,
+            title = title,
+            location = location,
+            locationDetail = locationDetail,
+            meetingTime = meetingTime,
+            content = content,
+            views = views,
+            currentApply = currentApply,
+            maxApply = maxApply,
+            chatLink = chatLink,
+            status = status,
+            minAge = minAge,
+            maxAge = maxAge,
+            province = province
         )
     }
 
