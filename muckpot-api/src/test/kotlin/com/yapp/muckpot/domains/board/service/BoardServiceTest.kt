@@ -234,7 +234,7 @@ class BoardServiceTest @Autowired constructor(
         val boardId = boardService.saveBoard(userId, createRequest)!!
 
         // when
-        boardService.deleteBoard(userId, boardId)
+        boardService.deleteBoardAndSendEmail(userId, boardId)
 
         val findBoard = boardRepository.findByIdOrNull(boardId)
         findBoard shouldBe null
@@ -246,7 +246,7 @@ class BoardServiceTest @Autowired constructor(
         val boardId = boardService.saveBoard(userId, createRequest)!!
         // when & then
         shouldThrow<MuckPotException> {
-            boardService.deleteBoard(otherUserId, boardId)
+            boardService.deleteBoardAndSendEmail(otherUserId, boardId)
         }.errorCode shouldBe BoardErrorCode.BOARD_UNAUTHORIZED
     }
 
@@ -254,7 +254,7 @@ class BoardServiceTest @Autowired constructor(
         // given
         val board = boardRepository.save(Fixture.createBoard(user = user))
         // when
-        boardService.deleteBoard(userId, board.id!!)
+        boardService.deleteBoardAndSendEmail(userId, board.id!!)
         // then
         val findBoard = participantRepository.findByBoard(board)
         findBoard shouldHaveSize 0
@@ -276,7 +276,7 @@ class BoardServiceTest @Autowired constructor(
         val board = boardRepository.save(Fixture.createBoard(user = user))
         participantRepository.save(Participant(applyUser, board))
         // when
-        boardService.cancelJoin(applyUser.id!!, board.id!!)
+        boardService.cancelJoinAndSendEmail(applyUser.id!!, board.id!!)
         // then
         val findParticipant = participantRepository.findByUserAndBoard(applyUser, board)
         findParticipant shouldBe null
@@ -289,7 +289,7 @@ class BoardServiceTest @Autowired constructor(
         val board = boardRepository.save(Fixture.createBoard(user = user))
         // when & then
         shouldThrow<MuckPotException> {
-            boardService.cancelJoin(applyUser.id!!, board.id!!)
+            boardService.cancelJoinAndSendEmail(applyUser.id!!, board.id!!)
         }.errorCode shouldBe ParticipantErrorCode.PARTICIPANT_NOT_FOUND
     }
 
@@ -299,7 +299,7 @@ class BoardServiceTest @Autowired constructor(
         participantRepository.save(Participant(user, board))
         // when & then
         shouldThrow<MuckPotException> {
-            boardService.cancelJoin(user.id!!, board.id!!)
+            boardService.cancelJoinAndSendEmail(user.id!!, board.id!!)
         }.errorCode shouldBe ParticipantErrorCode.WRITER_MUST_JOIN
     }
 

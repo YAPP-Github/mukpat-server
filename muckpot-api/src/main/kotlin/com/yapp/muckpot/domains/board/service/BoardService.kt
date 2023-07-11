@@ -50,7 +50,7 @@ class BoardService(
     }
 
     @Transactional(readOnly = true)
-    fun findAllMuckpot(request: CursorPaginationRequest): CursorPaginationResponse<MuckpotReadResponse> {
+    fun findAllBoards(request: CursorPaginationRequest): CursorPaginationResponse<MuckpotReadResponse> {
         val allBoard = boardQuerydslRepository.findAllWithPagination(request.lastId, request.countPerScroll)
         val boardIds = allBoard.map { it.id }
         val participantsByBoardId = participantQuerydslRepository.findByBoardIds(boardIds).groupBy { it.boardId }
@@ -120,8 +120,7 @@ class BoardService(
     }
 
     @Transactional
-    fun deleteBoard(userId: Long, boardId: Long) {
-        // TODO 먹팟 삭제 시 참여 인원에게 메일 전송
+    fun deleteBoardAndSendEmail(userId: Long, boardId: Long) {
         boardRepository.findByIdOrNull(boardId)?.let { board ->
             if (board.isNotMyBoard(userId)) {
                 throw MuckPotException(BoardErrorCode.BOARD_UNAUTHORIZED)
@@ -152,7 +151,7 @@ class BoardService(
     }
 
     @Transactional
-    fun cancelJoin(userId: Long, boardId: Long) {
+    fun cancelJoinAndSendEmail(userId: Long, boardId: Long) {
         boardRepository.findByIdOrNull(boardId)?.let { board ->
             val user = userRepository.findByIdOrNull(userId)
                 ?: throw MuckPotException(UserErrorCode.USER_NOT_FOUND)

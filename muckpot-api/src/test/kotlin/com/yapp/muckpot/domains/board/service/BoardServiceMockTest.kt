@@ -60,7 +60,7 @@ class BoardServiceMockTest @Autowired constructor(
         }
         test("모든 먹팟 조회 성공") {
             // when
-            val actual = boardService.findAllMuckpot(CursorPaginationRequest(null, allBoardSize.toLong()))
+            val actual = boardService.findAllBoards(CursorPaginationRequest(null, allBoardSize.toLong()))
             // then
             actual.list shouldHaveSize 3
             actual.lastId shouldBe allBoard.last().id
@@ -68,14 +68,14 @@ class BoardServiceMockTest @Autowired constructor(
 
         test("참가자가 6명을 넘어가면 마지막에 외N 명으로 응답한다") {
             // when
-            val actual = boardService.findAllMuckpot(CursorPaginationRequest(null, allBoardSize.toLong()))
+            val actual = boardService.findAllBoards(CursorPaginationRequest(null, allBoardSize.toLong()))
             // then
             actual.list[0].participants.last().nickName shouldBe "외 3명"
         }
 
         test("오늘, 내일은 meetingTime 기준으로 생성된다.") {
             // when
-            val actual = boardService.findAllMuckpot(CursorPaginationRequest(null, allBoardSize.toLong()))
+            val actual = boardService.findAllBoards(CursorPaginationRequest(null, allBoardSize.toLong()))
             // then
             actual.list[1].todayOrTomorrow shouldBe TODAY_KR
             actual.list[2].todayOrTomorrow shouldBe TOMORROW_KR

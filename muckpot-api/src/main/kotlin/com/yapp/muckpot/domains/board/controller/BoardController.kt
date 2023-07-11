@@ -87,7 +87,7 @@ class BoardController(
     @ApiOperation(value = "먹팟 글 리스트 조회")
     @GetMapping("/v1/boards")
     fun findAll(@ModelAttribute request: CursorPaginationRequest): ResponseEntity<ResponseDto> {
-        return ResponseEntityUtil.ok(boardService.findAllMuckpot(request))
+        return ResponseEntityUtil.ok(boardService.findAllBoards(request))
     }
 
     @ApiResponses(
@@ -166,7 +166,7 @@ class BoardController(
         @AuthenticationPrincipal userId: Long,
         @PathVariable boardId: Long
     ): ResponseEntity<ResponseDto> {
-        boardService.deleteBoard(userId, boardId)
+        boardService.deleteBoardAndSendEmail(userId, boardId)
         return ResponseEntityUtil.noContent()
     }
 
@@ -203,7 +203,7 @@ class BoardController(
         @AuthenticationPrincipal userId: Long,
         @PathVariable boardId: Long
     ): ResponseEntity<ResponseDto> {
-        boardService.cancelJoin(userId, boardId)
+        boardService.cancelJoinAndSendEmail(userId, boardId)
         return ResponseEntityUtil.noContent()
     }
 
