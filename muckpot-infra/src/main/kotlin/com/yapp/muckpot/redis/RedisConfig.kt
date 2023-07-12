@@ -1,5 +1,7 @@
 package com.yapp.muckpot.redis
 
+import com.yapp.muckpot.redis.constants.REGIONS_CACHE_NAME
+import com.yapp.muckpot.redis.dto.RegionResponse
 import org.redisson.Redisson
 import org.redisson.api.RedissonClient
 import org.redisson.config.Config
@@ -9,10 +11,12 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.redis.cache.RedisCacheConfiguration
 import org.springframework.data.redis.cache.RedisCacheManager
+import org.springframework.data.redis.cache.RedisCacheManager.RedisCacheManagerBuilder
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair
 import org.springframework.data.redis.serializer.StringRedisSerializer
 
@@ -47,7 +51,7 @@ class RedisConfig(
 
     @Bean
     fun cacheManager(connectionFactory: RedisConnectionFactory): CacheManager {
-        val cacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
+        val cacheDefaultConfig = RedisCacheConfiguration.defaultCacheConfig()
             .serializeKeysWith(
                 SerializationPair.fromSerializer(StringRedisSerializer())
             )
@@ -55,8 +59,20 @@ class RedisConfig(
                 SerializationPair.fromSerializer(GenericJackson2JsonRedisSerializer())
             )
         return RedisCacheManager.builder(connectionFactory)
-            .cacheDefaults(cacheConfiguration)
-            .build()
+            .cacheDefaults(cacheDefaultConfig).also {
+                regionsCacheConfig(it)
+            }.build()
+    }
+
+    private fun regionsCacheConfig(cacheBuilder: RedisCacheManagerBuilder) {
+        cacheBuilder
+            .withCacheConfiguration(
+                REGIONS_CACHE_NAME,
+                RedisCacheConfiguration.defaultCacheConfig()
+                    .serializeValuesWith(
+                        SerializationPair.fromSerializer(Jackson2JsonRedisSerializer(RegionResponse::class.java))
+                    )
+            )
     }
 
     companion object {
