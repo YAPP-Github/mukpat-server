@@ -3,13 +3,12 @@ package com.yapp.muckpot.domains.board.service
 import com.yapp.muckpot.common.dto.CursorPaginationRequest
 import com.yapp.muckpot.common.dto.CursorPaginationResponse
 import com.yapp.muckpot.common.redisson.DistributedLock
-import com.yapp.muckpot.domains.board.controller.dto.MuckpotCityResponse
+import com.yapp.muckpot.domains.board.controller.converter.RegionConverter
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateRequest
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateRequestV1
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotDetailResponse
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotReadResponse
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotUpdateRequest
-import com.yapp.muckpot.domains.board.controller.dto.RegionResponse
 import com.yapp.muckpot.domains.board.entity.Participant
 import com.yapp.muckpot.domains.board.exception.BoardErrorCode
 import com.yapp.muckpot.domains.board.exception.ParticipantErrorCode
@@ -26,6 +25,8 @@ import com.yapp.muckpot.email.EmailTemplate
 import com.yapp.muckpot.exception.MuckPotException
 import com.yapp.muckpot.redis.constants.ALL_KEY
 import com.yapp.muckpot.redis.constants.REGIONS_CACHE_NAME
+import com.yapp.muckpot.redis.dto.MuckpotCityResponse
+import com.yapp.muckpot.redis.dto.RegionResponse
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.data.repository.findByIdOrNull
@@ -89,8 +90,8 @@ class BoardService(
         }
     }
 
-    @Transactional
     @CacheEvict(value = [REGIONS_CACHE_NAME], key = ALL_KEY)
+    @Transactional
     fun updateBoardAndSendEmail(userId: Long, boardId: Long, request: MuckpotUpdateRequest) {
         boardRepository.findByIdOrNull(boardId)?.let { board ->
             if (board.isNotMyBoard(userId)) {
@@ -190,7 +191,7 @@ class BoardService(
         val muckpotCityResponses: MutableList<MuckpotCityResponse> = mutableListOf()
         boardQuerydslRepository.findAllRegions().groupBy { it.city }
             .mapValues { (city, provinces) ->
-                muckpotCityResponses.add(MuckpotCityResponse.of(city, provinces))
+                muckpotCityResponses.add(RegionConverter.convertToCityResponse(city, provinces))
             }
         return RegionResponse(muckpotCityResponses)
     }
