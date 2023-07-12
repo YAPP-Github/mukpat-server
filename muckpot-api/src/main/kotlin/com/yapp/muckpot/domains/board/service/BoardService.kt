@@ -44,8 +44,8 @@ class BoardService(
     private val participantService: ParticipantService,
     private val provinceService: ProvinceService
 ) {
-    @Transactional
     @CacheEvict(value = [REGIONS_CACHE_NAME], key = ALL_KEY)
+    @Transactional
     fun saveBoard(userId: Long, request: MuckpotCreateRequest): Long? {
         val user = userRepository.findByIdOrNull(userId)
             ?: throw MuckPotException(UserErrorCode.USER_NOT_FOUND)
@@ -90,6 +90,7 @@ class BoardService(
     }
 
     @Transactional
+    @CacheEvict(value = [REGIONS_CACHE_NAME], key = ALL_KEY)
     fun updateBoardAndSendEmail(userId: Long, boardId: Long, request: MuckpotUpdateRequest) {
         boardRepository.findByIdOrNull(boardId)?.let { board ->
             if (board.isNotMyBoard(userId)) {
@@ -125,6 +126,7 @@ class BoardService(
         }
     }
 
+    @CacheEvict(value = [REGIONS_CACHE_NAME], key = ALL_KEY)
     @Transactional
     fun deleteBoardAndSendEmail(userId: Long, boardId: Long) {
         boardRepository.findByIdOrNull(boardId)?.let { board ->
@@ -144,6 +146,7 @@ class BoardService(
         }
     }
 
+    @CacheEvict(value = [REGIONS_CACHE_NAME], key = ALL_KEY)
     @Transactional
     fun changeStatus(userId: Long, boardId: Long, changeStatus: MuckPotStatus) {
         boardRepository.findByIdOrNull(boardId)?.let { board ->
