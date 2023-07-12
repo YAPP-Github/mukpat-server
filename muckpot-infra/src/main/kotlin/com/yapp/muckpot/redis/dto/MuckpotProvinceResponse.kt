@@ -1,4 +1,4 @@
-package com.yapp.muckpot.domains.board.controller.dto
+package com.yapp.muckpot.redis.dto
 
 import java.io.Serializable
 
