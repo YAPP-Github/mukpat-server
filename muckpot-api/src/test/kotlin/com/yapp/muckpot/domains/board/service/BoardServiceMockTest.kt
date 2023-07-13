@@ -5,6 +5,7 @@ import com.ninjasquad.springmockk.MockkBean
 import com.yapp.muckpot.common.constants.TODAY_KR
 import com.yapp.muckpot.common.constants.TOMORROW_KR
 import com.yapp.muckpot.common.dto.CursorPaginationRequest
+import com.yapp.muckpot.domains.board.controller.dto.RegionFilterRequest
 import com.yapp.muckpot.domains.board.dto.ParticipantReadResponse
 import com.yapp.muckpot.domains.board.dto.RegionDto
 import com.yapp.muckpot.domains.board.dto.RegionDto.CityDto
@@ -107,7 +108,7 @@ class BoardServiceMockTest @Autowired constructor(
 
         test("먹팟 상세조회 성공") {
             // when
-            val actual = boardService.findBoardDetailAndVisit(1, loginUser)
+            val actual = boardService.findBoardDetailAndVisit(1, loginUser, RegionFilterRequest())
 
             // then
             actual.meetingDate shouldBe "12월 25일 (토)"

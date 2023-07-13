@@ -12,6 +12,7 @@ import com.yapp.muckpot.common.utils.SecurityContextHolderUtil
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateRequest
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateResponse
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotUpdateRequest
+import com.yapp.muckpot.domains.board.controller.dto.RegionFilterRequest
 import com.yapp.muckpot.domains.board.service.BoardService
 import com.yapp.muckpot.domains.user.enums.MuckPotStatus
 import io.swagger.annotations.Api
@@ -105,11 +106,13 @@ class BoardController(
     )
     @ApiOperation(value = "먹팟 글 상세 조회")
     @GetMapping("/v1/boards/{boardId}")
-    fun findByBoardId(@PathVariable boardId: Long): ResponseEntity<ResponseDto> {
+    fun findByBoardId(@PathVariable boardId: Long, request: RegionFilterRequest): ResponseEntity<ResponseDto> {
+        request.validate()
         return ResponseEntityUtil.ok(
             boardService.findBoardDetailAndVisit(
                 boardId,
-                SecurityContextHolderUtil.getCredentialOrNull()
+                SecurityContextHolderUtil.getCredentialOrNull(),
+                request
             )
         )
     }

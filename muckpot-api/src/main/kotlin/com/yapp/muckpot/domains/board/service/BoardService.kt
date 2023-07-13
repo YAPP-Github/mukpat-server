@@ -8,6 +8,7 @@ import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateRequest
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotDetailResponse
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotReadResponse
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotUpdateRequest
+import com.yapp.muckpot.domains.board.controller.dto.RegionFilterRequest
 import com.yapp.muckpot.domains.board.entity.Participant
 import com.yapp.muckpot.domains.board.exception.BoardErrorCode
 import com.yapp.muckpot.domains.board.exception.ParticipantErrorCode
@@ -68,7 +69,7 @@ class BoardService(
     }
 
     @Transactional
-    fun findBoardDetailAndVisit(boardId: Long, loginUserInfo: UserResponse?): MuckpotDetailResponse {
+    fun findBoardDetailAndVisit(boardId: Long, loginUserInfo: UserResponse?, request: RegionFilterRequest): MuckpotDetailResponse {
         boardRepository.findByIdOrNull(boardId)?.let { board ->
             if (board.user.id != loginUserInfo?.userId) {
                 board.visit()
@@ -78,8 +79,8 @@ class BoardService(
             return MuckpotDetailResponse.of(
                 board = board,
                 participants = participantQuerydslRepository.findByBoardIds(listOf(boardId)),
-                prevId = boardQuerydslRepository.findPrevId(boardId),
-                nextId = boardQuerydslRepository.findNextId(boardId),
+                prevId = boardQuerydslRepository.findPrevId(boardId, request.cityId, request.provinceId),
+                nextId = boardQuerydslRepository.findNextId(boardId, request.cityId, request.provinceId),
                 userAge = userAge
             ).apply {
                 sortParticipantsByLoginUser(loginUserInfo)
