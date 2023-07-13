@@ -4,6 +4,8 @@ import Fixture
 import com.querydsl.jpa.impl.JPAQueryFactory
 import com.yapp.muckpot.config.CustomDataJpaTest
 import com.yapp.muckpot.domains.board.entity.Board
+import com.yapp.muckpot.domains.board.entity.City
+import com.yapp.muckpot.domains.board.entity.Province
 import com.yapp.muckpot.domains.user.entity.MuckPotUser
 import com.yapp.muckpot.domains.user.enums.MuckPotStatus
 import com.yapp.muckpot.domains.user.repository.MuckPotUserRepository
@@ -17,19 +19,25 @@ import java.time.LocalDateTime
 class BoardQuerydslRepositoryTest(
     private val userRepository: MuckPotUserRepository,
     private val boardRepository: BoardRepository,
-    private val jpaQueryFactory: JPAQueryFactory
+    private val jpaQueryFactory: JPAQueryFactory,
+    private val cityRepository: CityRepository,
+    private val provinceRepository: ProvinceRepository
 ) : StringSpec({
     val boardQuerydslRepository = BoardQuerydslRepository(jpaQueryFactory)
 
     lateinit var user: MuckPotUser
     lateinit var boards: List<Board>
+    lateinit var province: Province
+    lateinit var city: City
 
     beforeEach {
         user = Fixture.createUser()
+        city = cityRepository.save(Fixture.createCity())
+        province = provinceRepository.save(Fixture.createProvince(city = city))
         boards = listOf(
-            Fixture.createBoard(title = "board1", user = user).apply { createdAt = LocalDateTime.now() },
-            Fixture.createBoard(title = "board2", user = user).apply { createdAt = LocalDateTime.now().plusDays(1) },
-            Fixture.createBoard(title = "board3", user = user).apply { createdAt = LocalDateTime.now().plusDays(2) }
+            Fixture.createBoard(title = "board1", user = user, province = province).apply { createdAt = LocalDateTime.now() },
+            Fixture.createBoard(title = "board2", user = user, province = province).apply { createdAt = LocalDateTime.now().plusDays(1) },
+            Fixture.createBoard(title = "board3", user = user, province = province).apply { createdAt = LocalDateTime.now().plusDays(2) }
         )
 
         userRepository.save(user)
@@ -39,6 +47,8 @@ class BoardQuerydslRepositoryTest(
     afterEach {
         boardRepository.deleteAll()
         userRepository.deleteAll()
+        provinceRepository.deleteAll()
+        cityRepository.deleteAll()
     }
 
     "countPerScroll이 2인 경우" {

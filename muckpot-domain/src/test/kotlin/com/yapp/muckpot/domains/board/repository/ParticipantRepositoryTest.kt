@@ -14,19 +14,25 @@ import org.springframework.beans.factory.annotation.Autowired
 class ParticipantRepositoryTest(
     @Autowired val muckPotUserRepository: MuckPotUserRepository,
     @Autowired val boardRepository: BoardRepository,
-    @Autowired val participantRepository: ParticipantRepository
+    @Autowired val participantRepository: ParticipantRepository,
+    @Autowired val cityRepository: CityRepository,
+    @Autowired val provinceRepository: ProvinceRepository
 ) : StringSpec({
 
     afterEach {
         participantRepository.deleteAll()
         boardRepository.deleteAll()
         muckPotUserRepository.deleteAll()
+        provinceRepository.deleteAll()
+        cityRepository.deleteAll()
     }
 
     "Participant 데이터 저장 성공" {
         // given
         val user = Fixture.createUser()
-        val board = Fixture.createBoard(user = user)
+        val city = cityRepository.save(Fixture.createCity())
+        val province = provinceRepository.save(Fixture.createProvince(city = city))
+        val board = Fixture.createBoard(user = user, province = province)
         muckPotUserRepository.save(user)
         boardRepository.save(board)
         // when
@@ -38,7 +44,9 @@ class ParticipantRepositoryTest(
     "Participant 데이터 소프트 삭제 성공" {
         // given
         val user = muckPotUserRepository.save(Fixture.createUser())
-        val board = boardRepository.save(Fixture.createBoard(user = user))
+        val city = cityRepository.save(Fixture.createCity())
+        val province = provinceRepository.save(Fixture.createProvince(city = city))
+        val board = boardRepository.save(Fixture.createBoard(user = user, province = province))
         participantRepository.save(Participant(user, board))
 
         // when
@@ -52,7 +60,9 @@ class ParticipantRepositoryTest(
     "유저와 보드로 조회 할 수 있다." {
         // given
         val user = muckPotUserRepository.save(Fixture.createUser())
-        val board = boardRepository.save(Fixture.createBoard(user = user))
+        val city = cityRepository.save(Fixture.createCity())
+        val province = provinceRepository.save(Fixture.createProvince(city = city))
+        val board = boardRepository.save(Fixture.createBoard(user = user, province = province))
         participantRepository.save(Participant(user, board))
         // when
         val actual = participantRepository.findByUserAndBoard(user, board)!!

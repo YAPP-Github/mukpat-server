@@ -5,7 +5,9 @@ import com.yapp.muckpot.common.enums.Gender
 import com.yapp.muckpot.common.redisson.ConcurrencyHelper
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateRequest
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotUpdateRequest
+import com.yapp.muckpot.domains.board.entity.City
 import com.yapp.muckpot.domains.board.entity.Participant
+import com.yapp.muckpot.domains.board.entity.Province
 import com.yapp.muckpot.domains.board.exception.BoardErrorCode
 import com.yapp.muckpot.domains.board.exception.ParticipantErrorCode
 import com.yapp.muckpot.domains.board.repository.BoardRepository
@@ -40,6 +42,8 @@ class BoardServiceTest @Autowired constructor(
     private val provinceRepository: ProvinceRepository
 ) : StringSpec({
     lateinit var user: MuckPotUser
+    lateinit var province: Province
+    lateinit var city: City
     var userId: Long = 0
     val createRequest = MuckpotCreateRequest(
         meetingDate = LocalDate.now().plusDays(1),
@@ -77,12 +81,16 @@ class BoardServiceTest @Autowired constructor(
     beforeEach {
         user = userRepository.save(Fixture.createUser())
         userId = user.id!!
+        city = cityRepository.save(Fixture.createCity())
+        province = provinceRepository.save(Fixture.createProvince(city = city))
     }
 
     afterEach {
         participantRepository.deleteAll()
         boardRepository.deleteAll()
         userRepository.deleteAll()
+        provinceRepository.deleteAll()
+        cityRepository.deleteAll()
     }
 
     "먹팟 생성 성공" {
@@ -257,7 +265,7 @@ class BoardServiceTest @Autowired constructor(
 
     "글 삭제시 참여자 목록도 함께 삭제한다." {
         // given
-        val board = boardRepository.save(Fixture.createBoard(user = user))
+        val board = boardRepository.save(Fixture.createBoard(user = user, province = province))
         // when
         boardService.deleteBoard(userId, board.id!!)
         // then
@@ -267,7 +275,7 @@ class BoardServiceTest @Autowired constructor(
 
     "먹팟 상태변경 성공" {
         // given
-        val boardId = boardRepository.save(Fixture.createBoard(user = user)).id!!
+        val boardId = boardRepository.save(Fixture.createBoard(user = user, province = province)).id!!
         // when
         boardService.changeStatus(userId, boardId, MuckPotStatus.DONE)
         // then
@@ -278,7 +286,7 @@ class BoardServiceTest @Autowired constructor(
     "먹팟 참가 신청 취소 성공" {
         // given
         val applyUser = userRepository.save(Fixture.createUser())
-        val board = boardRepository.save(Fixture.createBoard(user = user))
+        val board = boardRepository.save(Fixture.createBoard(user = user, province = province))
         participantRepository.save(Participant(applyUser, board))
         // when
         boardService.cancelJoin(applyUser.id!!, board.id!!)
@@ -291,7 +299,7 @@ class BoardServiceTest @Autowired constructor(
     "기존 참가 신청 내역 없으면 참가 신청 취소 불가" {
         // given
         val applyUser = userRepository.save(Fixture.createUser())
-        val board = boardRepository.save(Fixture.createBoard(user = user))
+        val board = boardRepository.save(Fixture.createBoard(user = user, province = province))
         // when & then
         shouldThrow<MuckPotException> {
             boardService.cancelJoin(applyUser.id!!, board.id!!)
@@ -300,7 +308,7 @@ class BoardServiceTest @Autowired constructor(
 
     "먹팟 글 작성자는 참가 신청 취소할 수 없다." {
         // given
-        val board = boardRepository.save(Fixture.createBoard(user = user))
+        val board = boardRepository.save(Fixture.createBoard(user = user, province = province))
         participantRepository.save(Participant(user, board))
         // when & then
         shouldThrow<MuckPotException> {
