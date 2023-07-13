@@ -52,7 +52,6 @@ object Fixture {
         status: MuckPotStatus = MuckPotStatus.IN_PROGRESS,
         minAge: Int = AGE_MIN,
         maxAge: Int = AGE_MAX,
-        state: State = State.ACTIVE,
         province: Province = createProvince()
     ): Board {
         return Board(
