@@ -4,7 +4,9 @@ import com.yapp.muckpot.common.constants.AGE_MIN
 import com.yapp.muckpot.common.enums.Gender
 import com.yapp.muckpot.common.enums.State
 import com.yapp.muckpot.domains.board.entity.Board
+import com.yapp.muckpot.domains.board.entity.City
 import com.yapp.muckpot.domains.board.entity.Participant
+import com.yapp.muckpot.domains.board.entity.Province
 import com.yapp.muckpot.domains.user.entity.MuckPotUser
 import com.yapp.muckpot.domains.user.enums.JobGroupMain
 import com.yapp.muckpot.domains.user.enums.MuckPotStatus
@@ -53,7 +55,8 @@ object Fixture {
         status: MuckPotStatus = MuckPotStatus.IN_PROGRESS,
         minAge: Int = AGE_MIN,
         maxAge: Int = AGE_MAX,
-        state: State = State.ACTIVE
+        state: State = State.ACTIVE,
+        province: Province = createProvince()
     ): Board {
         return Board(
             id,
@@ -70,7 +73,8 @@ object Fixture {
             status,
             minAge,
             maxAge,
-            state
+            state,
+            province
         )
     }
 
@@ -79,5 +83,23 @@ object Fixture {
         board: Board = createBoard()
     ): Participant {
         return Participant(user, board)
+    }
+
+    fun createProvince(
+        name: String = "강남구",
+        city: City = createCity()
+    ): Province {
+        return Province(
+            name,
+            city
+        )
+    }
+
+    fun createCity(
+        name: String = "서울특별시"
+    ): City {
+        return City(
+            name
+        )
     }
 }

@@ -69,7 +69,9 @@ class BoardServiceTest @Autowired constructor(
         y = 1.0,
         title = "modify title",
         content = "content",
-        chatLink = "modify chatLink"
+        chatLink = "modify chatLink",
+        region_1depth_name = "서울특별시",
+        region_2depth_name = "송파구"
     )
 
     beforeEach {
@@ -157,6 +159,8 @@ class BoardServiceTest @Autowired constructor(
         boardService.updateBoardAndSendEmail(userId, boardId, updateRequest)
         // then
         val actual = boardRepository.findByIdOrNull(boardId)!!
+        val province = provinceRepository.findByName(updateRequest.region_2depth_name)
+
         actual.maxApply shouldBe updateRequest.maxApply
         actual.minAge shouldBe updateRequest.minAge
         actual.maxAge shouldBe updateRequest.maxAge
@@ -166,6 +170,7 @@ class BoardServiceTest @Autowired constructor(
         actual.title shouldBe updateRequest.title
         actual.content shouldBe updateRequest.content
         actual.chatLink shouldBe updateRequest.chatLink
+        actual.province!!.id.shouldBe(province!!.id)
     }
 
     "자신의 글만 수정할 수 있다." {
