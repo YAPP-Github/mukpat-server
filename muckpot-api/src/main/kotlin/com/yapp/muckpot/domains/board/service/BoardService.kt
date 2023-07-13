@@ -3,6 +3,7 @@ package com.yapp.muckpot.domains.board.service
 import com.yapp.muckpot.common.dto.CursorPaginationRequest
 import com.yapp.muckpot.common.dto.CursorPaginationResponse
 import com.yapp.muckpot.common.redisson.DistributedLock
+import com.yapp.muckpot.domains.board.controller.converter.RegionConverter
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateRequest
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateRequestV1
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotDetailResponse
@@ -22,6 +23,12 @@ import com.yapp.muckpot.domains.user.repository.MuckPotUserRepository
 import com.yapp.muckpot.email.EmailService
 import com.yapp.muckpot.email.EmailTemplate
 import com.yapp.muckpot.exception.MuckPotException
+import com.yapp.muckpot.redis.constants.ALL_KEY
+import com.yapp.muckpot.redis.constants.REGIONS_CACHE_NAME
+import com.yapp.muckpot.redis.dto.MuckpotCityResponse
+import com.yapp.muckpot.redis.dto.RegionResponse
+import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -38,6 +45,7 @@ class BoardService(
     private val participantService: ParticipantService,
     private val provinceService: ProvinceService
 ) {
+    @CacheEvict(value = [REGIONS_CACHE_NAME], key = ALL_KEY)
     @Transactional
     fun saveBoard(userId: Long, request: MuckpotCreateRequest): Long? {
         val user = userRepository.findByIdOrNull(userId)
@@ -49,7 +57,7 @@ class BoardService(
     }
 
     @Transactional(readOnly = true)
-    fun findAllMuckpot(request: CursorPaginationRequest): CursorPaginationResponse<MuckpotReadResponse> {
+    fun findAllBoards(request: CursorPaginationRequest): CursorPaginationResponse<MuckpotReadResponse> {
         val allBoard = boardQuerydslRepository.findAllWithPagination(request.lastId, request.countPerScroll)
         val boardIds = allBoard.map { it.id }
         val participantsByBoardId = participantQuerydslRepository.findByBoardIds(boardIds).groupBy { it.boardId }
@@ -82,6 +90,7 @@ class BoardService(
         }
     }
 
+    @CacheEvict(value = [REGIONS_CACHE_NAME], key = ALL_KEY)
     @Transactional
     fun updateBoardAndSendEmail(userId: Long, boardId: Long, request: MuckpotUpdateRequest) {
         boardRepository.findByIdOrNull(boardId)?.let { board ->
@@ -118,9 +127,9 @@ class BoardService(
         }
     }
 
+    @CacheEvict(value = [REGIONS_CACHE_NAME], key = ALL_KEY)
     @Transactional
-    fun deleteBoard(userId: Long, boardId: Long) {
-        // TODO 먹팟 삭제 시 참여 인원에게 메일 전송
+    fun deleteBoardAndSendEmail(userId: Long, boardId: Long) {
         boardRepository.findByIdOrNull(boardId)?.let { board ->
             if (board.isNotMyBoard(userId)) {
                 throw MuckPotException(BoardErrorCode.BOARD_UNAUTHORIZED)
@@ -138,6 +147,7 @@ class BoardService(
         }
     }
 
+    @CacheEvict(value = [REGIONS_CACHE_NAME], key = ALL_KEY)
     @Transactional
     fun changeStatus(userId: Long, boardId: Long, changeStatus: MuckPotStatus) {
         boardRepository.findByIdOrNull(boardId)?.let { board ->
@@ -151,7 +161,7 @@ class BoardService(
     }
 
     @Transactional
-    fun cancelJoin(userId: Long, boardId: Long) {
+    fun cancelJoinAndSendEmail(userId: Long, boardId: Long) {
         boardRepository.findByIdOrNull(boardId)?.let { board ->
             val user = userRepository.findByIdOrNull(userId)
                 ?: throw MuckPotException(UserErrorCode.USER_NOT_FOUND)
@@ -173,6 +183,17 @@ class BoardService(
         } ?: run {
             throw MuckPotException(BoardErrorCode.BOARD_NOT_FOUND)
         }
+    }
+
+    @Cacheable(value = [REGIONS_CACHE_NAME], key = ALL_KEY)
+    @Transactional(readOnly = true)
+    fun findAllRegions(): RegionResponse {
+        val muckpotCityResponses: MutableList<MuckpotCityResponse> = mutableListOf()
+        boardQuerydslRepository.findAllRegions().groupBy { it.city }
+            .mapValues { (city, provinces) ->
+                muckpotCityResponses.add(RegionConverter.convertToCityResponse(city, provinces))
+            }
+        return RegionResponse(muckpotCityResponses)
     }
 
     @Transactional

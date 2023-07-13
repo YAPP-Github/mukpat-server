@@ -6,11 +6,15 @@ import com.yapp.muckpot.common.constants.TODAY_KR
 import com.yapp.muckpot.common.constants.TOMORROW_KR
 import com.yapp.muckpot.common.dto.CursorPaginationRequest
 import com.yapp.muckpot.domains.board.dto.ParticipantReadResponse
+import com.yapp.muckpot.domains.board.dto.RegionDto
+import com.yapp.muckpot.domains.board.dto.RegionDto.CityDto
+import com.yapp.muckpot.domains.board.dto.RegionDto.ProvinceDto
 import com.yapp.muckpot.domains.board.repository.BoardQuerydslRepository
 import com.yapp.muckpot.domains.board.repository.BoardRepository
 import com.yapp.muckpot.domains.board.repository.ParticipantQuerydslRepository
 import com.yapp.muckpot.domains.user.controller.dto.UserResponse
-import com.yapp.muckpot.domains.user.enums.MuckPotStatus
+import com.yapp.muckpot.domains.user.enums.MuckPotStatus.DONE
+import com.yapp.muckpot.domains.user.enums.MuckPotStatus.IN_PROGRESS
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
@@ -57,7 +61,7 @@ class BoardServiceMockTest @Autowired constructor(
         }
         test("모든 먹팟 조회 성공") {
             // when
-            val actual = boardService.findAllMuckpot(CursorPaginationRequest(null, allBoardSize.toLong()))
+            val actual = boardService.findAllBoards(CursorPaginationRequest(null, allBoardSize.toLong()))
             // then
             actual.list shouldHaveSize 3
             actual.lastId shouldBe allBoard.last().id
@@ -65,14 +69,14 @@ class BoardServiceMockTest @Autowired constructor(
 
         test("참가자가 6명을 넘어가면 마지막에 외N 명으로 응답한다") {
             // when
-            val actual = boardService.findAllMuckpot(CursorPaginationRequest(null, allBoardSize.toLong()))
+            val actual = boardService.findAllBoards(CursorPaginationRequest(null, allBoardSize.toLong()))
             // then
             actual.list[0].participants.last().nickName shouldBe "외 3명"
         }
 
         test("오늘, 내일은 meetingTime 기준으로 생성된다.") {
             // when
-            val actual = boardService.findAllMuckpot(CursorPaginationRequest(null, allBoardSize.toLong()))
+            val actual = boardService.findAllBoards(CursorPaginationRequest(null, allBoardSize.toLong()))
             // then
             actual.list[1].todayOrTomorrow shouldBe TODAY_KR
             actual.list[2].todayOrTomorrow shouldBe TOMORROW_KR
@@ -109,8 +113,43 @@ class BoardServiceMockTest @Autowired constructor(
             actual.meetingDate shouldBe "12월 25일 (토)"
             actual.meetingTime shouldBe "오후 12:20"
             actual.createDate shouldBe "2100년 12월 23일"
-            actual.status shouldBe MuckPotStatus.IN_PROGRESS.korNm
+            actual.status shouldBe IN_PROGRESS.korNm
             actual.participants shouldHaveSize participantResponses.size
+        }
+    }
+
+    context("findAllRegions 테스트") {
+        beforeTest {
+            // given
+            val allRegions = listOf(
+                RegionDto(1, IN_PROGRESS, CityDto(1, "경기도"), ProvinceDto(1, "용인시 기흥구")),
+                RegionDto(2, DONE, CityDto(1, "경기도"), ProvinceDto(1, "용인시 기흥구")),
+                RegionDto(4, DONE, CityDto(1, "경기도"), ProvinceDto(2, "용인시 수지구")),
+                RegionDto(5, DONE, CityDto(2, "서울특별시"), ProvinceDto(3, "강남구")),
+                RegionDto(6, DONE, CityDto(2, "서울특별시"), ProvinceDto(3, "강남구")),
+                RegionDto(7, DONE, CityDto(2, "서울특별시"), ProvinceDto(4, "강동구"))
+            )
+            every { boardQuerydslRepository.findAllRegions() } returns allRegions
+        }
+
+        test("지역 별 합계는 IN_PROGRESS 인것만 계산해야 한다, 없으면 0") {
+            // when
+            val actual = boardService.findAllRegions()
+            // then
+            actual.list shouldHaveSize 2
+            actual.list[0].sumByCity shouldBe 1
+            actual.list[0].provinces shouldHaveSize 2
+            actual.list[0].provinces[0].provinceName shouldBe "용인시 기흥구"
+            actual.list[0].provinces[0].sumByProvince shouldBe 1
+            actual.list[0].provinces[1].provinceName shouldBe "용인시 수지구"
+            actual.list[0].provinces[1].sumByProvince shouldBe 0
+            actual.list[1].cityName shouldBe "서울특별시"
+            actual.list[1].sumByCity shouldBe 0
+            actual.list[1].provinces shouldHaveSize 2
+            actual.list[1].provinces[0].provinceName shouldBe "강남구"
+            actual.list[1].provinces[0].sumByProvince shouldBe 0
+            actual.list[1].provinces[1].provinceName shouldBe "강동구"
+            actual.list[1].provinces[1].sumByProvince shouldBe 0
         }
     }
 })

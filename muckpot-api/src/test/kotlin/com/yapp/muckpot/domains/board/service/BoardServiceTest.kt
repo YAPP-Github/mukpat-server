@@ -18,6 +18,8 @@ import com.yapp.muckpot.domains.user.enums.JobGroupMain
 import com.yapp.muckpot.domains.user.enums.MuckPotStatus
 import com.yapp.muckpot.domains.user.repository.MuckPotUserRepository
 import com.yapp.muckpot.exception.MuckPotException
+import com.yapp.muckpot.redis.RedisService
+import com.yapp.muckpot.redis.constants.REGIONS_CACHE_NAME
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldHaveSize
@@ -37,7 +39,8 @@ class BoardServiceTest @Autowired constructor(
     private val userRepository: MuckPotUserRepository,
     private val participantRepository: ParticipantRepository,
     private val cityRepository: CityRepository,
-    private val provinceRepository: ProvinceRepository
+    private val provinceRepository: ProvinceRepository,
+    private val redisService: RedisService
 ) : StringSpec({
     lateinit var user: MuckPotUser
     var userId: Long = 0
@@ -71,6 +74,7 @@ class BoardServiceTest @Autowired constructor(
         content = "content",
         chatLink = "modify chatLink"
     )
+    val regionsRedisKey = "$REGIONS_CACHE_NAME::all"
 
     beforeEach {
         user = userRepository.save(Fixture.createUser())
@@ -234,7 +238,7 @@ class BoardServiceTest @Autowired constructor(
         val boardId = boardService.saveBoard(userId, createRequest)!!
 
         // when
-        boardService.deleteBoard(userId, boardId)
+        boardService.deleteBoardAndSendEmail(userId, boardId)
 
         val findBoard = boardRepository.findByIdOrNull(boardId)
         findBoard shouldBe null
@@ -246,7 +250,7 @@ class BoardServiceTest @Autowired constructor(
         val boardId = boardService.saveBoard(userId, createRequest)!!
         // when & then
         shouldThrow<MuckPotException> {
-            boardService.deleteBoard(otherUserId, boardId)
+            boardService.deleteBoardAndSendEmail(otherUserId, boardId)
         }.errorCode shouldBe BoardErrorCode.BOARD_UNAUTHORIZED
     }
 
@@ -254,7 +258,7 @@ class BoardServiceTest @Autowired constructor(
         // given
         val board = boardRepository.save(Fixture.createBoard(user = user))
         // when
-        boardService.deleteBoard(userId, board.id!!)
+        boardService.deleteBoardAndSendEmail(userId, board.id!!)
         // then
         val findBoard = participantRepository.findByBoard(board)
         findBoard shouldHaveSize 0
@@ -276,7 +280,7 @@ class BoardServiceTest @Autowired constructor(
         val board = boardRepository.save(Fixture.createBoard(user = user))
         participantRepository.save(Participant(applyUser, board))
         // when
-        boardService.cancelJoin(applyUser.id!!, board.id!!)
+        boardService.cancelJoinAndSendEmail(applyUser.id!!, board.id!!)
         // then
         val findParticipant = participantRepository.findByUserAndBoard(applyUser, board)
         findParticipant shouldBe null
@@ -289,7 +293,7 @@ class BoardServiceTest @Autowired constructor(
         val board = boardRepository.save(Fixture.createBoard(user = user))
         // when & then
         shouldThrow<MuckPotException> {
-            boardService.cancelJoin(applyUser.id!!, board.id!!)
+            boardService.cancelJoinAndSendEmail(applyUser.id!!, board.id!!)
         }.errorCode shouldBe ParticipantErrorCode.PARTICIPANT_NOT_FOUND
     }
 
@@ -299,7 +303,7 @@ class BoardServiceTest @Autowired constructor(
         participantRepository.save(Participant(user, board))
         // when & then
         shouldThrow<MuckPotException> {
-            boardService.cancelJoin(user.id!!, board.id!!)
+            boardService.cancelJoinAndSendEmail(user.id!!, board.id!!)
         }.errorCode shouldBe ParticipantErrorCode.WRITER_MUST_JOIN
     }
 
@@ -317,5 +321,26 @@ class BoardServiceTest @Autowired constructor(
         findBoard1.province!!.id.shouldBe(findBoard2.province!!.id)
         findCity shouldNotBe null
         findProvince shouldNotBe null
+    }
+
+    "지역 조회정보는 최초1회 redis에 저장한다." {
+        // when
+        boardService.findAllRegions()
+
+        // then
+        val actual = redisService.getData(regionsRedisKey)
+        actual shouldNotBe null
+    }
+
+    "먹팟 생성시 지역정보는 redis에서 삭제된다." {
+        // given
+        boardService.findAllRegions()
+
+        // when
+        boardService.saveBoard(userId, createRequest)
+
+        // then
+        val actual = redisService.getData(regionsRedisKey)
+        actual shouldBe null
     }
 })
