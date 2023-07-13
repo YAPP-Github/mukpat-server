@@ -27,33 +27,28 @@ class BoardQuerydslRepositoryTest(
 
     lateinit var user: MuckPotUser
     lateinit var boards: List<Board>
-    lateinit var cities: List<City>
-    lateinit var provinces: List<Province>
+    lateinit var province: Province
+    lateinit var city: City
 
     beforeEach {
         user = Fixture.createUser()
-        cities = listOf(
-            City("경기도"),
-            City("서울특별시")
-        )
-        provinces = listOf(
-            Province("용인시 기흥구", cities[0]),
-            Province("서초구", cities[1])
-        )
+        city = cityRepository.save(Fixture.createCity())
+        province = provinceRepository.save(Fixture.createProvince(city = city))
         boards = listOf(
-            Fixture.createBoard(title = "board1", user = user, province = provinces[0]).apply { createdAt = LocalDateTime.now() },
-            Fixture.createBoard(title = "board2", user = user, province = provinces[0]).apply { createdAt = LocalDateTime.now().plusDays(1) },
-            Fixture.createBoard(title = "board3", user = user, province = provinces[1]).apply { createdAt = LocalDateTime.now().plusDays(2) }
+            Fixture.createBoard(title = "board1", user = user, province = province).apply { createdAt = LocalDateTime.now() },
+            Fixture.createBoard(title = "board2", user = user, province = province).apply { createdAt = LocalDateTime.now().plusDays(1) },
+            Fixture.createBoard(title = "board3", user = user, province = province).apply { createdAt = LocalDateTime.now().plusDays(2) }
         )
+
         userRepository.save(user)
-        cityRepository.saveAll(cities)
-        provinceRepository.saveAll(provinces)
         boardRepository.saveAll(boards)
     }
 
     afterEach {
         boardRepository.deleteAll()
         userRepository.deleteAll()
+        provinceRepository.deleteAll()
+        cityRepository.deleteAll()
     }
 
     "countPerScroll이 2인 경우" {

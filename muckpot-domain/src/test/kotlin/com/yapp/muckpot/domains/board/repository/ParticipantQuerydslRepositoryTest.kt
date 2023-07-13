@@ -4,7 +4,9 @@ import Fixture
 import com.querydsl.jpa.impl.JPAQueryFactory
 import com.yapp.muckpot.config.CustomDataJpaTest
 import com.yapp.muckpot.domains.board.entity.Board
+import com.yapp.muckpot.domains.board.entity.City
 import com.yapp.muckpot.domains.board.entity.Participant
+import com.yapp.muckpot.domains.board.entity.Province
 import com.yapp.muckpot.domains.user.entity.MuckPotUser
 import com.yapp.muckpot.domains.user.repository.MuckPotUserRepository
 import io.kotest.core.spec.style.StringSpec
@@ -18,13 +20,17 @@ class ParticipantQuerydslRepositoryTest(
     private val participantRepository: ParticipantRepository,
     private val userRepository: MuckPotUserRepository,
     private val boardRepository: BoardRepository,
-    private val jpaQueryFactory: JPAQueryFactory
+    private val jpaQueryFactory: JPAQueryFactory,
+    private val cityRepository: CityRepository,
+    private val provinceRepository: ProvinceRepository
 ) : StringSpec({
     val participantQuerydslRepository = ParticipantQuerydslRepository(jpaQueryFactory)
 
     lateinit var users: List<MuckPotUser>
     lateinit var boards: List<Board>
     lateinit var participants: List<Participant>
+    lateinit var province: Province
+    lateinit var city: City
 
     beforeEach {
         users = listOf(
@@ -32,10 +38,12 @@ class ParticipantQuerydslRepositoryTest(
             Fixture.createUser(),
             Fixture.createUser()
         )
+        city = cityRepository.save(Fixture.createCity())
+        province = provinceRepository.save(Fixture.createProvince(city = city))
         boards = listOf(
-            Fixture.createBoard(user = users[0]),
-            Fixture.createBoard(title = "board2", user = users[0]),
-            Fixture.createBoard(title = "board3", user = users[0])
+            Fixture.createBoard(user = users[0], province = province),
+            Fixture.createBoard(title = "board2", user = users[0], province = province),
+            Fixture.createBoard(title = "board3", user = users[0], province = province)
         )
         participants = listOf(
             Fixture.createParticipant(users[0], boards[0]),
@@ -53,6 +61,8 @@ class ParticipantQuerydslRepositoryTest(
         participantRepository.deleteAll()
         boardRepository.deleteAll()
         userRepository.deleteAll()
+        provinceRepository.deleteAll()
+        cityRepository.deleteAll()
     }
 
     "먹팟_ID 리스트를 조건으로 조회 성공" {

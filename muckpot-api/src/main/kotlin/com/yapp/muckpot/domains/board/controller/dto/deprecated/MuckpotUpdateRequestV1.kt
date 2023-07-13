@@ -1,4 +1,4 @@
-package com.yapp.muckpot.domains.board.controller.dto
+package com.yapp.muckpot.domains.board.controller.dto.deprecated
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.yapp.muckpot.common.Location
@@ -15,7 +15,6 @@ import com.yapp.muckpot.common.constants.TITLE_MAX
 import com.yapp.muckpot.common.constants.TITLE_MAX_INVALID
 import com.yapp.muckpot.common.constants.YYYYMMDD
 import com.yapp.muckpot.domains.board.entity.Board
-import com.yapp.muckpot.domains.board.entity.Province
 import com.yapp.muckpot.domains.board.exception.BoardErrorCode
 import com.yapp.muckpot.email.EmailTemplate
 import com.yapp.muckpot.exception.MuckPotException
@@ -28,8 +27,9 @@ import java.time.LocalTime
 import javax.validation.constraints.Min
 import javax.validation.constraints.NotBlank
 
-@ApiModel(value = "먹팟수정 요청")
-data class MuckpotUpdateRequest(
+@Deprecated("V2 배포 후 제거")
+@ApiModel(value = "먹팟 글 수정 V1")
+data class MuckpotUpdateRequestV1(
     @field:ApiModelProperty(notes = "만날 날짜", required = true, example = "2023-05-21")
     @field:JsonFormat(shape = JsonFormat.Shape.STRING, pattern = YYYYMMDD)
     val meetingDate: LocalDate,
@@ -61,24 +61,16 @@ data class MuckpotUpdateRequest(
     @field:ApiModelProperty(notes = "오픈채팅방 링크", required = true, example = "https://open.kakao.com/o/gSIkvvHc")
     @field:Length(max = CHAT_LINK_MAX, message = LINK_MAX_INVALID)
     @field:NotBlank(message = NOT_BLANK_COMMON)
-    var chatLink: String,
-    @field:ApiModelProperty(notes = "시/도", required = true, example = "경기도")
-    @field:NotBlank(message = NOT_BLANK_COMMON)
-    var region_1depth_name: String,
-    @field:ApiModelProperty(notes = "구/군", required = true, example = "용인시 기흥구")
-    @field:NotBlank(message = NOT_BLANK_COMMON)
-    var region_2depth_name: String
+    var chatLink: String
 ) {
     init {
         title = title.trim()
         content = content?.trim()
         chatLink = chatLink.trim()
         locationDetail = locationDetail?.trim()
-        region_1depth_name = region_1depth_name.trim()
-        region_2depth_name = region_2depth_name.trim()
     }
 
-    fun updateBoard(board: Board, province: Province) {
+    fun updateBoard(board: Board) {
         if (this.maxApply < board.currentApply) {
             throw MuckPotException(BoardErrorCode.MAX_APPLY_UPDATE_FAIL)
         }
@@ -91,7 +83,6 @@ data class MuckpotUpdateRequest(
         board.maxAge = maxAge ?: AGE_MAX
         board.maxApply = this.maxApply
         board.chatLink = this.chatLink
-        board.province = province
     }
 
     fun createBoardUpdateMailBody(board: Board): String {

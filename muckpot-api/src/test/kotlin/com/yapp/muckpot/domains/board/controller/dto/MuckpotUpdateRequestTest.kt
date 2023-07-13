@@ -1,6 +1,8 @@
 package com.yapp.muckpot.domains.board.controller.dto
 
 import Fixture
+import com.yapp.muckpot.domains.board.entity.City
+import com.yapp.muckpot.domains.board.entity.Province
 import com.yapp.muckpot.domains.board.exception.BoardErrorCode
 import com.yapp.muckpot.exception.MuckPotException
 import io.kotest.assertions.throwables.shouldThrow
@@ -27,13 +29,16 @@ class MuckpotUpdateRequestTest : StringSpec({
             y = 0.0,
             title = "title",
             content = null,
-            chatLink = "chat_link"
+            chatLink = "chat_link",
+            region_1depth_name = "서울특별시",
+            region_2depth_name = "강남구"
         )
     }
 
     "현재 먹팟 참여인원 미만으로 변경할 수 없다." {
         shouldThrow<MuckPotException> {
-            request.updateBoard(Fixture.createBoard(currentApply = request.maxApply + 1))
+            val province = Province(request.region_2depth_name, City(request.region_1depth_name))
+            request.updateBoard(Fixture.createBoard(currentApply = request.maxApply + 1), province)
         }.errorCode shouldBe BoardErrorCode.MAX_APPLY_UPDATE_FAIL
     }
 

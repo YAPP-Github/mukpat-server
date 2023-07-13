@@ -5,7 +5,6 @@ import com.yapp.muckpot.common.dto.CursorPaginationResponse
 import com.yapp.muckpot.common.redisson.DistributedLock
 import com.yapp.muckpot.domains.board.controller.converter.RegionConverter
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateRequest
-import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateRequestV1
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotDetailResponse
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotReadResponse
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotUpdateRequest
@@ -103,7 +102,8 @@ class BoardService(
                 board.title,
                 request.createBoardUpdateMailBody(board)
             )
-            request.updateBoard(board)
+            val province = provinceService.saveProvinceIfNot(request.region_1depth_name, request.region_2depth_name)
+            request.updateBoard(board, province)
             participantService.sendEmailToParticipantsWithoutWriter(
                 board = board,
                 mailTitle = mailTitle,
@@ -194,15 +194,5 @@ class BoardService(
                 muckpotCityResponses.add(RegionConverter.convertToCityResponse(city, provinces))
             }
         return RegionResponse(muckpotCityResponses)
-    }
-
-    @Transactional
-    fun saveBoardV1(userId: Long, request: MuckpotCreateRequestV1): Long? {
-        // TODO 먹팟 등록 시 같은 회사 인원에게 메일 전송
-        val user = userRepository.findByIdOrNull(userId)
-            ?: throw MuckPotException(UserErrorCode.USER_NOT_FOUND)
-        val board = boardRepository.save(request.toBoard(user))
-        participantRepository.save(Participant(user, board))
-        return board.id
     }
 }

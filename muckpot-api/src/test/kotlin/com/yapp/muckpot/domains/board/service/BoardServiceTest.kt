@@ -5,7 +5,9 @@ import com.yapp.muckpot.common.enums.Gender
 import com.yapp.muckpot.common.redisson.ConcurrencyHelper
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateRequest
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotUpdateRequest
+import com.yapp.muckpot.domains.board.entity.City
 import com.yapp.muckpot.domains.board.entity.Participant
+import com.yapp.muckpot.domains.board.entity.Province
 import com.yapp.muckpot.domains.board.exception.BoardErrorCode
 import com.yapp.muckpot.domains.board.exception.ParticipantErrorCode
 import com.yapp.muckpot.domains.board.repository.BoardRepository
@@ -43,6 +45,8 @@ class BoardServiceTest @Autowired constructor(
     private val redisService: RedisService
 ) : StringSpec({
     lateinit var user: MuckPotUser
+    lateinit var province: Province
+    lateinit var city: City
     var userId: Long = 0
     val createRequest = MuckpotCreateRequest(
         meetingDate = LocalDate.now().plusDays(1),
@@ -72,19 +76,25 @@ class BoardServiceTest @Autowired constructor(
         y = 1.0,
         title = "modify title",
         content = "content",
-        chatLink = "modify chatLink"
+        chatLink = "modify chatLink",
+        region_1depth_name = "서울특별시",
+        region_2depth_name = "송파구"
     )
     val regionsRedisKey = "$REGIONS_CACHE_NAME::all"
 
     beforeEach {
         user = userRepository.save(Fixture.createUser())
         userId = user.id!!
+        city = cityRepository.save(Fixture.createCity())
+        province = provinceRepository.save(Fixture.createProvince(city = city))
     }
 
     afterEach {
         participantRepository.deleteAll()
         boardRepository.deleteAll()
         userRepository.deleteAll()
+        provinceRepository.deleteAll()
+        cityRepository.deleteAll()
     }
 
     "먹팟 생성 성공" {
@@ -161,6 +171,8 @@ class BoardServiceTest @Autowired constructor(
         boardService.updateBoardAndSendEmail(userId, boardId, updateRequest)
         // then
         val actual = boardRepository.findByIdOrNull(boardId)!!
+        val province = provinceRepository.findByName(updateRequest.region_2depth_name)
+
         actual.maxApply shouldBe updateRequest.maxApply
         actual.minAge shouldBe updateRequest.minAge
         actual.maxAge shouldBe updateRequest.maxAge
@@ -170,6 +182,7 @@ class BoardServiceTest @Autowired constructor(
         actual.title shouldBe updateRequest.title
         actual.content shouldBe updateRequest.content
         actual.chatLink shouldBe updateRequest.chatLink
+        actual.province!!.id.shouldBe(province!!.id)
     }
 
     "자신의 글만 수정할 수 있다." {
@@ -256,7 +269,7 @@ class BoardServiceTest @Autowired constructor(
 
     "글 삭제시 참여자 목록도 함께 삭제한다." {
         // given
-        val board = boardRepository.save(Fixture.createBoard(user = user))
+        val board = boardRepository.save(Fixture.createBoard(user = user, province = province))
         // when
         boardService.deleteBoardAndSendEmail(userId, board.id!!)
         // then
@@ -266,7 +279,7 @@ class BoardServiceTest @Autowired constructor(
 
     "먹팟 상태변경 성공" {
         // given
-        val boardId = boardRepository.save(Fixture.createBoard(user = user)).id!!
+        val boardId = boardRepository.save(Fixture.createBoard(user = user, province = province)).id!!
         // when
         boardService.changeStatus(userId, boardId, MuckPotStatus.DONE)
         // then
@@ -277,7 +290,7 @@ class BoardServiceTest @Autowired constructor(
     "먹팟 참가 신청 취소 성공" {
         // given
         val applyUser = userRepository.save(Fixture.createUser())
-        val board = boardRepository.save(Fixture.createBoard(user = user))
+        val board = boardRepository.save(Fixture.createBoard(user = user, province = province))
         participantRepository.save(Participant(applyUser, board))
         // when
         boardService.cancelJoinAndSendEmail(applyUser.id!!, board.id!!)
@@ -290,7 +303,7 @@ class BoardServiceTest @Autowired constructor(
     "기존 참가 신청 내역 없으면 참가 신청 취소 불가" {
         // given
         val applyUser = userRepository.save(Fixture.createUser())
-        val board = boardRepository.save(Fixture.createBoard(user = user))
+        val board = boardRepository.save(Fixture.createBoard(user = user, province = province))
         // when & then
         shouldThrow<MuckPotException> {
             boardService.cancelJoinAndSendEmail(applyUser.id!!, board.id!!)
@@ -299,7 +312,7 @@ class BoardServiceTest @Autowired constructor(
 
     "먹팟 글 작성자는 참가 신청 취소할 수 없다." {
         // given
-        val board = boardRepository.save(Fixture.createBoard(user = user))
+        val board = boardRepository.save(Fixture.createBoard(user = user, province = province))
         participantRepository.save(Participant(user, board))
         // when & then
         shouldThrow<MuckPotException> {
