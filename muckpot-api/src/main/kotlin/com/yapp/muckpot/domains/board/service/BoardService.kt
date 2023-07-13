@@ -8,6 +8,7 @@ import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateRequestV1
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotDetailResponse
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotReadResponse
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotUpdateRequest
+import com.yapp.muckpot.domains.board.controller.dto.MuckpotUpdateRequestV1
 import com.yapp.muckpot.domains.board.entity.Participant
 import com.yapp.muckpot.domains.board.exception.BoardErrorCode
 import com.yapp.muckpot.domains.board.exception.ParticipantErrorCode
@@ -94,7 +95,8 @@ class BoardService(
                 board.title,
                 request.createBoardUpdateMailBody(board)
             )
-            request.updateBoard(board)
+            val province = provinceService.saveProvinceIfNot(request.region_1depth_name, request.region_2depth_name)
+            request.updateBoard(board, province)
             participantService.sendEmailToParticipantsWithoutWriter(
                 board = board,
                 mailTitle = mailTitle,
@@ -175,6 +177,7 @@ class BoardService(
         }
     }
 
+    @Deprecated("V2 배포 후 제거")
     @Transactional
     fun saveBoardV1(userId: Long, request: MuckpotCreateRequestV1): Long? {
         // TODO 먹팟 등록 시 같은 회사 인원에게 메일 전송
@@ -183,5 +186,29 @@ class BoardService(
         val board = boardRepository.save(request.toBoard(user))
         participantRepository.save(Participant(user, board))
         return board.id
+    }
+
+    @Deprecated("V2 배포 후 제거")
+    @Transactional
+    fun updateBoardAndSendEmailV1(userId: Long, boardId: Long, request: MuckpotUpdateRequestV1) {
+        boardRepository.findByIdOrNull(boardId)?.let { board ->
+            if (board.isNotMyBoard(userId)) {
+                throw MuckPotException(BoardErrorCode.BOARD_UNAUTHORIZED)
+            }
+            // Update 이전에 수행되어야 함.
+            val mailTitle = EmailTemplate.BOARD_UPDATE_EMAIL.formatSubject(board.title)
+            val mailBody = EmailTemplate.BOARD_UPDATE_EMAIL.formatBody(
+                board.title,
+                request.createBoardUpdateMailBody(board)
+            )
+            request.updateBoard(board)
+            participantService.sendEmailToParticipantsWithoutWriter(
+                board = board,
+                mailTitle = mailTitle,
+                mailBody = mailBody
+            )
+        } ?: run {
+            throw MuckPotException(BoardErrorCode.BOARD_NOT_FOUND)
+        }
     }
 }

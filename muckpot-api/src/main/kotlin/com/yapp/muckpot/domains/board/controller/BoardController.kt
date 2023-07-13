@@ -12,6 +12,7 @@ import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateRequest
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateRequestV1
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateResponse
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotUpdateRequest
+import com.yapp.muckpot.domains.board.controller.dto.MuckpotUpdateRequestV1
 import com.yapp.muckpot.domains.board.service.BoardService
 import com.yapp.muckpot.domains.user.enums.MuckPotStatus
 import io.swagger.annotations.Api
@@ -115,7 +116,7 @@ class BoardController(
     }
 
     @ApiOperation(value = "먹팟 글 수정")
-    @PatchMapping("/v1/boards/{boardId}")
+    @PatchMapping("/v2/boards/{boardId}")
     fun updateBoard(
         @AuthenticationPrincipal userId: Long,
         @PathVariable boardId: Long,
@@ -233,5 +234,18 @@ class BoardController(
                 boardService.saveBoardV1(userId, request)
             )
         )
+    }
+
+    @ApiOperation(value = "먹팟 글 수정 - v1")
+    @PatchMapping("/v1/boards/{boardId}")
+    @Deprecated("V2 배포 후 제거")
+    fun updateBoardV1(
+        @AuthenticationPrincipal userId: Long,
+        @PathVariable boardId: Long,
+        @RequestBody @Valid
+        request: MuckpotUpdateRequestV1
+    ): ResponseEntity<ResponseDto> {
+        boardService.updateBoardAndSendEmailV1(userId, boardId, request)
+        return ResponseEntityUtil.noContent()
     }
 }
