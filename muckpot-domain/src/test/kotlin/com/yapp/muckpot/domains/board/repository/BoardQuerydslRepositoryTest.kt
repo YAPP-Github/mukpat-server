@@ -19,9 +19,9 @@ import java.time.LocalDateTime
 class BoardQuerydslRepositoryTest(
     private val userRepository: MuckPotUserRepository,
     private val boardRepository: BoardRepository,
-    private val jpaQueryFactory: JPAQueryFactory,
     private val cityRepository: CityRepository,
-    private val provinceRepository: ProvinceRepository
+    private val provinceRepository: ProvinceRepository,
+    private val jpaQueryFactory: JPAQueryFactory
 ) : StringSpec({
     val boardQuerydslRepository = BoardQuerydslRepository(jpaQueryFactory)
 
@@ -101,6 +101,12 @@ class BoardQuerydslRepositoryTest(
         // then
         val actual = boardRepository.findByStatus(MuckPotStatus.IN_PROGRESS)
         actual shouldHaveSize 1
+    }
+
+    "먹팟에 등록된 모든 지역정보 조회" {
+        val actual = boardQuerydslRepository.findAllRegions()
+
+        actual shouldHaveSize 3
     }
 }) {
     override fun extensions() = listOf(SpringExtension)
