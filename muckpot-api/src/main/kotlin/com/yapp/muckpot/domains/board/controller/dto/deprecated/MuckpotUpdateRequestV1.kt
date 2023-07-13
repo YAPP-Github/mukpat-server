@@ -1,4 +1,4 @@
-package com.yapp.muckpot.domains.board.controller.dto
+package com.yapp.muckpot.domains.board.controller.dto.deprecated
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.yapp.muckpot.common.Location
