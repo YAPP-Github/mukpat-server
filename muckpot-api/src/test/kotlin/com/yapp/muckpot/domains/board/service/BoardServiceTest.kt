@@ -5,6 +5,7 @@ import com.yapp.muckpot.common.enums.Gender
 import com.yapp.muckpot.common.redisson.ConcurrencyHelper
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateRequest
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotUpdateRequest
+import com.yapp.muckpot.domains.board.controller.dto.RegionFilterRequest
 import com.yapp.muckpot.domains.board.entity.City
 import com.yapp.muckpot.domains.board.entity.Participant
 import com.yapp.muckpot.domains.board.entity.Province
@@ -23,7 +24,7 @@ import com.yapp.muckpot.exception.MuckPotException
 import com.yapp.muckpot.redis.RedisService
 import com.yapp.muckpot.redis.constants.REGIONS_CACHE_NAME
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.spec.style.StringSpec
+import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -42,8 +43,9 @@ class BoardServiceTest @Autowired constructor(
     private val participantRepository: ParticipantRepository,
     private val cityRepository: CityRepository,
     private val provinceRepository: ProvinceRepository,
+    private val provinceService: ProvinceService,
     private val redisService: RedisService
-) : StringSpec({
+) : FunSpec({
     lateinit var user: MuckPotUser
     lateinit var province: Province
     lateinit var city: City
@@ -97,263 +99,343 @@ class BoardServiceTest @Autowired constructor(
         cityRepository.deleteAll()
     }
 
-    "먹팟 생성 성공" {
-        // when
-        val boardId = boardService.saveBoard(userId, createRequest)
+    context("먹팟 생성 테스트") {
 
-        // then
-        val findBoard = boardRepository.findByIdOrNull(boardId)!!
-        val participant = participantRepository.findByBoard(findBoard)
-        val findCity = cityRepository.findByName(createRequest.region_1depth_name)
-        val findProvince = provinceRepository.findByName(createRequest.region_2depth_name)
+        test("생성 성공") {
+            // when
+            val boardId = boardService.saveBoard(userId, createRequest)
 
-        findBoard shouldNotBe null
-        findBoard.user.id shouldBe userId
-        findBoard.currentApply shouldBe 1
-        participant shouldNotBe null
-        findCity shouldNotBe null
-        findProvince shouldNotBe null
+            // then
+            val findBoard = boardRepository.findByIdOrNull(boardId)!!
+            val participant = participantRepository.findByBoard(findBoard)
+            val findCity = cityRepository.findByName(createRequest.region_1depth_name)
+            val findProvince = provinceRepository.findByName(createRequest.region_2depth_name)
+
+            findBoard shouldNotBe null
+            findBoard.user.id shouldBe userId
+            findBoard.currentApply shouldBe 1
+            participant shouldNotBe null
+            findCity shouldNotBe null
+            findProvince shouldNotBe null
+        }
+
+        test("먹팟 생성 시 시/도,구/군 값은 최초 1번만 디비에 값 저장 후 재사용") {
+            // when
+            val boardId1 = boardService.saveBoard(userId, createRequest)
+            val boardId2 = boardService.saveBoard(userId, createRequest)
+            // then
+            val findBoard1 = boardRepository.findByIdOrNull(boardId1)!!
+            val findBoard2 = boardRepository.findByIdOrNull(boardId2)!!
+            val findCity = cityRepository.findByName(createRequest.region_1depth_name)
+            val findProvince = provinceRepository.findByName(createRequest.region_2depth_name)
+
+            findBoard1 shouldNotBe null
+            findBoard1.province!!.id.shouldBe(findBoard2.province!!.id)
+            findCity shouldNotBe null
+            findProvince shouldNotBe null
+        }
+
+        test("먹팟 생성시 지역정보는 redis에서 삭제된다.") {
+            // given
+            boardService.findAllRegions()
+
+            // when
+            boardService.saveBoard(userId, createRequest)
+
+            // then
+            val actual = redisService.getData(regionsRedisKey)
+            actual shouldBe null
+        }
     }
 
-    "자신의 글은 조회수가 증가하지 않는다." {
-        // given
-        val boardId = boardService.saveBoard(userId, createRequest)!!
-        val loginUserInfo = UserResponse.of(user)
+    context("먹팟 상세 테스트") {
 
-        // when
-        boardService.findBoardDetailAndVisit(boardId, loginUserInfo)
-        boardService.findBoardDetailAndVisit(boardId, loginUserInfo)
+        test("자신의 글은 조회수가 증가하지 않는다.") {
+            // given
+            val boardId = boardService.saveBoard(userId, createRequest)!!
+            val loginUserInfo = UserResponse.of(user)
 
-        // then
-        val findBoard = boardRepository.findByIdOrNull(boardId)!!
-        findBoard.views shouldBe 0
+            // when
+            boardService.findBoardDetailAndVisit(boardId, loginUserInfo, RegionFilterRequest())
+            boardService.findBoardDetailAndVisit(boardId, loginUserInfo, RegionFilterRequest())
+
+            // then
+            val findBoard = boardRepository.findByIdOrNull(boardId)!!
+            findBoard.views shouldBe 0
+        }
+
+        test("다른 유저가 조회시 조회수가 증가한다.") {
+            // given
+            val boardId = boardService.saveBoard(userId, createRequest)!!
+            val otherUser = UserResponse.of(userRepository.save(Fixture.createUser()))
+
+            // when
+            boardService.findBoardDetailAndVisit(boardId, otherUser, RegionFilterRequest())
+
+            // then
+            val findBoard = boardRepository.findByIdOrNull(boardId)!!
+            findBoard.views shouldBe 1
+        }
+
+        test("비로그인 유저도 조회수가 증가한다.") {
+            // given
+            val boardId = boardService.saveBoard(userId, createRequest)!!
+            // when
+            boardService.findBoardDetailAndVisit(boardId, null, RegionFilterRequest())
+            // then
+            val findBoard = boardRepository.findByIdOrNull(boardId)!!
+            findBoard.views shouldBe 1
+        }
+
+        context("상세 조회 이전, 이후 아이디 테스트") {
+            var thirdBoardId: Long = 0
+            var secondBoardId: Long = 0
+            var firstBoardId: Long = 0
+
+            lateinit var province1: Province
+
+            beforeTest {
+                // given
+                province1 = provinceService.saveProvinceIfNot("city1", "province1")
+                val province2 = provinceService.saveProvinceIfNot("city1", "province2")
+                val province3 = provinceService.saveProvinceIfNot("city2", "province3")
+                thirdBoardId = boardService.saveBoard(
+                    userId,
+                    createRequest.apply {
+                        region_1depth_name = province3.city.name
+                        region_2depth_name = province3.name
+                    }
+                )!!
+                secondBoardId = boardService.saveBoard(
+                    userId,
+                    createRequest.apply {
+                        region_1depth_name = province2.city.name
+                        region_2depth_name = province2.name
+                    }
+                )!!
+                firstBoardId = boardService.saveBoard(
+                    userId,
+                    createRequest.apply {
+                        region_1depth_name = province1.city.name
+                        region_2depth_name = province1.name
+                    }
+                )!!
+            }
+
+            test("cityId 조건이 포함되는 경우") {
+                // when
+                val actual = boardService.findBoardDetailAndVisit(
+                    firstBoardId,
+                    UserResponse.of(user),
+                    RegionFilterRequest(
+                        cityId = province1.city.id
+                    )
+                )
+                // then
+                actual.prevId shouldBe null
+                actual.nextId shouldBe secondBoardId
+            }
+
+            test("cityId, provinceId 조건이 포함되는 경우") {
+                // when
+                val actual = boardService.findBoardDetailAndVisit(
+                    firstBoardId,
+                    UserResponse.of(user),
+                    RegionFilterRequest(cityId = province1.city.id, provinceId = province1.id)
+                )
+                // then
+                actual.prevId shouldBe null
+                actual.nextId shouldBe null
+            }
+
+            test("지역 필터 없는경우") {
+                // when
+                val actual = boardService.findBoardDetailAndVisit(
+                    secondBoardId,
+                    UserResponse.of(user),
+                    RegionFilterRequest()
+                )
+                // then
+                actual.prevId shouldBe firstBoardId
+                actual.nextId shouldBe thirdBoardId
+            }
+        }
     }
 
-    "먹팟 상세 조회시 조회수가 증가한다." {
-        // given
-        val boardId = boardService.saveBoard(userId, createRequest)!!
-        val otherUser = UserResponse.of(userRepository.save(Fixture.createUser()))
+    context("먹팟 수정 테스트") {
+        test("수정 성공") {
+            // given
+            val boardId = boardService.saveBoard(userId, createRequest)!!
+            // when
+            boardService.updateBoardAndSendEmail(userId, boardId, updateRequest)
+            // then
+            val actual = boardRepository.findByIdOrNull(boardId)!!
+            val findProvince = provinceRepository.findByName(updateRequest.region_2depth_name)
 
-        // when
-        boardService.findBoardDetailAndVisit(boardId, otherUser)
+            actual.maxApply shouldBe updateRequest.maxApply
+            actual.minAge shouldBe updateRequest.minAge
+            actual.maxAge shouldBe updateRequest.maxAge
+            actual.location.locationName shouldBe updateRequest.locationName
+            actual.getX() shouldBe updateRequest.x
+            actual.getY() shouldBe updateRequest.y
+            actual.title shouldBe updateRequest.title
+            actual.content shouldBe updateRequest.content
+            actual.chatLink shouldBe updateRequest.chatLink
+            actual.province!!.id.shouldBe(findProvince!!.id)
+        }
 
-        // then
-        val findBoard = boardRepository.findByIdOrNull(boardId)!!
-        findBoard.views shouldBe 1
+        test("자신의 글만 수정할 수 있다.") {
+            // given
+            val otherUserId = -1L
+            val boardId = boardService.saveBoard(userId, createRequest)!!
+            // when & then
+            shouldThrow<MuckPotException> {
+                boardService.updateBoardAndSendEmail(otherUserId, boardId, updateRequest)
+            }.errorCode shouldBe BoardErrorCode.BOARD_UNAUTHORIZED
+        }
     }
 
-    "비로그인 유저도 조회수가 증가한다." {
-        // given
-        val boardId = boardService.saveBoard(userId, createRequest)!!
-        // when
-        boardService.findBoardDetailAndVisit(boardId, null)
-        // then
-        val findBoard = boardRepository.findByIdOrNull(boardId)!!
-        findBoard.views shouldBe 1
-    }
-
-    "이전, 이후 아이디도 함께 응답에 반환한다." {
-        // given
-        val prevBoardId = boardService.saveBoard(userId, createRequest)!!
-        val boardId = boardService.saveBoard(userId, createRequest)!!
-        val nextBoardId = boardService.saveBoard(userId, createRequest)!!
-        // when
-        val actual = boardService.findBoardDetailAndVisit(boardId, null)
-        // then
-        actual.prevId shouldBe nextBoardId
-        actual.nextId shouldBe prevBoardId
-    }
-
-    "먹팟 수정 성공" {
-        // given
-        val boardId = boardService.saveBoard(userId, createRequest)!!
-        // when
-        boardService.updateBoardAndSendEmail(userId, boardId, updateRequest)
-        // then
-        val actual = boardRepository.findByIdOrNull(boardId)!!
-        val province = provinceRepository.findByName(updateRequest.region_2depth_name)
-
-        actual.maxApply shouldBe updateRequest.maxApply
-        actual.minAge shouldBe updateRequest.minAge
-        actual.maxAge shouldBe updateRequest.maxAge
-        actual.location.locationName shouldBe updateRequest.locationName
-        actual.getX() shouldBe updateRequest.x
-        actual.getY() shouldBe updateRequest.y
-        actual.title shouldBe updateRequest.title
-        actual.content shouldBe updateRequest.content
-        actual.chatLink shouldBe updateRequest.chatLink
-        actual.province!!.id.shouldBe(province!!.id)
-    }
-
-    "자신의 글만 수정할 수 있다." {
-        // given
-        val otherUserId = -1L
-        val boardId = boardService.saveBoard(userId, createRequest)!!
-        // when & then
-        shouldThrow<MuckPotException> {
-            boardService.updateBoardAndSendEmail(otherUserId, boardId, updateRequest)
-        }.errorCode shouldBe BoardErrorCode.BOARD_UNAUTHORIZED
-    }
-
-    "먹팟 참가 신청 성공" {
-        // given
-        val boardId = boardService.saveBoard(userId, createRequest)!!
-        val applyUser = userRepository.save(
-            MuckPotUser(
-                null, "test1@naver.com", "pw", "nickname1",
-                Gender.MEN, 2000, JobGroupMain.DEVELOPMENT, "sub", "url"
+    context("먹팟 참가 테스트") {
+        test("참가 신청 성공") {
+            // given
+            val boardId = boardService.saveBoard(userId, createRequest)!!
+            val applyUser = userRepository.save(
+                MuckPotUser(
+                    null, "test1@naver.com", "pw", "nickname1",
+                    Gender.MEN, 2000, JobGroupMain.DEVELOPMENT, "sub", "url"
+                )
             )
-        )
-        val applyUserId = applyUser.id!!
+            val applyUserId = applyUser.id!!
 
-        // when
-        boardService.joinBoard(applyUserId, boardId)
+            // when
+            boardService.joinBoard(applyUserId, boardId)
 
-        // then
-        val findBoard = boardRepository.findByIdOrNull(boardId)!!
-        val participant = participantRepository.findByBoard(findBoard)
-        findBoard.currentApply shouldBe 2
-        participant shouldNotBe null
-    }
+            // then
+            val findBoard = boardRepository.findByIdOrNull(boardId)!!
+            val participant = participantRepository.findByBoard(findBoard)
+            findBoard.currentApply shouldBe 2
+            participant shouldNotBe null
+        }
 
-    "먹팟 중복 참가 신청 불가 검증" {
-        val boardId = boardService.saveBoard(userId, createRequest)!!
-        shouldThrow<MuckPotException> {
-            boardService.joinBoard(userId, boardId)
-        }.errorCode shouldBe ParticipantErrorCode.ALREADY_JOIN
-    }
+        test("먹팟 중복 참가 신청 불가 검증") {
+            val boardId = boardService.saveBoard(userId, createRequest)!!
+            shouldThrow<MuckPotException> {
+                boardService.joinBoard(userId, boardId)
+            }.errorCode shouldBe ParticipantErrorCode.ALREADY_JOIN
+        }
 
-    "먹팟 참가 동시성 테스트" {
-        // given
-        val boardId = boardService.saveBoard(userId, createRequest)!!
-        val applyUser = userRepository.save(
-            MuckPotUser(
-                null, "test1@naver.com", "pw", "nickname1",
-                Gender.MEN, 2000, JobGroupMain.DEVELOPMENT, "sub", "url"
+        test("먹팟 참가 동시성 테스트") {
+            // given
+            val boardId = boardService.saveBoard(userId, createRequest)!!
+            val applyUser = userRepository.save(
+                MuckPotUser(
+                    null, "test1@naver.com", "pw", "nickname1",
+                    Gender.MEN, 2000, JobGroupMain.DEVELOPMENT, "sub", "url"
+                )
             )
-        )
-        val applyId = applyUser.id!!
+            val applyId = applyUser.id!!
 
-        // when
-        val successCount = AtomicLong()
-        ConcurrencyHelper.execute(
-            { boardService.joinBoard(applyId, boardId) },
-            successCount
-        )
+            // when
+            val successCount = AtomicLong()
+            ConcurrencyHelper.execute(
+                { boardService.joinBoard(applyId, boardId) },
+                successCount
+            )
 
-        // then
-        val findBoard = boardRepository.findByIdOrNull(boardId)!!
-        findBoard.currentApply shouldBe 2
+            // then
+            val findBoard = boardRepository.findByIdOrNull(boardId)!!
+            findBoard.currentApply shouldBe 2
+        }
     }
 
-    "먹팟 삭제 요청시 INACTIVE로 변경된다." {
-        // given
-        val boardId = boardService.saveBoard(userId, createRequest)!!
+    context("먹팟 삭제 테스트") {
+        test("먹팟 삭제 요청시 INACTIVE로 변경된다.") {
+            // given
+            val boardId = boardService.saveBoard(userId, createRequest)!!
 
-        // when
-        boardService.deleteBoardAndSendEmail(userId, boardId)
+            // when
+            boardService.deleteBoardAndSendEmail(userId, boardId)
 
-        val findBoard = boardRepository.findByIdOrNull(boardId)
-        findBoard shouldBe null
+            val findBoard = boardRepository.findByIdOrNull(boardId)
+            findBoard shouldBe null
+        }
+
+        test("자신의 글만 삭제할 수 있다.") {
+            // given
+            val otherUserId = -1L
+            val boardId = boardService.saveBoard(userId, createRequest)!!
+            // when & then
+            shouldThrow<MuckPotException> {
+                boardService.deleteBoardAndSendEmail(otherUserId, boardId)
+            }.errorCode shouldBe BoardErrorCode.BOARD_UNAUTHORIZED
+        }
+
+        test("글 삭제시 참여자 목록도 함께 삭제한다.") {
+            // given
+            val board = boardRepository.save(Fixture.createBoard(user = user, province = province))
+            // when
+            boardService.deleteBoardAndSendEmail(userId, board.id!!)
+            // then
+            val findBoard = participantRepository.findByBoard(board)
+            findBoard shouldHaveSize 0
+        }
     }
 
-    "자신의 글만 삭제할 수 있다." {
-        // given
-        val otherUserId = -1L
-        val boardId = boardService.saveBoard(userId, createRequest)!!
-        // when & then
-        shouldThrow<MuckPotException> {
-            boardService.deleteBoardAndSendEmail(otherUserId, boardId)
-        }.errorCode shouldBe BoardErrorCode.BOARD_UNAUTHORIZED
+    context("먹팟 상태 변경 테스트") {
+        test("먹팟 상태변경 성공") {
+            // given
+            val boardId = boardRepository.save(Fixture.createBoard(user = user, province = province)).id!!
+            // when
+            boardService.changeStatus(userId, boardId, MuckPotStatus.DONE)
+            // then
+            val actual = boardRepository.findByIdOrNull(boardId)!!
+            actual.status shouldBe MuckPotStatus.DONE
+        }
     }
 
-    "글 삭제시 참여자 목록도 함께 삭제한다." {
-        // given
-        val board = boardRepository.save(Fixture.createBoard(user = user, province = province))
-        // when
-        boardService.deleteBoardAndSendEmail(userId, board.id!!)
-        // then
-        val findBoard = participantRepository.findByBoard(board)
-        findBoard shouldHaveSize 0
-    }
-
-    "먹팟 상태변경 성공" {
-        // given
-        val boardId = boardRepository.save(Fixture.createBoard(user = user, province = province)).id!!
-        // when
-        boardService.changeStatus(userId, boardId, MuckPotStatus.DONE)
-        // then
-        val actual = boardRepository.findByIdOrNull(boardId)!!
-        actual.status shouldBe MuckPotStatus.DONE
-    }
-
-    "먹팟 참가 신청 취소 성공" {
-        // given
-        val applyUser = userRepository.save(Fixture.createUser())
-        val board = boardRepository.save(Fixture.createBoard(user = user, province = province))
-        participantRepository.save(Participant(applyUser, board))
-        // when
-        boardService.cancelJoinAndSendEmail(applyUser.id!!, board.id!!)
-        // then
-        val findParticipant = participantRepository.findByUserAndBoard(applyUser, board)
-        findParticipant shouldBe null
-        board.currentApply shouldBe 0
-    }
-
-    "기존 참가 신청 내역 없으면 참가 신청 취소 불가" {
-        // given
-        val applyUser = userRepository.save(Fixture.createUser())
-        val board = boardRepository.save(Fixture.createBoard(user = user, province = province))
-        // when & then
-        shouldThrow<MuckPotException> {
+    context("참가 신청 취소 테스트") {
+        test("참가 신청 취소 성공") {
+            // given
+            val applyUser = userRepository.save(Fixture.createUser())
+            val board = boardRepository.save(Fixture.createBoard(user = user, province = province))
+            participantRepository.save(Participant(applyUser, board))
+            // when
             boardService.cancelJoinAndSendEmail(applyUser.id!!, board.id!!)
-        }.errorCode shouldBe ParticipantErrorCode.PARTICIPANT_NOT_FOUND
+            // then
+            val findParticipant = participantRepository.findByUserAndBoard(applyUser, board)
+            findParticipant shouldBe null
+            board.currentApply shouldBe 0
+        }
+
+        test("기존 참가 신청 내역 없으면 참가 신청 취소 불가") {
+            // given
+            val applyUser = userRepository.save(Fixture.createUser())
+            val board = boardRepository.save(Fixture.createBoard(user = user, province = province))
+            // when & then
+            shouldThrow<MuckPotException> {
+                boardService.cancelJoinAndSendEmail(applyUser.id!!, board.id!!)
+            }.errorCode shouldBe ParticipantErrorCode.PARTICIPANT_NOT_FOUND
+        }
+
+        test("먹팟 글 작성자는 참가 신청 취소할 수 없다.") {
+            // given
+            val board = boardRepository.save(Fixture.createBoard(user = user, province = province))
+            participantRepository.save(Participant(user, board))
+            // when & then
+            shouldThrow<MuckPotException> {
+                boardService.cancelJoinAndSendEmail(user.id!!, board.id!!)
+            }.errorCode shouldBe ParticipantErrorCode.WRITER_MUST_JOIN
+        }
     }
 
-    "먹팟 글 작성자는 참가 신청 취소할 수 없다." {
-        // given
-        val board = boardRepository.save(Fixture.createBoard(user = user, province = province))
-        participantRepository.save(Participant(user, board))
-        // when & then
-        shouldThrow<MuckPotException> {
-            boardService.cancelJoinAndSendEmail(user.id!!, board.id!!)
-        }.errorCode shouldBe ParticipantErrorCode.WRITER_MUST_JOIN
-    }
+    context("등록된 모든 지역정보 조회 테스트") {
+        test("지역 조회정보는 최초1회 redis에 저장한다.") {
+            // when
+            boardService.findAllRegions()
 
-    "먹팟 생성 시 시/도,군/구 값은 최초 1번만 디비에 값 저장 후 재사용" {
-        // when
-        val boardId1 = boardService.saveBoard(userId, createRequest)
-        val boardId2 = boardService.saveBoard(userId, createRequest)
-        // then
-        val findBoard1 = boardRepository.findByIdOrNull(boardId1)!!
-        val findBoard2 = boardRepository.findByIdOrNull(boardId2)!!
-        val findCity = cityRepository.findByName(createRequest.region_1depth_name)
-        val findProvince = provinceRepository.findByName(createRequest.region_2depth_name)
-
-        findBoard1 shouldNotBe null
-        findBoard1.province!!.id.shouldBe(findBoard2.province!!.id)
-        findCity shouldNotBe null
-        findProvince shouldNotBe null
-    }
-
-    "지역 조회정보는 최초1회 redis에 저장한다." {
-        // when
-        boardService.findAllRegions()
-
-        // then
-        val actual = redisService.getData(regionsRedisKey)
-        actual shouldNotBe null
-    }
-
-    "먹팟 생성시 지역정보는 redis에서 삭제된다." {
-        // given
-        boardService.findAllRegions()
-
-        // when
-        boardService.saveBoard(userId, createRequest)
-
-        // then
-        val actual = redisService.getData(regionsRedisKey)
-        actual shouldBe null
+            // then
+            val actual = redisService.getData(regionsRedisKey)
+            actual shouldNotBe null
+        }
     }
 })

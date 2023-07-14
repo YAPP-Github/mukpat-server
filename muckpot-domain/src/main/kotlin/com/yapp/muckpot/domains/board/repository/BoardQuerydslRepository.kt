@@ -31,17 +31,19 @@ class BoardQuerydslRepository(
             .fetch()
     }
 
-    fun findPrevId(boardId: Long): Long? {
+    fun findPrevId(boardId: Long, cityId: Long? = null, provinceId: Long? = null): Long? {
         return queryFactory.from(board)
+            .innerJoin(board.province, province)
             .select(board.id.min())
-            .where(board.id.gt(boardId))
+            .where(board.id.gt(boardId), cityIdEqBoard(cityId), provinceIdEqBoard(provinceId))
             .fetchOne()
     }
 
-    fun findNextId(boardId: Long): Long? {
+    fun findNextId(boardId: Long, cityId: Long? = null, provinceId: Long? = null): Long? {
         return queryFactory.from(board)
+            .innerJoin(board.province, province)
             .select(board.id.max())
-            .where(board.id.lt(boardId))
+            .where(board.id.lt(boardId), cityIdEqBoard(cityId), provinceIdEqBoard(provinceId))
             .fetchOne()
     }
 
@@ -78,6 +80,18 @@ class BoardQuerydslRepository(
     private fun lessThanLastId(lastId: Long?): BooleanExpression? {
         return lastId?.let {
             board.id.lt(it)
+        }
+    }
+
+    private fun cityIdEqBoard(cityId: Long?): BooleanExpression? {
+        return cityId?.let {
+            board.province.city.id.eq(cityId)
+        }
+    }
+
+    private fun provinceIdEqBoard(provinceId: Long?): BooleanExpression? {
+        return provinceId?.let {
+            board.province.id.eq(provinceId)
         }
     }
 }
