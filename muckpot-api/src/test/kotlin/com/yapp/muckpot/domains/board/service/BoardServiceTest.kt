@@ -310,7 +310,7 @@ class BoardServiceTest @Autowired constructor(
         }.errorCode shouldBe ParticipantErrorCode.WRITER_MUST_JOIN
     }
 
-    test("먹팟 생성 시 시/도,군/구 값은 최초 1번만 디비에 값 저장 후 재사용") {
+    test("먹팟 생성 시 시/도,구/군 값은 최초 1번만 디비에 값 저장 후 재사용") {
         // when
         val boardId1 = boardService.saveBoard(userId, createRequest)
         val boardId2 = boardService.saveBoard(userId, createRequest)
