@@ -96,5 +96,15 @@ class BoardTest : FunSpec({
 
             board.status shouldBe MuckPotStatus.IN_PROGRESS
         }
+
+        test("먹팟 취소시 상태 IN_PROGRESS 변경 성공") {
+            // given
+            val board = Fixture.createBoard(maxApply = 2, currentApply = 2, status = MuckPotStatus.DONE)
+            // when
+            board.cancelJoin()
+            // then
+            board.currentApply shouldBe 1
+            board.status shouldBe MuckPotStatus.IN_PROGRESS
+        }
     }
 })
