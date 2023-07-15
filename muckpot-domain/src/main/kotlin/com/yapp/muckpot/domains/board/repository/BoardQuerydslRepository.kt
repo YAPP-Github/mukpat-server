@@ -94,4 +94,14 @@ class BoardQuerydslRepository(
             board.province.id.eq(provinceId)
         }
     }
+
+    fun findAllWithPaginationAndRegion(lastId: Long?, countPerScroll: Long, cityId: Long?, provinceId: Long?): List<Board> {
+        return queryFactory.from(board)
+            .select(board)
+            .innerJoin(board.province, province)
+            .where(lessThanLastId(lastId), cityIdEqBoard(cityId), provinceIdEqBoard(provinceId))
+            .orderBy(board.createdAt.desc())
+            .limit(countPerScroll)
+            .fetch()
+    }
 }

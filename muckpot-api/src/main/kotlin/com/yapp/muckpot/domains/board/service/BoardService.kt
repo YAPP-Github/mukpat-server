@@ -1,9 +1,9 @@
 package com.yapp.muckpot.domains.board.service
 
-import com.yapp.muckpot.common.dto.CursorPaginationRequest
 import com.yapp.muckpot.common.dto.CursorPaginationResponse
 import com.yapp.muckpot.common.redisson.DistributedLock
 import com.yapp.muckpot.domains.board.controller.converter.RegionConverter
+import com.yapp.muckpot.domains.board.controller.dto.AllMuckpotGetRequest
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateRequest
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotDetailResponse
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotReadResponse
@@ -57,8 +57,8 @@ class BoardService(
     }
 
     @Transactional(readOnly = true)
-    fun findAllBoards(request: CursorPaginationRequest): CursorPaginationResponse<MuckpotReadResponse> {
-        val allBoard = boardQuerydslRepository.findAllWithPagination(request.lastId, request.countPerScroll)
+    fun findAllBoards(request: AllMuckpotGetRequest): CursorPaginationResponse<MuckpotReadResponse> {
+        val allBoard = boardQuerydslRepository.findAllWithPaginationAndRegion(request.lastId, request.countPerScroll, request.cityId, request.provinceId)
         val boardIds = allBoard.map { it.id }
         val participantsByBoardId = participantQuerydslRepository.findByBoardIds(boardIds).groupBy { it.boardId }
         val responseList = allBoard.map { MuckpotReadResponse.of(it, participantsByBoardId.getOrDefault(it.id, emptyList())) }

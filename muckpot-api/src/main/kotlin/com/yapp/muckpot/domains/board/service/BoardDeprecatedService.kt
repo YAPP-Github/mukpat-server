@@ -1,10 +1,15 @@
 package com.yapp.muckpot.domains.board.service
 
+import com.yapp.muckpot.common.dto.CursorPaginationRequest
+import com.yapp.muckpot.common.dto.CursorPaginationResponse
+import com.yapp.muckpot.domains.board.controller.dto.MuckpotReadResponse
 import com.yapp.muckpot.domains.board.controller.dto.deprecated.MuckpotCreateRequestV1
 import com.yapp.muckpot.domains.board.controller.dto.deprecated.MuckpotUpdateRequestV1
 import com.yapp.muckpot.domains.board.entity.Participant
 import com.yapp.muckpot.domains.board.exception.BoardErrorCode
+import com.yapp.muckpot.domains.board.repository.BoardQuerydslRepository
 import com.yapp.muckpot.domains.board.repository.BoardRepository
+import com.yapp.muckpot.domains.board.repository.ParticipantQuerydslRepository
 import com.yapp.muckpot.domains.board.repository.ParticipantRepository
 import com.yapp.muckpot.domains.user.exception.UserErrorCode
 import com.yapp.muckpot.domains.user.repository.MuckPotUserRepository
@@ -20,7 +25,9 @@ class BoardDeprecatedService(
     private val userRepository: MuckPotUserRepository,
     private val boardRepository: BoardRepository,
     private val participantRepository: ParticipantRepository,
-    private val participantService: ParticipantService
+    private val participantService: ParticipantService,
+    private val boardQuerydslRepository: BoardQuerydslRepository,
+    private val participantQuerydslRepository: ParticipantQuerydslRepository
 ) {
     @Transactional
     fun saveBoardV1(userId: Long, request: MuckpotCreateRequestV1): Long? {
@@ -53,5 +60,17 @@ class BoardDeprecatedService(
         } ?: run {
             throw MuckPotException(BoardErrorCode.BOARD_NOT_FOUND)
         }
+    }
+
+    @Transactional(readOnly = true)
+    fun findAllBoardsV1(request: CursorPaginationRequest): CursorPaginationResponse<MuckpotReadResponse> {
+        val allBoard = boardQuerydslRepository.findAllWithPagination(request.lastId, request.countPerScroll)
+        val boardIds = allBoard.map { it.id }
+        val participantsByBoardId = participantQuerydslRepository.findByBoardIds(boardIds).groupBy { it.boardId }
+        val responseList = allBoard.map { MuckpotReadResponse.of(it, participantsByBoardId.getOrDefault(it.id, emptyList())) }
+        if (responseList.isNotEmpty()) {
+            return CursorPaginationResponse(responseList, responseList.last().boardId)
+        }
+        return CursorPaginationResponse(responseList)
     }
 }
