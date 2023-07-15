@@ -4,7 +4,6 @@ import Fixture
 import com.ninjasquad.springmockk.MockkBean
 import com.yapp.muckpot.common.constants.TODAY_KR
 import com.yapp.muckpot.common.constants.TOMORROW_KR
-import com.yapp.muckpot.common.dto.CursorPaginationRequest
 import com.yapp.muckpot.domains.board.controller.dto.AllMuckpotGetRequest
 import com.yapp.muckpot.domains.board.controller.dto.RegionFilterRequest
 import com.yapp.muckpot.domains.board.dto.ParticipantReadResponse
@@ -63,7 +62,7 @@ class BoardServiceMockTest @Autowired constructor(
         }
         test("모든 먹팟 조회 성공") {
             // when
-            val actual = boardService.findAllBoards(AllMuckpotGetRequest(null, allBoardSize.toLong(),null,null))
+            val actual = boardService.findAllBoards(AllMuckpotGetRequest(null, allBoardSize.toLong(), null, null))
             // then
             actual.list shouldHaveSize 3
             actual.lastId shouldBe allBoard.last().id
@@ -71,14 +70,14 @@ class BoardServiceMockTest @Autowired constructor(
 
         test("참가자가 6명을 넘어가면 마지막에 외N 명으로 응답한다") {
             // when
-            val actual = boardService.findAllBoards(AllMuckpotGetRequest(null, allBoardSize.toLong(),null,null))
+            val actual = boardService.findAllBoards(AllMuckpotGetRequest(null, allBoardSize.toLong(), null, null))
             // then
             actual.list[0].participants.last().nickName shouldBe "외 3명"
         }
 
         test("오늘, 내일은 meetingTime 기준으로 생성된다.") {
             // when
-            val actual = boardService.findAllBoards(AllMuckpotGetRequest(null, allBoardSize.toLong(),null,null))
+            val actual = boardService.findAllBoards(AllMuckpotGetRequest(null, allBoardSize.toLong(), null, null))
             // then
             actual.list[1].todayOrTomorrow shouldBe TODAY_KR
             actual.list[2].todayOrTomorrow shouldBe TOMORROW_KR
