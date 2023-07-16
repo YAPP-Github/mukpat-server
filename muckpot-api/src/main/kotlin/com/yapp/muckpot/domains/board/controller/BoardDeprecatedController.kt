@@ -1,7 +1,9 @@
 package com.yapp.muckpot.domains.board.controller
 
 import com.yapp.muckpot.common.ResponseDto
+import com.yapp.muckpot.common.constants.MUCKPOT_FIND_ALL
 import com.yapp.muckpot.common.constants.MUCKPOT_SAVE_RESPONSE
+import com.yapp.muckpot.common.dto.CursorPaginationRequest
 import com.yapp.muckpot.common.utils.ResponseEntityUtil
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateResponse
 import com.yapp.muckpot.domains.board.controller.dto.deprecated.MuckpotCreateRequestV1
@@ -16,6 +18,8 @@ import io.swagger.annotations.ExampleProperty
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -69,5 +73,25 @@ class BoardDeprecatedController(
     ): ResponseEntity<ResponseDto> {
         boardService.updateBoardAndSendEmailV1(userId, boardId, request)
         return ResponseEntityUtil.noContent()
+    }
+
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                code = 200,
+                examples = Example(
+                    ExampleProperty(
+                        value = MUCKPOT_FIND_ALL,
+                        mediaType = MediaType.APPLICATION_JSON_VALUE
+                    )
+                ),
+                message = "성공"
+            )
+        ]
+    )
+    @ApiOperation(value = "먹팟 글 리스트 조회 - v1")
+    @GetMapping("/v1/boards")
+    fun findAllV1(@ModelAttribute request: CursorPaginationRequest): ResponseEntity<ResponseDto> {
+        return ResponseEntityUtil.ok(boardService.findAllBoardsV1(request))
     }
 }

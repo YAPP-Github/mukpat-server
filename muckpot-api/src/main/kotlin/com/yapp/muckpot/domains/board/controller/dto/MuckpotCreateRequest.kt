@@ -28,7 +28,7 @@ import javax.validation.constraints.NotBlank
 
 @ApiModel(value = "먹팟생성 요청")
 data class MuckpotCreateRequest(
-    @field:ApiModelProperty(notes = "만날 날짜", required = true, example = "2023-05-21")
+    @field:ApiModelProperty(notes = "만날 날짜", required = true, example = "2023-12-21")
     @field:JsonFormat(shape = JsonFormat.Shape.STRING, pattern = YYYYMMDD)
     val meetingDate: LocalDate,
     @field:ApiModelProperty(notes = "만날 시간", required = true, example = "13:00")

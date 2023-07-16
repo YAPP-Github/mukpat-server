@@ -6,9 +6,9 @@ import com.yapp.muckpot.common.constants.MUCKPOT_FIND_BY_ID
 import com.yapp.muckpot.common.constants.MUCKPOT_JOIN_RESPONSE
 import com.yapp.muckpot.common.constants.MUCKPOT_REGIONS
 import com.yapp.muckpot.common.constants.MUCKPOT_SAVE_RESPONSE
-import com.yapp.muckpot.common.dto.CursorPaginationRequest
 import com.yapp.muckpot.common.utils.ResponseEntityUtil
 import com.yapp.muckpot.common.utils.SecurityContextHolderUtil
+import com.yapp.muckpot.domains.board.controller.dto.AllMuckpotGetRequest
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateRequest
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateResponse
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotUpdateRequest
@@ -85,8 +85,8 @@ class BoardController(
         ]
     )
     @ApiOperation(value = "먹팟 글 리스트 조회")
-    @GetMapping("/v1/boards")
-    fun findAll(@ModelAttribute request: CursorPaginationRequest): ResponseEntity<ResponseDto> {
+    @GetMapping("/v2/boards")
+    fun findAll(@ModelAttribute request: AllMuckpotGetRequest): ResponseEntity<ResponseDto> {
         return ResponseEntityUtil.ok(boardService.findAllBoards(request))
     }
 
