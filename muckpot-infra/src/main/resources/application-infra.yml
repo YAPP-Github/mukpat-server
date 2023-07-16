@@ -23,3 +23,13 @@ spring:
   redis:
     host: ${DEV_REDIS_HOST}
     port: ${REDIS_PORT}
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: prod
+  redis:
+    host: ${PROD_REDIS_HOST}
+    port: ${REDIS_PORT}
