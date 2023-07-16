@@ -13,7 +13,7 @@ spring:
 
 jwt:
   issuer: "muckpot"
-  secret-key: ${JWT_SECRET_KEY:secret}
+  secret-key: ${JWT_SECRET_KEY_DEV:secret}
 
 logging:
   config: classpath:logback-${spring.config.activate.on-profile}.xml
@@ -23,5 +23,23 @@ api:
     permit-all: false # 배포: false, 테스트 : true
     allowed-origins:
       ${LOCAL_ORIGIN:localOrigin},
+      ${DEV_ORIGIN:prodOrigin},
+      ${DEV_ORIGIN_2:prodOrigin2}
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+jwt:
+  issuer: "muckpot"
+  secret-key: ${JWT_SECRET_KEY_PROD:secret}
+
+api:
+  option:
+    permit-all: false
+    allowed-origins:
       ${PROD_ORIGIN:prodOrigin},
       ${PROD_ORIGIN_2:prodOrigin2}
