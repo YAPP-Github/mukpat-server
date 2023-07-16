@@ -41,7 +41,7 @@ jobs:
           context: ./muckpot-api
           push: true
           args: --build-arg PROFILE=$ACTIVE_PROFILE
-          tags: muckpot/muckpot-api:${{ github.run_number }}
+          tags: muckpot/muckpot-api-dev:${{ github.run_number }}
 
   deploy:
     needs: build
@@ -58,8 +58,8 @@ jobs:
             cd /var/www/html/api
             sudo touch .env
             echo "${{ secrets.ENV_VARS }}" | sudo tee .env > /dev/null
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/muckpot-api:${{ github.run_number }}
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/muckpot-api-dev:${{ github.run_number }}
             docker stop $(docker ps -a -q)
-            docker run -v ${HOME}/logs:/logs --restart=unless-stopped -d -p ${{ secrets.DEV_PORT }}:${{ secrets.DEV_PORT }} --env-file .env ${{ secrets.DOCKERHUB_USERNAME }}/muckpot-api:${{ github.run_number }}
+            docker run -v ${HOME}/logs:/logs --restart=unless-stopped -d -p ${{ secrets.DEV_PORT }}:${{ secrets.DEV_PORT }} --env-file .env ${{ secrets.DOCKERHUB_USERNAME }}/muckpot-api-dev:${{ github.run_number }}
             docker rm $(docker ps -a -q --filter "status=exited")
             docker image prune -a -f
