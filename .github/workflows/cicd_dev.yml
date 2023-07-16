@@ -49,9 +49,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: EC2 Docker Run
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v1.0.4
         with:
-          host: ${{ secrets.EC2_HOST }}
+          host: ${{ secrets.EC2_DEV_HOST }}
           username: ${{ secrets.EC2_DEV_USER }}
           key: ${{ secrets.EC2_DEV_KEY }}
           port: ${{ env.DEV_PORT }}
