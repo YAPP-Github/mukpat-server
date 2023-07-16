@@ -109,10 +109,6 @@ class Board(
         this.views++
     }
 
-    fun expired(): Boolean {
-        return (this.status == IN_PROGRESS && this.meetingTime.isBefore(LocalDateTime.now()))
-    }
-
     fun getX(): Double {
         return this.location.locationPoint.x
     }
@@ -135,6 +131,8 @@ class Board(
     }
 
     fun cancelJoin() {
+        require(meetingTime > LocalDateTime.now()) { "이미 마감된 먹팟입니다." }
+        this.status = IN_PROGRESS
         this.currentApply--
     }
 
