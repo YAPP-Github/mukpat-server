@@ -6,6 +6,7 @@ on:
 
 env:
   ACTIVE_PROFILE: "dev"
+  IMAGE_NAME: "muckpot-api"-$ACTIVE_PROFILE
 
 permissions:
   contents: read
@@ -41,7 +42,7 @@ jobs:
           context: ./muckpot-api
           push: true
           args: --build-arg PROFILE=$ACTIVE_PROFILE
-          tags: muckpot/muckpot-api:${{ github.run_number }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/$IMAGE_NAME:${{ github.run_number }}
 
   deploy:
     needs: build
@@ -51,15 +52,15 @@ jobs:
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_KEY }}
+          username: ${{ secrets.EC2_DEV_USER }}
+          key: ${{ secrets.EC2_DEV_KEY }}
           port: ${{ env.DEV_PORT }}
           script: |
             cd /var/www/html/api
             sudo touch .env
             echo "${{ secrets.ENV_VARS }}" | sudo tee .env > /dev/null
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/muckpot-api:${{ github.run_number }}
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/$IMAGE_NAME:${{ github.run_number }}
             docker stop $(docker ps -a -q)
-            docker run -v ${HOME}/logs:/logs --restart=unless-stopped -d -p ${{ secrets.DEV_PORT }}:${{ secrets.DEV_PORT }} --env-file .env ${{ secrets.DOCKERHUB_USERNAME }}/muckpot-api:${{ github.run_number }}
+            docker run -v ${HOME}/logs:/logs --restart=unless-stopped -d -p ${{ secrets.DEV_PORT }}:${{ secrets.DEV_PORT }} --env-file .env ${{ secrets.DOCKERHUB_USERNAME }}/$IMAGE_NAME:${{ github.run_number }}
             docker rm $(docker ps -a -q --filter "status=exited")
             docker image prune -a -f

@@ -35,3 +35,19 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.spatial.dialect.mariadb.MariaDB103SpatialDialect
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: jdbc:mariadb://${RDS_PROD_URL}/${RDS_PROD_DB_NAME}
+    username: ${RDS_PROD_ID}
+    password: ${RDS_PROD_PW}
+    driver-class-name: org.mariadb.jdbc.Driver
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.spatial.dialect.mariadb.MariaDB103SpatialDialect
