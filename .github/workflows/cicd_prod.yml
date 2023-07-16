@@ -1,11 +1,11 @@
-name: muckpot dev api CI/CD script
+name: muckpot prod api CI/CD script
 
 on:
   push:
-    branches: [ "develop" ]
+    branches: [ "main" ]
 
 env:
-  ACTIVE_PROFILE: "dev"
+  ACTIVE_PROFILE: "prod"
 
 permissions:
   contents: read
