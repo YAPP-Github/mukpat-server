@@ -6,7 +6,7 @@ on:
 
 env:
   ACTIVE_PROFILE: "prod"
-  IMAGE_NAME: "muckpot-api"-$ACTIVE_PROFILE
+  IMAGE_NAME: "muckpot-api"-${ACTIVE_PROFILE}
 
 permissions:
   contents: read
