@@ -1,9 +1,8 @@
-spring:
-  mail:
-    host: smtp.gmail.com
-    port: ${GOOGLE_SMTP_PORT:8080}
-    username: ${GOOGLE_SMTP_USERNAME:test}
-    password: ${GOOGLE_SMTP_PASSWORD:test}
+aws:
+  ses:
+    access-key: ${SES_ACCESS_KEY}
+    secret-key: ${SES_SECRET_KEY}
+    region : ${SES_REGION}
 
 ---
 
