@@ -21,7 +21,7 @@ java.sourceCompatibility = JavaVersion.VERSION_11
 
 sonarqube {
     properties {
-        property("sonar.projectKey", "YAPP-Github_22nd-Web-Team-1-BE")
+        property("sonar.projectKey", "YAPP-Github_mukpat-server")
         property("sonar.organization", "yapp-github")
         property("sonar.host.url", "https://sonarcloud.io")
         // sonar additional settings
