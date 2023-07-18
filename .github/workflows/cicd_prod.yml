@@ -40,7 +40,7 @@ jobs:
         with:
           context: ./muckpot-api
           push: true
-          args: --build-arg PROFILE=${{ env.PROFILE }}
+          args: --build-arg PROFILE=$PROFILE
           tags: muckpot/muckpot-api-prod:${{ github.run_number }}
 
   deploy:
