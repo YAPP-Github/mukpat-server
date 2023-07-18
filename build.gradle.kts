@@ -12,9 +12,27 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint") version "11.3.2"
 
     kotlin("kapt") version "1.6.21" apply false
+
+    id("org.sonarqube") version "4.2.1.3168"
+    id("jacoco")
 }
 
 java.sourceCompatibility = JavaVersion.VERSION_11
+
+sonarqube {
+    properties {
+        property("sonar.projectKey", "YAPP-Github_22nd-Web-Team-1-BE")
+        property("sonar.organization", "yapp-github")
+        property("sonar.host.url", "https://sonarcloud.io")
+        // sonar additional settings
+        property("sonar.sources", "src")
+        property("sonar.language", "Kotlin")
+        property("sonar.sourceEncoding", "UTF-8")
+        property("sonar.test.inclusions", "**/*Test.java")
+        property("sonar.exclusions", "**/test/**, **/Q*.kt, **/*Doc*.kt, **/resources/** ,**/*Application*.kt , **/*Config*.kt, **/*Dto*.kt, **/*Request*.kt, **/*Response*.kt ,**/*Exception*.kt ,**/*ErrorCode*.kt")
+        property("sonar.java.coveragePlugin", "jacoco")
+    }
+}
 
 allprojects {
     group = "com.yapp"
@@ -42,6 +60,7 @@ subprojects {
     apply(plugin = "org.springframework.boot")
     apply(plugin = "io.spring.dependency-management")
     apply(plugin = "org.jlleitschuh.gradle.ktlint")
+    apply(plugin = "jacoco")
 
     dependencies {
         implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -56,5 +75,41 @@ subprojects {
         testImplementation("io.kotest.extensions:kotest-extensions-spring:1.1.2")
         testImplementation("io.mockk:mockk:1.12.4")
         testImplementation("com.ninja-squad:springmockk:3.1.2")
+    }
+
+    tasks.test {
+        finalizedBy(tasks.jacocoTestReport) // report is always generated after tests run
+    }
+    tasks.jacocoTestReport {
+        dependsOn(tasks.test) // tests are required to run before generating the report
+        reports {
+            xml.required.set(true)
+            xml.outputLocation.set(File("$buildDir/reports/jacoco.xml"))
+        }
+        classDirectories.setFrom(
+            files(
+                classDirectories.files.map {
+                    fileTree(it) { // 테스트 커버리지 측정 제외 목록
+                        exclude(
+                            "**/*Application*",
+                            "**/*Config*",
+                            "**/*Dto*",
+                            "**/*Request*",
+                            "**/*Response*",
+                            "**/*Interceptor*",
+                            "**/*Exception*",
+                            "**/Q*"
+                        ) // QueryDsl 용이나 Q로 시작하는 클래스 뺄 위험 존재
+                    }
+                }
+            )
+        )
+    }
+
+    sonarqube {
+        properties {
+            property("sonar.java.binaries", "$buildDir/classes")
+            property("sonar.coverage.jacoco.xmlReportPaths", "$buildDir/reports/jacoco.xml")
+        }
     }
 }
