@@ -3,6 +3,7 @@ package com.yapp.muckpot.domains.board.controller
 import com.yapp.muckpot.common.ResponseDto
 import com.yapp.muckpot.common.constants.MUCKPOT_FIND_ALL
 import com.yapp.muckpot.common.constants.MUCKPOT_FIND_BY_ID
+import com.yapp.muckpot.common.constants.MUCKPOT_FIND_BY_ID_FOR_UPDATE
 import com.yapp.muckpot.common.constants.MUCKPOT_JOIN_RESPONSE
 import com.yapp.muckpot.common.constants.MUCKPOT_REGIONS
 import com.yapp.muckpot.common.constants.MUCKPOT_SAVE_RESPONSE
@@ -227,5 +228,30 @@ class BoardController(
     @GetMapping("/v1/boards/regions")
     fun findAllRegions(): ResponseEntity<ResponseDto> {
         return ResponseEntityUtil.ok(boardService.findAllRegions())
+    }
+
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                code = 200,
+                examples = Example(
+                    ExampleProperty(
+                        value = MUCKPOT_FIND_BY_ID_FOR_UPDATE,
+                        mediaType = MediaType.APPLICATION_JSON_VALUE
+                    )
+                ),
+                message = "성공"
+            )
+        ]
+    )
+    @ApiOperation(value = "먹팟 수정 정보 조회")
+    @GetMapping("/v1/boards/{boardId}/update")
+    fun findUpdateBoardDetail(@PathVariable boardId: Long): ResponseEntity<ResponseDto> {
+        return ResponseEntityUtil.ok(
+            boardService.findUpdateBoardDetail(
+                boardId,
+                SecurityContextHolderUtil.getCredentialOrNull()
+            )
+        )
     }
 }
