@@ -10,5 +10,6 @@ const val YYYYMMDD = "yyyy-MM-dd"
 const val HHmm = "HH:mm"
 
 const val KR_MM_DD_E = "MM월 dd일 (E)"
+const val KR_YYYY_MM_DD_E = "YYYY년 MM월 dd일 (E)"
 const val KR_YYYY_MM_DD = "YYYY년 MM월 dd일"
 const val a_hhmm = "a hh:mm"
