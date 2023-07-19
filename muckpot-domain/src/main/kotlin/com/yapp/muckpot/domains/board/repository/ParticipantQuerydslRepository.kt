@@ -24,6 +24,7 @@ class ParticipantQuerydslRepository(
             )
         )
             .from(participant)
+            .innerJoin(participant.user, muckPotUser)
             .where(participant.board.id.`in`(boardIds))
             .orderBy(participant.createdAt.asc())
             .fetch()
