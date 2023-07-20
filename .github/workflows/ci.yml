@@ -37,5 +37,5 @@ jobs:
         restore-keys: ${{ runner.os }}-gradle
 
     - name: Gradle Sonar
-      run: ./gradlew sonar -Dorg.gradle.jvmargs="-Xmx2g"
+      run: ./gradlew sonar
 
