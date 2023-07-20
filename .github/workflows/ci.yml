@@ -37,7 +37,7 @@ jobs:
         restore-keys: ${{ runner.os }}-gradle
 
     - name: Gradle Sonar
-      run: ./gradlew sonar -Dorg.gradle.jvmargs="-Xmx2g"
+      run: ./gradlew sonar -Dorg.gradle.jvmargs="-Xmx2g" --stacktrace --no-daemon
       env:
         GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
