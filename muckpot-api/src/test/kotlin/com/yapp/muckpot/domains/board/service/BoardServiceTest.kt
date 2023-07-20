@@ -438,4 +438,21 @@ class BoardServiceTest @Autowired constructor(
             actual shouldNotBe null
         }
     }
+
+    context("먹팟 수정 정보 조회 테스트") {
+
+        test("수정을 위한 상세 데이터 조회 성공") {
+            // given
+            val boardId = boardService.saveBoard(userId, createRequest)!!
+            val loginUserInfo = UserResponse.of(user)
+
+            // when
+            val actual = boardService.findUpdateBoardDetail(boardId, loginUserInfo)
+
+            // then
+            actual.userAge shouldBe user.getAge()
+            actual.title shouldBe createRequest.title
+            actual.content shouldBe createRequest.content
+        }
+    }
 })

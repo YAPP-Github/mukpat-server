@@ -3,6 +3,7 @@ package com.yapp.muckpot.common
 import com.yapp.muckpot.common.constants.A_DAY_AGO
 import com.yapp.muckpot.common.constants.KR_MM_DD_E
 import com.yapp.muckpot.common.constants.KR_YYYY_MM_DD
+import com.yapp.muckpot.common.constants.KR_YYYY_MM_DD_E
 import com.yapp.muckpot.common.constants.N_HOURS_AGO
 import com.yapp.muckpot.common.constants.N_MINUTES_AGO
 import com.yapp.muckpot.common.constants.TODAY_KR
@@ -104,6 +105,13 @@ class TimeUtilTest : FunSpec({
         val localDateTime = LocalDateTime.of(2020, 1, 2, 12, 0)
         // when & then
         TimeUtil.localeKoreanFormatting(localDateTime, KR_MM_DD_E) shouldBe "01월 02일 (목)"
+    }
+
+    test("KR_YYYY_MM_DD_E 포맷 테스트") {
+        // given
+        val localDateTime = LocalDateTime.of(2020, 1, 2, 12, 0)
+        // when & then
+        TimeUtil.localeKoreanFormatting(localDateTime, KR_YYYY_MM_DD_E) shouldBe "2020년 01월 02일 (목)"
     }
 
     test("KR_YYYY_MM_DD 포맷 테스트") {

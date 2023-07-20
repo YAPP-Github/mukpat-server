@@ -7,6 +7,7 @@ import com.yapp.muckpot.domains.board.controller.dto.AllMuckpotGetRequest
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateRequest
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotDetailResponse
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotReadResponse
+import com.yapp.muckpot.domains.board.controller.dto.MuckpotUpdateDetailResponse
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotUpdateRequest
 import com.yapp.muckpot.domains.board.controller.dto.RegionFilterRequest
 import com.yapp.muckpot.domains.board.entity.Participant
@@ -195,5 +196,18 @@ class BoardService(
                 muckpotCityResponses.add(RegionConverter.convertToCityResponse(city, provinces))
             }
         return RegionResponse(muckpotCityResponses)
+    }
+
+    @Transactional(readOnly = true)
+    fun findUpdateBoardDetail(boardId: Long, loginUserInfo: UserResponse?): MuckpotUpdateDetailResponse {
+        boardRepository.findByIdOrNull(boardId)?.let { board ->
+            val userAge: Int? = loginUserInfo?.let { userRepository.findByIdOrNull(it.userId)?.getAge() }
+            return MuckpotUpdateDetailResponse.of(
+                board = board,
+                userAge = userAge
+            )
+        } ?: run {
+            throw MuckPotException(BoardErrorCode.BOARD_NOT_FOUND)
+        }
     }
 }

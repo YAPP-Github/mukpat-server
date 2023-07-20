@@ -108,10 +108,10 @@ class BoardServiceMockTest @Autowired constructor(
 
         test("먹팟 상세조회 성공") {
             // when
-            val actual = boardService.findBoardDetailAndVisit(1, loginUser, RegionFilterRequest())
+            val actual = boardService.findBoardDetailAndVisit(board.id!!, loginUser, RegionFilterRequest())
 
             // then
-            actual.meetingDate shouldBe "12월 25일 (토)"
+            actual.meetingDate shouldBe "2100년 12월 25일 (토)"
             actual.meetingTime shouldBe "오후 12:20"
             actual.createDate shouldBe "2100년 12월 23일"
             actual.status shouldBe IN_PROGRESS.korNm
