@@ -85,27 +85,30 @@ const val MUCKPOT_FIND_BY_ID = """
 {
   "status": 200,
   "result": {
-    "boardId": 114,
-    "title": "같이 밥묵으실분",
-    "content": "내용 입니다.",
-    "chatLink": "https://open.kakao.com/o/gSIkvvHc",
-    "status": "모집중",
-    "meetingDate": "07월 21일 (금)",
-    "meetingTime": "오후 01:00",
-    "createDate": "2023년 06월 11일",
-    "maxApply": 5,
+    "boardId": 31,
+    "prevId": null,
+    "nextId": 14,
+    "title": "개성주악 먹어여",
+    "content": "개성주악 맛있어요",
+    "chatLink": "https://open.kakao.com/o/s0U23Rsf",
+    "status": "모집마감",
+    "meetingDate": "2023년 07월 14일 (금)",
+    "meetingTime": "오후 12:30",
+    "createDate": "2023년 07월 14일",
+    "maxApply": 2,
     "currentApply": 1,
-    "minAge": 20,
-    "maxAge": 100,
-    "locationName": "서울 성북구 안암동5가 104-30 캐치카페 안암",
-    "x": 127.02970799701643,
-    "y": 37.58392327180857,
-    "locationDetail": "6층",
-    "views": 1,
+    "minAge": 21,
+    "maxAge": 25,
+    "locationName": "경기 파주시 탄현면 갈현리 797-1 연리희재",
+    "x": 126.713351951771,
+    "y": 37.7684106528357,
+    "locationDetail": "",
+    "views": 208,
+    "userAge": null,
     "participants": [
       {
-        "userId": 128,
-        "nickName": "nickname2",
+        "userId": 21,
+        "nickName": "건빵",
         "jobGroupMain": "개발",
         "writer": true
       }
@@ -150,6 +153,29 @@ const val MUCKPOT_REGIONS = """
         ]
       }
     ]
+  }
+}
+"""
+
+const val MUCKPOT_FIND_BY_ID_FOR_UPDATE = """
+{
+  "status": 200,
+  "result": {
+    "boardId": 31,
+    "title": "개성주악 먹어여",
+    "content": "개성주악 맛있어요",
+    "chatLink": "https://open.kakao.com/o/s0U23Rsf",
+    "meetingDate": "2023년 07월 14일 (금)",
+    "meetingTime": "오후 12:30",
+    "createDate": "2023년 07월 14일",
+    "maxApply": 2,
+    "minAge": 21,
+    "maxAge": 25,
+    "locationName": "경기 파주시 탄현면 갈현리 797-1 연리희재",
+    "x": 126.713351951771,
+    "y": 37.7684106528357,
+    "locationDetail": "",
+    "userAge": null
   }
 }
 """
