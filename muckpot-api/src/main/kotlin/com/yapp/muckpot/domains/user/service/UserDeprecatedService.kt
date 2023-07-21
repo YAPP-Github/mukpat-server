@@ -73,12 +73,10 @@ class UserDeprecatedService(
         } ?: run {
             val authKey = RandomCodeUtil.generateRandomCode()
             eventPublisher.publishEvent(
-                eventPublisher.publishEvent(
-                    EmailDto(
-                        subject = EmailTemplate.AUTH_EMAIL.subject,
-                        body = EmailTemplate.AUTH_EMAIL.formatBody(authKey),
-                        to = request.email
-                    )
+                EmailDto(
+                    subject = EmailTemplate.AUTH_EMAIL.subject,
+                    body = EmailTemplate.AUTH_EMAIL.formatBody(authKey),
+                    to = request.email
                 )
             )
             redisService.setDataExpireWithNewest(key = request.email, value = authKey, duration = THIRTY_MINS)

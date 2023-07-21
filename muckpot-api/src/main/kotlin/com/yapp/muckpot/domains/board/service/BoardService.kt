@@ -107,7 +107,11 @@ class BoardService(
             val province = provinceService.saveProvinceIfNot(request.region_1depth_name, request.region_2depth_name)
             request.updateBoard(board, province)
             participantQuerydslRepository.findParticipantsEmailsExcept(board, board.user.email).forEach { email ->
-                eventPublisher.publishEvent(EmailDto(mailTitle, mailBody, email))
+                eventPublisher.publishEvent(EmailDto(
+                    subject = mailTitle,
+                    body = mailBody,
+                    to = email)
+                )
             }
         } ?: run {
             throw MuckPotException(BoardErrorCode.BOARD_NOT_FOUND)
@@ -138,7 +142,11 @@ class BoardService(
             val mailTitle = EmailTemplate.BOARD_DELETE_EMAIL.formatSubject(board.title)
             val mailBody = EmailTemplate.BOARD_DELETE_EMAIL.formatBody(board.title)
             participantQuerydslRepository.findParticipantsEmailsExcept(board, board.user.email).forEach { email ->
-                eventPublisher.publishEvent(EmailDto(mailTitle, mailBody, email))
+                eventPublisher.publishEvent(EmailDto(
+                    subject = mailTitle,
+                    body = mailBody,
+                    to = email)
+                )
             }
             participantRepository.deleteByBoard(board)
             boardRepository.delete(board)
@@ -172,7 +180,11 @@ class BoardService(
             val mailTitle = EmailTemplate.PARTICIPANT_CANCEL_EMAIL.formatSubject(user.nickName, board.title)
             val mailBody = EmailTemplate.PARTICIPANT_CANCEL_EMAIL.formatBody(user.nickName, board.title)
             participantQuerydslRepository.findParticipantsEmailsExcept(board, user.email).forEach { email ->
-                eventPublisher.publishEvent(EmailDto(mailTitle, mailBody, email))
+                eventPublisher.publishEvent(EmailDto(
+                    subject = mailTitle,
+                    body = mailBody,
+                    to = email)
+                )
             }
             participantRepository.delete(participant)
             board.cancelJoin()
