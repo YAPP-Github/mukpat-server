@@ -21,7 +21,7 @@ import com.yapp.muckpot.domains.user.controller.dto.UserResponse
 import com.yapp.muckpot.domains.user.enums.MuckPotStatus
 import com.yapp.muckpot.domains.user.exception.UserErrorCode
 import com.yapp.muckpot.domains.user.repository.MuckPotUserRepository
-import com.yapp.muckpot.email.EmailService
+import com.yapp.muckpot.email.EmailDto
 import com.yapp.muckpot.email.EmailTemplate
 import com.yapp.muckpot.exception.MuckPotException
 import com.yapp.muckpot.redis.constants.ALL_KEY
@@ -30,6 +30,7 @@ import com.yapp.muckpot.redis.dto.MuckpotCityResponse
 import com.yapp.muckpot.redis.dto.RegionResponse
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -42,9 +43,8 @@ class BoardService(
     private val boardQuerydslRepository: BoardQuerydslRepository,
     private val participantRepository: ParticipantRepository,
     private val participantQuerydslRepository: ParticipantQuerydslRepository,
-    private val emailService: EmailService,
-    private val participantService: ParticipantService,
-    private val provinceService: ProvinceService
+    private val provinceService: ProvinceService,
+    private val eventPublisher: ApplicationEventPublisher
 ) {
     @CacheEvict(value = [REGIONS_CACHE_NAME], key = ALL_KEY)
     @Transactional
@@ -106,11 +106,9 @@ class BoardService(
             )
             val province = provinceService.saveProvinceIfNot(request.region_1depth_name, request.region_2depth_name)
             request.updateBoard(board, province)
-            participantService.sendEmailToParticipantsWithoutWriter(
-                board = board,
-                mailTitle = mailTitle,
-                mailBody = mailBody
-            )
+            participantQuerydslRepository.findParticipantsEmailsExcept(board, board.user.email).forEach { email ->
+                eventPublisher.publishEvent(EmailDto(mailTitle, mailBody, email))
+            }
         } ?: run {
             throw MuckPotException(BoardErrorCode.BOARD_NOT_FOUND)
         }
@@ -137,11 +135,11 @@ class BoardService(
                 throw MuckPotException(BoardErrorCode.BOARD_UNAUTHORIZED)
             }
             // DELETE 이전에 수행되어야 함.
-            participantService.sendEmailToParticipantsWithoutWriter(
-                board = board,
-                mailTitle = EmailTemplate.BOARD_DELETE_EMAIL.formatSubject(board.title),
-                mailBody = EmailTemplate.BOARD_DELETE_EMAIL.formatBody(board.title)
-            )
+            val mailTitle = EmailTemplate.BOARD_DELETE_EMAIL.formatSubject(board.title)
+            val mailBody = EmailTemplate.BOARD_DELETE_EMAIL.formatBody(board.title)
+            participantQuerydslRepository.findParticipantsEmailsExcept(board, board.user.email).forEach { email ->
+                eventPublisher.publishEvent(EmailDto(mailTitle, mailBody, email))
+            }
             participantRepository.deleteByBoard(board)
             boardRepository.delete(board)
         } ?: run {
@@ -171,14 +169,10 @@ class BoardService(
                 ?: throw MuckPotException(ParticipantErrorCode.PARTICIPANT_NOT_FOUND)
             if (board.user.id == userId) throw MuckPotException(ParticipantErrorCode.WRITER_MUST_JOIN)
             // DELETE 이전에 수행되어야 함.
-            participantQuerydslRepository.findParticipantEmails(board).forEach { email ->
-                if (email != user.email) {
-                    emailService.sendMail(
-                        subject = EmailTemplate.PARTICIPANT_CANCEL_EMAIL.formatSubject(user.nickName, board.title),
-                        body = EmailTemplate.PARTICIPANT_CANCEL_EMAIL.formatBody(user.nickName, board.title),
-                        to = email
-                    )
-                }
+            val mailTitle = EmailTemplate.PARTICIPANT_CANCEL_EMAIL.formatSubject(user.nickName, board.title)
+            val mailBody = EmailTemplate.PARTICIPANT_CANCEL_EMAIL.formatBody(user.nickName, board.title)
+            participantQuerydslRepository.findParticipantsEmailsExcept(board, user.email).forEach { email ->
+                eventPublisher.publishEvent(EmailDto(mailTitle, mailBody, email))
             }
             participantRepository.delete(participant)
             board.cancelJoin()
