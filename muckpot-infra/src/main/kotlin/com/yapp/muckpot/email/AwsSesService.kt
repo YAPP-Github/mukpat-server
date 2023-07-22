@@ -10,22 +10,23 @@ import mu.KLogging
 import org.springframework.mail.MailException
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
+import org.springframework.transaction.event.TransactionalEventListener
 
 @Service
 class AwsSesService(
     private val amazonSimpleEmailService: AmazonSimpleEmailService
-) : EmailService {
+) {
     private val log = KLogging().logger
 
     @Async
-    override fun sendMail(subject: String, body: String, to: String) {
+    @TransactionalEventListener
+    fun sendMail(emailSendEvent: EmailSendEvent) {
         try {
-            val destination = Destination().withToAddresses(to)
+            val destination = Destination().withToAddresses(emailSendEvent.to)
             val message = Message().apply {
-                withSubject(Content(subject))
-                withBody(Body().withHtml(Content(body)))
+                withSubject(Content(emailSendEvent.subject))
+                withBody(Body().withHtml(Content(emailSendEvent.body)))
             }
-
             amazonSimpleEmailService.sendEmail(
                 SendEmailRequest()
                     .withSource(SENDER_EMAIL)

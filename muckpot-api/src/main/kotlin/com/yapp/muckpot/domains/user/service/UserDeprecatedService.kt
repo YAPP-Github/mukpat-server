@@ -14,10 +14,11 @@ import com.yapp.muckpot.domains.user.controller.dto.deprecated.VerifyEmailAuthRe
 import com.yapp.muckpot.domains.user.enums.JobGroupMain
 import com.yapp.muckpot.domains.user.exception.UserErrorCode
 import com.yapp.muckpot.domains.user.repository.MuckPotUserRepository
-import com.yapp.muckpot.email.EmailService
+import com.yapp.muckpot.email.EmailSendEvent
 import com.yapp.muckpot.email.EmailTemplate
 import com.yapp.muckpot.exception.MuckPotException
 import com.yapp.muckpot.redis.RedisService
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -29,7 +30,7 @@ class UserDeprecatedService(
     private val jwtService: JwtService,
     private val redisService: RedisService,
     private val passwordEncoder: PasswordEncoder,
-    private val emailService: EmailService
+    private val eventPublisher: ApplicationEventPublisher
 ) {
     val THIRTY_MINS: Long = 60 * 30L
 
@@ -71,10 +72,12 @@ class UserDeprecatedService(
             throw MuckPotException(UserErrorCode.ALREADY_EXISTS_USER)
         } ?: run {
             val authKey = RandomCodeUtil.generateRandomCode()
-            emailService.sendMail(
-                subject = EmailTemplate.AUTH_EMAIL.subject,
-                body = EmailTemplate.AUTH_EMAIL.formatBody(authKey),
-                to = request.email
+            eventPublisher.publishEvent(
+                EmailSendEvent(
+                    subject = EmailTemplate.AUTH_EMAIL.subject,
+                    body = EmailTemplate.AUTH_EMAIL.formatBody(authKey),
+                    to = request.email
+                )
             )
             redisService.setDataExpireWithNewest(key = request.email, value = authKey, duration = THIRTY_MINS)
             return EmailAuthResponse(authKey)
