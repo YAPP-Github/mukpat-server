@@ -90,4 +90,12 @@ class ParticipantQuerydslRepositoryTest(
         actual shouldContain users[0].email
         actual shouldContain users[1].email
     }
+
+    "등록자 이메일 제외하고 조회 성공" {
+        // when
+        val actual = participantQuerydslRepository.findParticipantsEmailsExcept(boards[0], boards[0].user.email)
+        // then
+        actual shouldHaveSize 1
+        actual shouldContain users[1].email
+    }
 })

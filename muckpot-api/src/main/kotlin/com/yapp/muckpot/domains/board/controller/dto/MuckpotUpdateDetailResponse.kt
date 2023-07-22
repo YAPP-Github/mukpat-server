@@ -2,7 +2,7 @@ package com.yapp.muckpot.domains.board.controller.dto
 
 import com.yapp.muckpot.common.TimeUtil
 import com.yapp.muckpot.common.constants.KR_YYYY_MM_DD
-import com.yapp.muckpot.common.constants.KR_YYYY_MM_DD_E
+import com.yapp.muckpot.common.constants.YYYYMMDD
 import com.yapp.muckpot.common.constants.a_hhmm
 import com.yapp.muckpot.domains.board.entity.Board
 
@@ -38,7 +38,7 @@ data class MuckpotUpdateDetailResponse(
                 title = board.title,
                 content = board.content,
                 chatLink = board.chatLink,
-                meetingDate = TimeUtil.localeKoreanFormatting(board.meetingTime, KR_YYYY_MM_DD_E),
+                meetingDate = TimeUtil.localeKoreanFormatting(board.meetingTime, YYYYMMDD),
                 meetingTime = TimeUtil.localeKoreanFormatting(board.meetingTime, a_hhmm),
                 createDate = TimeUtil.localeKoreanFormatting(board.createdAt, KR_YYYY_MM_DD),
                 maxApply = board.maxApply,

@@ -41,4 +41,17 @@ class ParticipantQuerydslRepository(
             )
             .fetch()
     }
+
+    fun findParticipantsEmailsExcept(board: Board, exceptEmail: String): List<String> {
+        return queryFactory.select(
+            muckPotUser.email
+        )
+            .from(participant)
+            .innerJoin(participant.user, muckPotUser)
+            .where(
+                participant.board.eq(board),
+                participant.user.email.ne(exceptEmail)
+            )
+            .fetch()
+    }
 }

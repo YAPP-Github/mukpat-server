@@ -13,8 +13,10 @@ import com.yapp.muckpot.domains.board.repository.ParticipantQuerydslRepository
 import com.yapp.muckpot.domains.board.repository.ParticipantRepository
 import com.yapp.muckpot.domains.user.exception.UserErrorCode
 import com.yapp.muckpot.domains.user.repository.MuckPotUserRepository
+import com.yapp.muckpot.email.EmailSendEvent
 import com.yapp.muckpot.email.EmailTemplate
 import com.yapp.muckpot.exception.MuckPotException
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -25,9 +27,9 @@ class BoardDeprecatedService(
     private val userRepository: MuckPotUserRepository,
     private val boardRepository: BoardRepository,
     private val participantRepository: ParticipantRepository,
-    private val participantService: ParticipantService,
     private val boardQuerydslRepository: BoardQuerydslRepository,
-    private val participantQuerydslRepository: ParticipantQuerydslRepository
+    private val participantQuerydslRepository: ParticipantQuerydslRepository,
+    private val eventPublisher: ApplicationEventPublisher
 ) {
     @Transactional
     fun saveBoardV1(userId: Long, request: MuckpotCreateRequestV1): Long? {
@@ -52,11 +54,9 @@ class BoardDeprecatedService(
                 request.createBoardUpdateMailBody(board)
             )
             request.updateBoard(board)
-            participantService.sendEmailToParticipantsWithoutWriter(
-                board = board,
-                mailTitle = mailTitle,
-                mailBody = mailBody
-            )
+            participantQuerydslRepository.findParticipantsEmailsExcept(board, board.user.email).forEach { email ->
+                eventPublisher.publishEvent(EmailSendEvent(mailTitle, mailBody, email))
+            }
         } ?: run {
             throw MuckPotException(BoardErrorCode.BOARD_NOT_FOUND)
         }
