@@ -14,7 +14,7 @@ import com.yapp.muckpot.domains.user.controller.dto.VerifyEmailAuthRequest
 import com.yapp.muckpot.domains.user.enums.JobGroupMain
 import com.yapp.muckpot.domains.user.exception.UserErrorCode
 import com.yapp.muckpot.domains.user.repository.MuckPotUserRepository
-import com.yapp.muckpot.email.EmailDto
+import com.yapp.muckpot.email.EmailSendEvent
 import com.yapp.muckpot.email.EmailTemplate
 import com.yapp.muckpot.exception.MuckPotException
 import com.yapp.muckpot.redis.RedisService
@@ -60,7 +60,7 @@ class UserService(
         } ?: run {
             val authKey = RandomCodeUtil.generateRandomCode()
             eventPublisher.publishEvent(
-                EmailDto(
+                EmailSendEvent(
                     subject = EmailTemplate.AUTH_EMAIL.subject,
                     body = EmailTemplate.AUTH_EMAIL.formatBody(authKey),
                     to = request.email

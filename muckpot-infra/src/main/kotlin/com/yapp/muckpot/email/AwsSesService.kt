@@ -20,12 +20,12 @@ class AwsSesService(
 
     @Async
     @TransactionalEventListener
-    fun sendMail(emailDto: EmailDto) {
+    fun sendMail(emailSendEvent: EmailSendEvent) {
         try {
-            val destination = Destination().withToAddresses(emailDto.to)
+            val destination = Destination().withToAddresses(emailSendEvent.to)
             val message = Message().apply {
-                withSubject(Content(emailDto.subject))
-                withBody(Body().withHtml(Content(emailDto.body)))
+                withSubject(Content(emailSendEvent.subject))
+                withBody(Body().withHtml(Content(emailSendEvent.body)))
             }
             amazonSimpleEmailService.sendEmail(
                 SendEmailRequest()

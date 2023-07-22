@@ -13,7 +13,7 @@ import com.yapp.muckpot.domains.board.repository.ParticipantQuerydslRepository
 import com.yapp.muckpot.domains.board.repository.ParticipantRepository
 import com.yapp.muckpot.domains.user.exception.UserErrorCode
 import com.yapp.muckpot.domains.user.repository.MuckPotUserRepository
-import com.yapp.muckpot.email.EmailDto
+import com.yapp.muckpot.email.EmailSendEvent
 import com.yapp.muckpot.email.EmailTemplate
 import com.yapp.muckpot.exception.MuckPotException
 import org.springframework.context.ApplicationEventPublisher
@@ -55,7 +55,7 @@ class BoardDeprecatedService(
             )
             request.updateBoard(board)
             participantQuerydslRepository.findParticipantsEmailsExcept(board, board.user.email).forEach { email ->
-                eventPublisher.publishEvent(EmailDto(mailTitle, mailBody, email))
+                eventPublisher.publishEvent(EmailSendEvent(mailTitle, mailBody, email))
             }
         } ?: run {
             throw MuckPotException(BoardErrorCode.BOARD_NOT_FOUND)

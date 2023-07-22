@@ -21,7 +21,7 @@ import com.yapp.muckpot.domains.user.controller.dto.UserResponse
 import com.yapp.muckpot.domains.user.enums.MuckPotStatus
 import com.yapp.muckpot.domains.user.exception.UserErrorCode
 import com.yapp.muckpot.domains.user.repository.MuckPotUserRepository
-import com.yapp.muckpot.email.EmailDto
+import com.yapp.muckpot.email.EmailSendEvent
 import com.yapp.muckpot.email.EmailTemplate
 import com.yapp.muckpot.exception.MuckPotException
 import com.yapp.muckpot.redis.constants.ALL_KEY
@@ -108,7 +108,7 @@ class BoardService(
             request.updateBoard(board, province)
             participantQuerydslRepository.findParticipantsEmailsExcept(board, board.user.email).forEach { email ->
                 eventPublisher.publishEvent(
-                    EmailDto(
+                    EmailSendEvent(
                         subject = mailTitle,
                         body = mailBody,
                         to = email
@@ -145,7 +145,7 @@ class BoardService(
             val mailBody = EmailTemplate.BOARD_DELETE_EMAIL.formatBody(board.title)
             participantQuerydslRepository.findParticipantsEmailsExcept(board, board.user.email).forEach { email ->
                 eventPublisher.publishEvent(
-                    EmailDto(
+                    EmailSendEvent(
                         subject = mailTitle,
                         body = mailBody,
                         to = email
@@ -185,7 +185,7 @@ class BoardService(
             val mailBody = EmailTemplate.PARTICIPANT_CANCEL_EMAIL.formatBody(user.nickName, board.title)
             participantQuerydslRepository.findParticipantsEmailsExcept(board, user.email).forEach { email ->
                 eventPublisher.publishEvent(
-                    EmailDto(
+                    EmailSendEvent(
                         subject = mailTitle,
                         body = mailBody,
                         to = email
