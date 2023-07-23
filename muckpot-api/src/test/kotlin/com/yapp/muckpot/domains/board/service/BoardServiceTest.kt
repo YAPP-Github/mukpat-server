@@ -293,6 +293,16 @@ class BoardServiceTest @Autowired constructor(
                 boardService.updateBoardAndSendEmail(otherUserId, boardId, updateRequest)
             }.errorCode shouldBe BoardErrorCode.BOARD_UNAUTHORIZED
         }
+
+        test("만료 상태의 먹팟은 수정할 수 없다.") {
+            // given
+            val boardId = boardService.saveBoard(userId, createRequest)!!
+            boardService.changeStatus(userId, boardId, MuckPotStatus.DONE)
+            // when & then
+            shouldThrow<MuckPotException> {
+                boardService.updateBoardAndSendEmail(userId, boardId, updateRequest)
+            }.errorCode shouldBe BoardErrorCode.DONE_BOARD_NOT_UPDATE
+        }
     }
 
     context("먹팟 참가 테스트") {

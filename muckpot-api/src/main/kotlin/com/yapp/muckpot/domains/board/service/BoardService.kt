@@ -98,6 +98,9 @@ class BoardService(
             if (board.isNotMyBoard(userId)) {
                 throw MuckPotException(BoardErrorCode.BOARD_UNAUTHORIZED)
             }
+            if (board.isDone()) {
+                throw MuckPotException(BoardErrorCode.DONE_BOARD_NOT_UPDATE)
+            }
             // Update 이전에 수행되어야 함.
             val mailTitle = EmailTemplate.BOARD_UPDATE_EMAIL.formatSubject(board.title)
             val mailBody = EmailTemplate.BOARD_UPDATE_EMAIL.formatBody(
