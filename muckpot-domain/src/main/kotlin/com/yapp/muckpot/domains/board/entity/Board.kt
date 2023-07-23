@@ -124,19 +124,27 @@ class Board(
     fun changeStatus(changeStatus: MuckPotStatus) {
         require(
             (this.status == IN_PROGRESS && changeStatus == DONE) ||
-                ((this.status == DONE && changeStatus == IN_PROGRESS) && currentApply < maxApply)
+                (this.status == DONE && changeStatus == IN_PROGRESS)
         ) { "변경 가능한 상태가 아닙니다." }
-
+        validateToday()
         this.status = changeStatus
     }
 
     fun cancelJoin() {
-        require(meetingTime > LocalDateTime.now()) { "이미 마감된 먹팟입니다." }
+        validateToday()
         this.status = IN_PROGRESS
         this.currentApply--
     }
 
     fun isNotAgeLimit(): Boolean {
         return (this.minAge == AGE_MIN && this.maxAge == AGE_MAX)
+    }
+
+    fun isDone(): Boolean {
+        return this.status == DONE
+    }
+
+    private fun validateToday() {
+        require(meetingTime > LocalDateTime.now()) { "이미 마감된 먹팟입니다." }
     }
 }
