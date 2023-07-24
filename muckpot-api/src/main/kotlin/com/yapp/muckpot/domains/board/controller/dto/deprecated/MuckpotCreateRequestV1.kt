@@ -45,6 +45,8 @@ data class MuckpotCreateRequestV1(
     var locationName: String,
     @field:ApiModelProperty(notes = "주소 상세", required = false, example = "6층")
     var locationDetail: String? = null,
+    @field:ApiModelProperty(notes = "도로명(지번) 주소", required = true, example = "경기 용인시 기흥구 구성로 102")
+    var addressName: String? = null,
     @field:ApiModelProperty(notes = "x 좌표", required = true, example = "127.02970799701643")
     val x: Double,
     @field:ApiModelProperty(notes = "y 좌표", required = true, example = "37.58392327180857")
@@ -73,7 +75,7 @@ data class MuckpotCreateRequestV1(
             user = user,
             title = title,
             content = content,
-            location = Location(locationName, x, y),
+            location = Location(locationName = locationName, addressName = addressName, x, y),
             locationDetail = locationDetail,
             meetingTime = LocalDateTime.of(meetingDate, meetingTime),
             minAge = minAge ?: AGE_MIN,
