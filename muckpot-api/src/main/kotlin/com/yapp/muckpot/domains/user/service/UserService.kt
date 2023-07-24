@@ -1,6 +1,7 @@
 package com.yapp.muckpot.domains.user.service
 
 import com.yapp.muckpot.common.constants.ACCESS_TOKEN_KEY
+import com.yapp.muckpot.common.constants.ACCESS_TOKEN_SECONDS
 import com.yapp.muckpot.common.constants.REFRESH_TOKEN_KEY
 import com.yapp.muckpot.common.utils.CookieUtil
 import com.yapp.muckpot.common.utils.RandomCodeUtil
@@ -44,8 +45,8 @@ class UserService(
             val refreshToken = jwtService.generateRefreshToken(request.email, refreshTokenSeconds)
 
             redisService.setDataExpireWithNewest(request.email, refreshToken, refreshTokenSeconds)
-            CookieUtil.addHttpOnlyCookie(ACCESS_TOKEN_KEY, accessToken)
-            CookieUtil.addHttpOnlyCookie(REFRESH_TOKEN_KEY, refreshToken)
+            CookieUtil.addHttpOnlyCookie(ACCESS_TOKEN_KEY, accessToken, ACCESS_TOKEN_SECONDS.toInt())
+            CookieUtil.addHttpOnlyCookie(REFRESH_TOKEN_KEY, refreshToken, refreshTokenSeconds.toInt())
             return response
         } ?: run {
             throw MuckPotException(UserErrorCode.LOGIN_FAIL)
@@ -109,8 +110,8 @@ class UserService(
             val newRefreshToken = jwtService.generateNewRefreshFromOldRefresh(user.email, refreshToken)
 
             redisService.setDataExpireWithNewest(user.email, newRefreshToken, leftRefreshTokenSeconds)
-            CookieUtil.addHttpOnlyCookie(ACCESS_TOKEN_KEY, newAccessToken)
-            CookieUtil.addHttpOnlyCookie(REFRESH_TOKEN_KEY, newRefreshToken)
+            CookieUtil.addHttpOnlyCookie(ACCESS_TOKEN_KEY, newAccessToken, ACCESS_TOKEN_SECONDS.toInt())
+            CookieUtil.addHttpOnlyCookie(REFRESH_TOKEN_KEY, newRefreshToken, leftRefreshTokenSeconds.toInt())
         } ?: run {
             throw MuckPotException(UserErrorCode.USER_NOT_FOUND)
         }

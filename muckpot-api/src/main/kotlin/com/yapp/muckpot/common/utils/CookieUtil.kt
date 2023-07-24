@@ -35,10 +35,11 @@ object CookieUtil {
     /**
      * 현재 응답에 HttpOnly=true 쿠키 추가.
      */
-    fun addHttpOnlyCookie(name: String, value: String) {
+    fun addHttpOnlyCookie(name: String, value: String, expiredSeconds: Int) {
         val cookie = Cookie(name, value).apply {
             path = "/"
             isHttpOnly = true
+            maxAge = expiredSeconds
             domain = COOKIE_DOMAIN
         }
         // TODO 서버가 분리되면 해당 로직은 제거, (로컬에서 접근을 위한 설정)

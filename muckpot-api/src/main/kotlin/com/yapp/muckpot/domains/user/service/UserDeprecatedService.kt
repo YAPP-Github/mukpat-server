@@ -1,6 +1,7 @@
 package com.yapp.muckpot.domains.user.service
 
 import com.yapp.muckpot.common.constants.ACCESS_TOKEN_KEY
+import com.yapp.muckpot.common.constants.ACCESS_TOKEN_SECONDS
 import com.yapp.muckpot.common.constants.REFRESH_TOKEN_KEY
 import com.yapp.muckpot.common.utils.CookieUtil
 import com.yapp.muckpot.common.utils.RandomCodeUtil
@@ -57,8 +58,8 @@ class UserDeprecatedService(
             val refreshToken = jwtService.generateRefreshToken(request.email, refreshTokenSeconds)
 
             redisService.setDataExpireWithNewest(request.email, refreshToken, refreshTokenSeconds)
-            CookieUtil.addHttpOnlyCookie(ACCESS_TOKEN_KEY, accessToken)
-            CookieUtil.addHttpOnlyCookie(REFRESH_TOKEN_KEY, refreshToken)
+            CookieUtil.addHttpOnlyCookie(ACCESS_TOKEN_KEY, accessToken, ACCESS_TOKEN_SECONDS.toInt())
+            CookieUtil.addHttpOnlyCookie(REFRESH_TOKEN_KEY, refreshToken, refreshTokenSeconds.toInt())
             return response
         } ?: run {
             throw MuckPotException(UserErrorCode.LOGIN_FAIL)
