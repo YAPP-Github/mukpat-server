@@ -1,4 +1,5 @@
 import com.yapp.muckpot.common.Location
+import com.yapp.muckpot.common.QLocation.location
 import com.yapp.muckpot.common.constants.AGE_MAX
 import com.yapp.muckpot.common.constants.AGE_MIN
 import com.yapp.muckpot.common.enums.Gender
@@ -6,9 +7,11 @@ import com.yapp.muckpot.domains.board.entity.Board
 import com.yapp.muckpot.domains.board.entity.City
 import com.yapp.muckpot.domains.board.entity.Participant
 import com.yapp.muckpot.domains.board.entity.Province
+import com.yapp.muckpot.domains.board.entity.QProvince.province
 import com.yapp.muckpot.domains.user.entity.MuckPotUser
 import com.yapp.muckpot.domains.user.enums.JobGroupMain
 import com.yapp.muckpot.domains.user.enums.MuckPotStatus
+import org.testcontainers.shaded.org.bouncycastle.asn1.x500.style.RFC4519Style.title
 import java.time.LocalDateTime
 import java.util.*
 
@@ -41,7 +44,10 @@ object Fixture {
         id: Long? = null,
         user: MuckPotUser = createUser(),
         title: String = "board_title",
-        location: Location = Location("boardLocation", 40.7128, -74.0060),
+        locationName: String = "locationName",
+        addressName: String = "addressName",
+        x: Double = 40.7128,
+        y: Double = -74.0060,
         locationDetail: String? = null,
         meetingTime: LocalDateTime = LocalDateTime.now().plusMinutes(30),
         content: String? = "content",
@@ -58,7 +64,7 @@ object Fixture {
             id = id,
             user = user,
             title = title,
-            location = location,
+            location = Location(locationName, addressName, x, y),
             locationDetail = locationDetail,
             meetingTime = meetingTime,
             content = content,
