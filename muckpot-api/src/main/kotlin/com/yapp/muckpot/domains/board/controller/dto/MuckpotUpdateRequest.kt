@@ -123,12 +123,12 @@ data class MuckpotUpdateRequest(
         }
         if (this.locationName != board.location.locationName) {
             modifyBody.append(
-                EmailTemplate.createBoardUpdateRow("장소명(업체명)", board.location.locationName, this.locationName)
+                EmailTemplate.createBoardUpdateRow("장소명(업체명)이", board.location.locationName, this.locationName)
             )
         }
         if (this.addressName != board.location.addressName) {
             modifyBody.append(
-                EmailTemplate.createBoardUpdateRow("도로명(지번) 주소", board.location.addressName, this.addressName)
+                EmailTemplate.createBoardUpdateRow("도로명(지번) 주소가", board.location.addressName, this.addressName)
             )
         }
         if (this.locationDetail != board.locationDetail) {
