@@ -100,7 +100,7 @@ class Board(
         require(currentApply < maxApply) { "참여 모집이 마감되었습니다." }
         require(status == IN_PROGRESS) { "참여 모집이 마감되었습니다." }
         this.currentApply++
-        if (currentApply == maxApply) {
+        if (isFull()) {
             this.status = DONE
         }
     }
@@ -142,6 +142,10 @@ class Board(
 
     fun isDone(): Boolean {
         return this.status == DONE
+    }
+
+    fun isFull(): Boolean {
+        return this.currentApply == this.maxApply
     }
 
     private fun validateToday() {

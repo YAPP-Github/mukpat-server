@@ -17,7 +17,7 @@ object Fixture {
         id: Long? = null,
         email: String = UUID.randomUUID().toString().substring(0, 5) + "@naver.com",
         password: String = "abcd1234",
-        nickName: String = UUID.randomUUID().toString(),
+        nickName: String = UUID.randomUUID().toString().substring(0, 10),
         gender: Gender = Gender.MEN,
         yearOfBirth: Int = 2000,
         mainCategory: JobGroupMain = JobGroupMain.DEVELOPMENT,

@@ -135,7 +135,7 @@ class BoardServiceTest @Autowired constructor(
             findProvince shouldNotBe null
         }
 
-        test("먹팟 생성시 지역정보는 redis에서 삭제된다.") {
+        test("먹팟 생성시 지역정보는 redis에서 삭제.") {
             // given
             boardService.findAllRegions()
 
@@ -356,6 +356,21 @@ class BoardServiceTest @Autowired constructor(
             val findBoard = boardRepository.findByIdOrNull(boardId)!!
             findBoard.currentApply shouldBe 2
         }
+
+        test("참여인원 마감시 지역정보는 redis에서 삭제.") {
+            // given
+            boardService.findAllRegions() // 캐시저장
+            val user2 = userRepository.save(Fixture.createUser())
+            val board = boardRepository.save(Fixture.createBoard(user = user, province = province, maxApply = 2))
+            boardService.joinBoard(user.id!!, board.id!!)
+
+            // when
+            boardService.joinBoard(user2.id!!, board.id!!)
+
+            // then
+            val actual = redisService.getData(regionsRedisKey)
+            actual shouldBe null
+        }
     }
 
     context("먹팟 삭제 테스트") {
@@ -435,6 +450,22 @@ class BoardServiceTest @Autowired constructor(
             shouldThrow<MuckPotException> {
                 boardService.cancelJoinAndSendEmail(user.id!!, board.id!!)
             }.errorCode shouldBe ParticipantErrorCode.WRITER_MUST_JOIN
+        }
+
+        test("취소로 상태가 변경된 경우 지역정보는 redis에서 삭제.") {
+            // given
+            boardService.findAllRegions() // 캐시저장
+            val user2 = userRepository.save(Fixture.createUser())
+            val board = boardRepository.save(Fixture.createBoard(user = user, province = province, maxApply = 2, currentApply = 2))
+            participantRepository.save(Participant(user, board))
+            participantRepository.save(Participant(user2, board))
+
+            // when
+            boardService.cancelJoinAndSendEmail(user2.id!!, board.id!!)
+
+            // then
+            val actual = redisService.getData(regionsRedisKey)
+            actual shouldBe null
         }
     }
 
