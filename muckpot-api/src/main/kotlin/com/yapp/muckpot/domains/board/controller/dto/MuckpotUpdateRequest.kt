@@ -43,8 +43,11 @@ data class MuckpotUpdateRequest(
     val minAge: Int? = null,
     @field:ApiModelProperty(notes = "최대 나이", required = false, example = "100")
     val maxAge: Int? = null,
-    @field:ApiModelProperty(notes = "주소", required = true, example = "서울 성북구 안암동5가 104-30 캐치카페 안암")
+    @field:ApiModelProperty(notes = "장소명, 업체명", required = true, example = "빽다방 용인구성언남점")
     var locationName: String,
+    // TODO FE 작업 완료 후 nullable 제거
+    @field:ApiModelProperty(notes = "도로명(지번) 주소", required = true, example = "경기 용인시 기흥구 구성로 102")
+    var addressName: String? = null,
     @field:ApiModelProperty(notes = "주소 상세", required = false, example = "6층")
     var locationDetail: String? = null,
     @field:ApiModelProperty(notes = "x 좌표", required = true, example = "127.02970799701643")
@@ -84,7 +87,7 @@ data class MuckpotUpdateRequest(
         }
         board.title = this.title
         board.content = this.content
-        board.location = Location(locationName, x, y)
+        board.location = Location(locationName = locationName, addressName = addressName, x, y)
         board.locationDetail = this.locationDetail
         board.meetingTime = LocalDateTime.of(meetingDate, meetingTime)
         board.minAge = minAge ?: AGE_MIN
@@ -120,7 +123,12 @@ data class MuckpotUpdateRequest(
         }
         if (this.locationName != board.location.locationName) {
             modifyBody.append(
-                EmailTemplate.createBoardUpdateRow("만날 위치가", board.location.locationName, this.locationName)
+                EmailTemplate.createBoardUpdateRow("장소명(업체명)", board.location.locationName, this.locationName)
+            )
+        }
+        if (this.addressName != board.location.addressName) {
+            modifyBody.append(
+                EmailTemplate.createBoardUpdateRow("도로명(지번) 주소", board.location.addressName, this.addressName)
             )
         }
         if (this.locationDetail != board.locationDetail) {
