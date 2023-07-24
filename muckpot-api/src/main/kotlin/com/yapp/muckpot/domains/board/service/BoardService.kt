@@ -125,12 +125,15 @@ class BoardService(
 
     @DistributedLock(lockName = "joinLock", identifier = "boardId")
     fun joinBoard(userId: Long, boardId: Long) {
-        boardRepository.findByIdOrNull(boardId)?.let {
+        boardRepository.findByIdOrNull(boardId)?.let { board ->
             val user = userRepository.findByIdOrNull(userId) ?: throw MuckPotException(UserErrorCode.USER_NOT_FOUND)
-            val participant = participantRepository.findByUserAndBoard(user, it)
+            val participant = participantRepository.findByUserAndBoard(user, board)
             if (participant != null) throw MuckPotException(ParticipantErrorCode.ALREADY_JOIN)
-            it.join(user.getAge())
-            participantRepository.save(Participant(user, it))
+            board.join(user.getAge())
+            if (board.isFull()) {
+                provinceService.clearRegionsAll()
+            }
+            participantRepository.save(Participant(user, board))
         } ?: run {
             throw MuckPotException(BoardErrorCode.BOARD_NOT_FOUND)
         }
@@ -194,6 +197,9 @@ class BoardService(
                         to = email
                     )
                 )
+            }
+            if (board.isFull()) {
+                provinceService.clearRegionsAll()
             }
             participantRepository.delete(participant)
             board.cancelJoin()
