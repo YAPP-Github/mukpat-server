@@ -41,8 +41,11 @@ data class MuckpotCreateRequest(
     val minAge: Int? = null,
     @field:ApiModelProperty(notes = "최대 나이", required = false, example = "100")
     val maxAge: Int? = null,
-    @field:ApiModelProperty(notes = "주소", required = true, example = "서울 성북구 안암동5가 104-30 캐치카페 안암")
+    @field:ApiModelProperty(notes = "장소명, 업체명", required = true, example = "빽다방 용인구성언남점")
     var locationName: String,
+    // TODO FE 작업 완료 후 nullable 제거
+    @field:ApiModelProperty(notes = "도로명(지번) 주소", required = true, example = "경기 용인시 기흥구 구성로 102")
+    var addressName: String? = null,
     @field:ApiModelProperty(notes = "주소 상세", required = false, example = "6층")
     var locationDetail: String? = null,
     @field:ApiModelProperty(notes = "x 좌표", required = true, example = "127.02970799701643")
@@ -81,7 +84,7 @@ data class MuckpotCreateRequest(
             user = user,
             title = title,
             content = content,
-            location = Location(locationName, x, y),
+            location = Location(locationName = locationName, addressName = addressName, x, y),
             locationDetail = locationDetail,
             meetingTime = LocalDateTime.of(meetingDate, meetingTime),
             minAge = minAge ?: AGE_MIN,

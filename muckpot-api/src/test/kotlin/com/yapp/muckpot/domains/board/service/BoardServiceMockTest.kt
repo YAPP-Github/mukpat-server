@@ -84,12 +84,14 @@ class BoardServiceMockTest @Autowired constructor(
         }
     }
 
-    context("findBoardDetailAndVisit 성공") {
+    context("findBoardDetailAndVisit") {
         val loginUser = UserResponse(2, "user2")
         val board = Fixture.createBoard(
             id = 1,
             title = "board1",
-            meetingTime = LocalDateTime.of(2100, 12, 25, 12, 20, 30)
+            meetingTime = LocalDateTime.of(2100, 12, 25, 12, 20, 30),
+            locationName = "빽다방 용인구성언남점",
+            addressName = "경기 용인시 기흥구 구성로 102"
         ).apply {
             createdAt = LocalDateTime.of(2100, 12, 23, 12, 20, 30)
         }
@@ -111,11 +113,13 @@ class BoardServiceMockTest @Autowired constructor(
             val actual = boardService.findBoardDetailAndVisit(board.id!!, loginUser, RegionFilterRequest())
 
             // then
+            actual.participants shouldHaveSize participantResponses.size
             actual.meetingDate shouldBe "2100년 12월 25일 (토)"
             actual.meetingTime shouldBe "오후 12:20"
             actual.createDate shouldBe "2100년 12월 23일"
             actual.status shouldBe IN_PROGRESS.korNm
-            actual.participants shouldHaveSize participantResponses.size
+            actual.locationName shouldBe board.location.locationName
+            actual.addressName shouldBe board.location.addressName
         }
     }
 
