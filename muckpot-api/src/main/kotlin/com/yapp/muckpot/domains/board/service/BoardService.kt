@@ -221,7 +221,7 @@ class BoardService(
 
     @Transactional(readOnly = true)
     fun findUpdateBoardDetail(boardId: Long, loginUserInfo: UserResponse?): MuckpotUpdateDetailResponse {
-        boardRepository.findByIdOrNull(boardId)?.let { board ->
+        boardQuerydslRepository.findByIdOrNullWithRegion(boardId)?.let { board ->
             val userAge: Int? = loginUserInfo?.let { userRepository.findByIdOrNull(it.userId)?.getAge() }
             return MuckpotUpdateDetailResponse.of(
                 board = board,

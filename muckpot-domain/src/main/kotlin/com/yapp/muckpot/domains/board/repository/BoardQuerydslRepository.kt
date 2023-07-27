@@ -104,4 +104,13 @@ class BoardQuerydslRepository(
             .limit(countPerScroll)
             .fetch()
     }
+
+    fun findByIdOrNullWithRegion(boardId: Long?): Board? {
+        return queryFactory.from(board)
+            .select(board)
+            .leftJoin(board.province, province).fetchJoin()
+            .leftJoin(province.city, city).fetchJoin()
+            .where(board.id.eq(boardId))
+            .fetchOne()
+    }
 }
