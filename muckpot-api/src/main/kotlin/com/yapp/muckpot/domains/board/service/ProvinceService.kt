@@ -21,7 +21,13 @@ class ProvinceService(
     @Transactional
     fun saveProvinceIfNot(cityName: String, provinceName: String): Province {
         val city = cityRepository.findByName(cityName) ?: cityRepository.save(City(cityName))
-        return provinceRepository.findByName(provinceName) ?: provinceRepository.save(Province(provinceName, city))
+        val province = provinceRepository.findByName(provinceName)
+        province?.let {
+            if (it.city.name == cityName) {
+                return province
+            }
+        }
+        return provinceRepository.save(Province(provinceName, city))
     }
 
     @CacheEvict(value = [REGIONS_CACHE_NAME], key = ALL_KEY)
