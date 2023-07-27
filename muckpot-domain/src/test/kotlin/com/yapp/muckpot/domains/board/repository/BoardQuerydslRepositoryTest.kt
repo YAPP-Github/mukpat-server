@@ -108,6 +108,13 @@ class BoardQuerydslRepositoryTest(
 
         actual shouldHaveSize 3
     }
+
+    "지역정보를 한번의 쿼리로 가져온다." {
+        val actual = boardQuerydslRepository.findByIdOrNullWithRegion(boards[0].id)!!
+
+        actual.province?.name shouldBe province.name
+        actual.province?.city?.name shouldBe city.name
+    }
 }) {
     override fun extensions() = listOf(SpringExtension)
 }
