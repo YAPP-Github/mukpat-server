@@ -21,9 +21,8 @@ class ProvinceService(
     @Transactional
     fun saveProvinceIfNot(cityName: String, provinceName: String): Province {
         val city = cityRepository.findByName(cityName) ?: cityRepository.save(City(cityName))
-        val province = provinceRepository.findByName(provinceName)
-        province?.let {
-            if (it.city.name == cityName) {
+        provinceRepository.findByName(provinceName).forEach { province ->
+            if (province.city.name == cityName) {
                 return province
             }
         }

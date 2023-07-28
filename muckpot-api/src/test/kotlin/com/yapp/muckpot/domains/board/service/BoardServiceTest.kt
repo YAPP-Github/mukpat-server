@@ -281,7 +281,7 @@ class BoardServiceTest @Autowired constructor(
             actual.title shouldBe updateRequest.title
             actual.content shouldBe updateRequest.content
             actual.chatLink shouldBe updateRequest.chatLink
-            actual.province!!.id.shouldBe(findProvince!!.id)
+            actual.province!!.id.shouldBe(findProvince[0].id)
         }
 
         test("자신의 글만 수정할 수 있다.") {

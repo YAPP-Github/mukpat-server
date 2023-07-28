@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.Query
 
 interface ProvinceRepository : JpaRepository<Province, Long> {
     @Query("SELECT p FROM Province p JOIN FETCH p.city WHERE p.name = :name")
-    fun findByName(name: String): Province?
+    fun findByName(name: String): List<Province>
 }
