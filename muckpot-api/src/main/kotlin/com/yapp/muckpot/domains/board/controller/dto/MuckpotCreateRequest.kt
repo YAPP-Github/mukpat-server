@@ -9,7 +9,7 @@ import com.yapp.muckpot.common.constants.CONTENT_MAX
 import com.yapp.muckpot.common.constants.CONTENT_MAX_INVALID
 import com.yapp.muckpot.common.constants.HHmm
 import com.yapp.muckpot.common.constants.LINK_MAX_INVALID
-import com.yapp.muckpot.common.constants.MAX_APPLY_MIN_INVALID
+import com.yapp.muckpot.common.constants.MAX_APPLY_INVALID
 import com.yapp.muckpot.common.constants.NOT_BLANK_COMMON
 import com.yapp.muckpot.common.constants.TITLE_MAX
 import com.yapp.muckpot.common.constants.TITLE_MAX_INVALID
@@ -20,10 +20,10 @@ import com.yapp.muckpot.domains.user.entity.MuckPotUser
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 import org.hibernate.validator.constraints.Length
+import org.hibernate.validator.constraints.Range
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
-import javax.validation.constraints.Min
 import javax.validation.constraints.NotBlank
 
 @ApiModel(value = "먹팟생성 요청")
@@ -35,7 +35,7 @@ data class MuckpotCreateRequest(
     @field:JsonFormat(shape = JsonFormat.Shape.STRING, pattern = HHmm)
     val meetingTime: LocalTime,
     @field:ApiModelProperty(notes = "최대 참여 인원", required = true, example = "5")
-    @field:Min(2, message = MAX_APPLY_MIN_INVALID)
+    @field:Range(min = 2, max = 100, message = MAX_APPLY_INVALID)
     val maxApply: Int = 2,
     @field:ApiModelProperty(notes = "최소 나이", required = false, example = "20")
     val minAge: Int? = null,

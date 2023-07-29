@@ -2,6 +2,7 @@ package com.yapp.muckpot.domains.board.controller.dto
 
 import com.yapp.muckpot.common.constants.CHAT_LINK_MAX
 import com.yapp.muckpot.common.constants.CONTENT_MAX
+import com.yapp.muckpot.common.constants.MAX_APPLY_INVALID
 import com.yapp.muckpot.common.constants.NOT_BLANK_COMMON
 import com.yapp.muckpot.common.constants.TITLE_MAX
 import io.kotest.core.spec.style.StringSpec
@@ -110,6 +111,16 @@ class MuckpotCreateRequestTest : StringSpec({
         violations.size shouldBe 1
         for (violation in violations) {
             violation.message shouldBe NOT_BLANK_COMMON
+        }
+    }
+
+    "참여인원은 100명을 넘을 수 없다." {
+        val request = createMuckpotCreateRequest(maxApply = 101)
+
+        val violations: MutableSet<ConstraintViolation<MuckpotCreateRequest>> = validator.validate(request)
+        violations.size shouldBe 1
+        for (violation in violations) {
+            violation.message shouldBe MAX_APPLY_INVALID.format(2, 100)
         }
     }
 })
