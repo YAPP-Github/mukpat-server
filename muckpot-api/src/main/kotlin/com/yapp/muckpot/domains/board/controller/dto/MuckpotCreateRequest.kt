@@ -4,12 +4,12 @@ import com.fasterxml.jackson.annotation.JsonFormat
 import com.yapp.muckpot.common.Location
 import com.yapp.muckpot.common.constants.AGE_MAX
 import com.yapp.muckpot.common.constants.AGE_MIN
+import com.yapp.muckpot.common.constants.APPLY_RANGE_INVALID
 import com.yapp.muckpot.common.constants.CHAT_LINK_MAX
 import com.yapp.muckpot.common.constants.CONTENT_MAX
 import com.yapp.muckpot.common.constants.CONTENT_MAX_INVALID
 import com.yapp.muckpot.common.constants.HHmm
 import com.yapp.muckpot.common.constants.LINK_MAX_INVALID
-import com.yapp.muckpot.common.constants.MAX_APPLY_INVALID
 import com.yapp.muckpot.common.constants.NOT_BLANK_COMMON
 import com.yapp.muckpot.common.constants.TITLE_MAX
 import com.yapp.muckpot.common.constants.TITLE_MAX_INVALID
@@ -35,7 +35,7 @@ data class MuckpotCreateRequest(
     @field:JsonFormat(shape = JsonFormat.Shape.STRING, pattern = HHmm)
     val meetingTime: LocalTime,
     @field:ApiModelProperty(notes = "최대 참여 인원", required = true, example = "5")
-    @field:Range(min = 2, max = 100, message = MAX_APPLY_INVALID)
+    @field:Range(min = 2, max = 100, message = APPLY_RANGE_INVALID)
     val maxApply: Int = 2,
     @field:ApiModelProperty(notes = "최소 나이", required = false, example = "20")
     val minAge: Int? = null,
