@@ -27,12 +27,10 @@ class BoardTest : FunSpec({
             }.message shouldBe "최대 인원은 ${MAX_APPLY_MIN}명 이상 가능합니다."
         }
 
-        test("만날 시간은 현재시간 이후로만 가능하다.") {
-            shouldThrow<IllegalArgumentException> {
-                Fixture.createBoard(
-                    meetingTime = LocalDateTime.now().minusMinutes(30)
-                )
-            }.message shouldBe "만날 시간은 현재시간 이후에 가능합니다."
+        test("현재시간 미만의 먹팟은 DONE으로 생성된다.") {
+            val board = Fixture.createBoard(meetingTime = LocalDateTime.now().minusMinutes(10))
+
+            board.status shouldBe MuckPotStatus.DONE
         }
 
         test("정원이 초과된 경우 참여할 수 없다.") {

@@ -303,6 +303,33 @@ class BoardServiceTest @Autowired constructor(
                 boardService.updateBoardAndSendEmail(userId, boardId, updateRequest)
             }.errorCode shouldBe BoardErrorCode.DONE_BOARD_NOT_UPDATE
         }
+
+        test("현재시간 미만으로 수정시 DONE으로 상태가 변경된다.") {
+            // given
+            val boardId = boardService.saveBoard(userId, createRequest)!!
+            val request = MuckpotUpdateRequest(
+                meetingDate = LocalDate.now(),
+                meetingTime = LocalTime.of(0, 0),
+                maxApply = 6,
+                minAge = 25,
+                maxAge = 70,
+                locationName = "modify location",
+                locationDetail = "detail",
+                x = 1.0,
+                y = 1.0,
+                title = "modify title",
+                content = "content",
+                chatLink = "modify chatLink",
+                region_1depth_name = "서울특별시",
+                region_2depth_name = "송파구"
+            )
+            // when
+            boardService.updateBoardAndSendEmail(userId, boardId, request)
+            // then
+            val actual = boardRepository.findByIdOrNull(boardId)!!
+
+            actual.status shouldBe MuckPotStatus.DONE
+        }
     }
 
     context("먹팟 참가 테스트") {

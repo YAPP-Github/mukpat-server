@@ -92,7 +92,9 @@ class Board(
         require(maxAge in AGE_MIN..AGE_MAX) { AGE_EXP_MSG }
         require(minAge < maxAge) { "최소나이는 최대나이보다 작아야 합니다." }
         require(maxApply >= MAX_APPLY_MIN) { "최대 인원은 ${MAX_APPLY_MIN}명 이상 가능합니다." }
-        require(meetingTime > LocalDateTime.now()) { "만날 시간은 현재시간 이후에 가능합니다." }
+        if (isOutOfDate()) {
+            this.status = DONE
+        }
     }
 
     fun join(userAge: Int) {
@@ -146,6 +148,10 @@ class Board(
 
     fun isFull(): Boolean {
         return this.currentApply == this.maxApply
+    }
+
+    fun isOutOfDate(): Boolean {
+        return meetingTime < LocalDateTime.now()
     }
 
     private fun validateToday() {
