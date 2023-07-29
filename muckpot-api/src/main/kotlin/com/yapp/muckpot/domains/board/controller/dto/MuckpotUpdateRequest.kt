@@ -17,6 +17,7 @@ import com.yapp.muckpot.common.constants.YYYYMMDD
 import com.yapp.muckpot.domains.board.entity.Board
 import com.yapp.muckpot.domains.board.entity.Province
 import com.yapp.muckpot.domains.board.exception.BoardErrorCode
+import com.yapp.muckpot.domains.user.enums.MuckPotStatus
 import com.yapp.muckpot.email.EmailTemplate
 import com.yapp.muckpot.exception.MuckPotException
 import io.swagger.annotations.ApiModel
@@ -95,6 +96,9 @@ data class MuckpotUpdateRequest(
         board.maxApply = this.maxApply
         board.chatLink = this.chatLink
         board.province = province
+        if (board.meetingTime < LocalDateTime.now()) {
+            board.status = MuckPotStatus.DONE
+        }
     }
 
     fun createBoardUpdateMailBody(board: Board): String {

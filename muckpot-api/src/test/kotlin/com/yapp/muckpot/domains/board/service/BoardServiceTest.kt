@@ -286,15 +286,42 @@ class BoardServiceTest @Autowired constructor(
 
         test("자신의 글만 수정할 수 있다.") {
             // given
-            val otherUserId = -1L
             val boardId = boardService.saveBoard(userId, createRequest)!!
-            // when & then
-            shouldThrow<MuckPotException> {
-                boardService.updateBoardAndSendEmail(otherUserId, boardId, updateRequest)
-            }.errorCode shouldBe BoardErrorCode.BOARD_UNAUTHORIZED
+            val request = MuckpotUpdateRequest(
+                meetingDate = LocalDate.now(),
+                meetingTime = LocalTime.of(0, 0),
+                maxApply = 6,
+                minAge = 25,
+                maxAge = 70,
+                locationName = "modify location",
+                locationDetail = "detail",
+                x = 1.0,
+                y = 1.0,
+                title = "modify title",
+                content = "content",
+                chatLink = "modify chatLink",
+                region_1depth_name = "서울특별시",
+                region_2depth_name = "송파구"
+            )
+            // when
+            boardService.updateBoardAndSendEmail(userId, boardId, request)
+            // then
+            val actual = boardRepository.findByIdOrNull(boardId)!!
+
+            actual.status shouldBe MuckPotStatus.DONE
         }
 
         test("만료 상태의 먹팟은 수정할 수 없다.") {
+            // given
+            val boardId = boardService.saveBoard(userId, createRequest)!!
+            boardService.changeStatus(userId, boardId, MuckPotStatus.DONE)
+            // when & then
+            shouldThrow<MuckPotException> {
+                boardService.updateBoardAndSendEmail(userId, boardId, updateRequest)
+            }.errorCode shouldBe BoardErrorCode.DONE_BOARD_NOT_UPDATE
+        }
+
+        test("현재시간 미만으로 수정시 DONE으로 상태가 변경된다.") {
             // given
             val boardId = boardService.saveBoard(userId, createRequest)!!
             boardService.changeStatus(userId, boardId, MuckPotStatus.DONE)
