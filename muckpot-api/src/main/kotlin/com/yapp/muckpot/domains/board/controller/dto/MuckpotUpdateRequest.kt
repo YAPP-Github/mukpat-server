@@ -151,7 +151,7 @@ data class MuckpotUpdateRequest(
                 EmailTemplate.createBoardUpdateRow("오픈 채팅방 링크가", board.chatLink, this.chatLink)
             )
         }
-        if ((this.minAge != board.minAge) || (this.maxAge != board.maxAge)) {
+        if (((this.minAge ?: AGE_MIN) != board.minAge) || ((this.maxAge ?: AGE_MAX) != board.maxAge)) {
             val ageLimitFormat = "%d ~ %d"
             modifyBody.append(
                 EmailTemplate.createBoardUpdateRow(
