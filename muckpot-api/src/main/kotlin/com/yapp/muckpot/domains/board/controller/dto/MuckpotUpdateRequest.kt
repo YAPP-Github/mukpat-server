@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 import org.hibernate.validator.constraints.Length
 import org.hibernate.validator.constraints.Range
+import java.lang.IllegalArgumentException
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -159,6 +160,9 @@ data class MuckpotUpdateRequest(
                     ageLimitFormat.format(this.minAge, this.maxAge)
                 )
             )
+        }
+        if (modifyBody.isEmpty()) {
+            throw IllegalArgumentException("변경된 내용이 없습니다.")
         }
         return modifyBody.toString()
     }
