@@ -96,7 +96,7 @@ data class MuckpotUpdateRequest(
         board.maxApply = this.maxApply
         board.chatLink = this.chatLink
         board.province = province
-        if (board.meetingTime < LocalDateTime.now()) {
+        if (board.isOutOfDate()) {
             board.status = MuckPotStatus.DONE
         }
     }

@@ -31,7 +31,8 @@ data class MuckpotDetailResponse(
     val locationDetail: String? = null,
     val views: Int,
     val userAge: Int?,
-    var participants: List<ParticipantReadResponse>
+    var participants: List<ParticipantReadResponse>,
+    val isOutOfDate: Boolean
 ) {
     init {
         if (participants.isNotEmpty()) {
@@ -87,7 +88,8 @@ data class MuckpotDetailResponse(
                 locationDetail = board.locationDetail,
                 views = board.views,
                 userAge = userAge,
-                participants = participants
+                participants = participants,
+                isOutOfDate = board.isOutOfDate()
             )
             if (board.isNotAgeLimit()) {
                 response.changeIsNotAgeLimit()
