@@ -6,7 +6,6 @@ import com.yapp.muckpot.common.constants.LOGIN_RESPONSE
 import com.yapp.muckpot.common.constants.NO_BODY_RESPONSE
 import com.yapp.muckpot.common.constants.REFRESH_TOKEN_KEY
 import com.yapp.muckpot.common.constants.SIGN_UP_RESPONSE
-import com.yapp.muckpot.common.enums.StatusCode
 import com.yapp.muckpot.common.utils.ResponseEntityUtil
 import com.yapp.muckpot.common.utils.SecurityContextHolderUtil
 import com.yapp.muckpot.domains.user.controller.dto.LoginRequest
@@ -175,14 +174,8 @@ class UserController(
     @ApiOperation(value = "JWT 재발급")
     @PostMapping("/v1/users/refresh")
     fun reissueJwt(@CookieValue(REFRESH_TOKEN_KEY, required = false) refreshToken: String?): ResponseEntity<ResponseDto> {
-        refreshToken ?: return NOT_EXIST_REFRESH_TOKEN
+        refreshToken ?: throw IllegalArgumentException("리프레시 토큰이 존재하지 않습니다.")
         userService.reissueJwt(refreshToken)
         return ResponseEntityUtil.noContent()
-    }
-
-    companion object {
-        private val NOT_EXIST_REFRESH_TOKEN = ResponseEntity
-            .status(StatusCode.INVALID_TOKEN.code)
-            .body(ResponseDto(StatusCode.INVALID_TOKEN.code, "리프레시 토큰이 존재하지 않습니다."))
     }
 }
