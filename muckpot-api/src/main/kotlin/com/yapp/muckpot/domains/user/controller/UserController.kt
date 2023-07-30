@@ -132,9 +132,9 @@ class UserController(
     @GetMapping("/v1/users/profile")
     fun findLoginUserProfile(@CookieValue(REFRESH_TOKEN_KEY, required = false) refreshToken: String? = null, @CookieValue(ACCESS_TOKEN_KEY) accessToken: String): ResponseEntity<ResponseDto> {
         if (jwtService.isTokenExpired(accessToken)) {
-            refreshToken ?: return ResponseEntityUtil.noContent()
             return NOT_EXIST_ACCESS_TOKEN_EXP
         }
+        refreshToken ?: return ResponseEntityUtil.noContent()
         return SecurityContextHolderUtil.getCredentialOrNull()?.let {
             ResponseEntityUtil.ok(it)
         } ?: run {
