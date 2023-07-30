@@ -45,7 +45,7 @@ class JwtService(
             .withClaim(USER_CLAIM, objectMapper.writeValueAsString(response))
             // TODO 테스트 후 원복
             // .withExpiresAt(Date(Date().time + ACCESS_TOKEN_SECONDS * MS))
-            .withExpiresAt(Date(Date().time + 20 * MS))
+            .withExpiresAt(Date(Date().time + 180 * MS))
         return jwtBuilder.sign(algorithm)
     }
 
@@ -56,7 +56,7 @@ class JwtService(
             .withIssuedAt(Date())
             // TODO 테스트 후 원복
             // .withExpiresAt(Date(Date().time + expiredSeconds * MS))
-            .withExpiresAt(Date(Date().time + 180 * MS))
+            .withExpiresAt(Date(Date().time + 540 * MS))
         return jwtBuilder.sign(algorithm)
     }
 
