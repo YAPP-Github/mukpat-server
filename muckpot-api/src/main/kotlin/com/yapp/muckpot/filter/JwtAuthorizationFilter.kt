@@ -50,6 +50,9 @@ class JwtAuthorizationFilter(private val jwtService: JwtService) : OncePerReques
         filterChain.doFilter(request, response)
     }
     private fun needAccessTokenExpiredCheck(requestMethod: String, requestUri: String): Boolean {
+        if (requestUri == USER_PROFILE_URL) {
+            return true
+        }
         return (requestMethod != HttpMethod.GET.toString() && !TOKEN_EXPIRED_NOT_CHECK_URLS.contains(requestUri))
     }
 
@@ -62,8 +65,7 @@ class JwtAuthorizationFilter(private val jwtService: JwtService) : OncePerReques
             LOGIN_URL_V1
         )
         private val TOKEN_EXPIRED_NOT_CHECK_URLS = listOf(
-            REISSUE_JWT_URL,
-            USER_PROFILE_URL
+            REISSUE_JWT_URL
         )
     }
 }

@@ -128,7 +128,8 @@ class UserController(
     )
     @ApiOperation(value = "유저 프로필 조회")
     @GetMapping("/v1/users/profile")
-    fun findLoginUserProfile(): ResponseEntity<ResponseDto> {
+    fun findLoginUserProfile(@CookieValue(REFRESH_TOKEN_KEY, required = false) refreshToken: String? = null): ResponseEntity<ResponseDto> {
+        refreshToken ?: ResponseEntityUtil.noContent()
         return SecurityContextHolderUtil.getCredentialOrNull()?.let {
             ResponseEntityUtil.ok(it)
         } ?: run {
@@ -176,8 +177,12 @@ class UserController(
     @ApiOperation(value = "JWT 재발급")
     @PostMapping("/v1/users/refresh")
     fun reissueJwt(@CookieValue(REFRESH_TOKEN_KEY, required = false) refreshToken: String? = null, @CookieValue(ACCESS_TOKEN_KEY) accessToken: String): ResponseEntity<ResponseDto> {
-        refreshToken ?: throw IllegalArgumentException("리프레시 토큰이 존재하지 않습니다.")
+        refreshToken ?: throw NOT_EXIST_REFRESH_TOKEN_EXP
         userService.reissueJwt(refreshToken, accessToken)
         return ResponseEntityUtil.noContent()
+    }
+
+    companion object {
+        private val NOT_EXIST_REFRESH_TOKEN_EXP = IllegalArgumentException("리프레시 토큰이 존재하지 않습니다.")
     }
 }
