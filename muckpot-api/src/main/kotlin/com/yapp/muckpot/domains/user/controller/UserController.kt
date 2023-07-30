@@ -1,6 +1,7 @@
 package com.yapp.muckpot.domains.user.controller
 
 import com.yapp.muckpot.common.ResponseDto
+import com.yapp.muckpot.common.constants.ACCESS_TOKEN_KEY
 import com.yapp.muckpot.common.constants.EMAIL_AUTH_REQ_RESPONSE
 import com.yapp.muckpot.common.constants.LOGIN_RESPONSE
 import com.yapp.muckpot.common.constants.NO_BODY_RESPONSE
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.lang.IllegalArgumentException
 import javax.validation.Valid
 
 @RestController
@@ -173,9 +175,9 @@ class UserController(
     )
     @ApiOperation(value = "JWT 재발급")
     @PostMapping("/v1/users/refresh")
-    fun reissueJwt(@CookieValue(REFRESH_TOKEN_KEY, required = false) refreshToken: String?): ResponseEntity<ResponseDto> {
+    fun reissueJwt(@CookieValue(REFRESH_TOKEN_KEY, required = false) refreshToken: String? = null, @CookieValue(ACCESS_TOKEN_KEY) accessToken: String): ResponseEntity<ResponseDto> {
         refreshToken ?: throw IllegalArgumentException("리프레시 토큰이 존재하지 않습니다.")
-        userService.reissueJwt(refreshToken)
+        userService.reissueJwt(refreshToken, accessToken)
         return ResponseEntityUtil.noContent()
     }
 }

@@ -144,4 +144,9 @@ class JwtService(
             .withExpiresAt(expiredAt)
         return jwtBuilder.sign(algorithm)
     }
+
+    fun isTokenExpired(token: String): Boolean {
+        val decodedToken = JWT.decode(token)
+        return decodedToken.expiresAt <= Date()
+    }
 }
