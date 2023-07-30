@@ -131,16 +131,19 @@ class UserController(
     @ApiOperation(value = "유저 프로필 조회")
     @GetMapping("/v1/users/profile")
     fun findLoginUserProfile(@CookieValue(REFRESH_TOKEN_KEY, required = false) refreshToken: String? = null, @CookieValue(ACCESS_TOKEN_KEY, required = false) accessToken: String? = null): ResponseEntity<ResponseDto> {
-        accessToken?.let {
-            if (jwtService.isTokenExpired(it)) {
-                return NOT_EXIST_ACCESS_TOKEN_EXP
-            }
-        }
-        refreshToken ?: return ResponseEntityUtil.noContent()
         return SecurityContextHolderUtil.getCredentialOrNull()?.let {
             ResponseEntityUtil.ok(it)
         } ?: run {
-            ResponseEntityUtil.noContent()
+            // 로그인 했지만 refreshToken 만료 && 로그인 하지 않은 유저
+            refreshToken ?: return ResponseEntityUtil.noContent()
+            // 로그인 했지만 accessToken 만료
+            accessToken?.let {
+                if (jwtService.isTokenExpired(it)) {
+                    return NOT_EXIST_ACCESS_TOKEN_EXP
+                }
+            }
+            // 로그인하지 않은 유저
+            return ResponseEntityUtil.noContent()
         }
     }
 
