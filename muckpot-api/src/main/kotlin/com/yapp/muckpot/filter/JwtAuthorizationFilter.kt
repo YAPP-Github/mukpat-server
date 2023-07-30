@@ -24,12 +24,16 @@ class JwtAuthorizationFilter(private val jwtService: JwtService) : OncePerReques
         filterChain: FilterChain
     ) {
         jwtService.getCurrentUserClaim()?.let { userResponse ->
-            if (!TOKEN_EXPIRED_NOT_CHECK_URLS.contains(request.requestURI.toString()) && userResponse.tokenExpired) {
-                ResponseWriter.writeResponse(response, StatusCode.INVALID_TOKEN.code, "만료된 토큰입니다.")
+            if (ALREADY_LOGIN_REJECT_URLS.contains(request.requestURI.toString())) {
+                if (userResponse.tokenExpired) {
+                    filterChain.doFilter(request, response)
+                    return
+                }
+                ResponseWriter.writeResponse(response, HttpStatus.BAD_REQUEST.value(), "이미 로그인한 유저 입니다.")
                 return
             }
-            if (ALREADY_LOGIN_REJECT_URLS.contains(request.requestURI.toString())) {
-                ResponseWriter.writeResponse(response, HttpStatus.BAD_REQUEST.value(), "이미 로그인한 유저 입니다.")
+            if (!TOKEN_EXPIRED_NOT_CHECK_URLS.contains(request.requestURI.toString()) && userResponse.tokenExpired) {
+                ResponseWriter.writeResponse(response, StatusCode.INVALID_TOKEN.code, "만료된 토큰입니다.")
                 return
             }
             val authentication = AuthenticationUser(userResponse.userId, userResponse, true, LOGIN_USER_AUTHORITIES)

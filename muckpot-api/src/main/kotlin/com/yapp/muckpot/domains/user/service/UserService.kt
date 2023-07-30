@@ -1,6 +1,5 @@
 package com.yapp.muckpot.domains.user.service
 
-import com.yapp.muckpot.common.constants.ACCESS_TOKEN_COOKIE_SECONDS
 import com.yapp.muckpot.common.constants.ACCESS_TOKEN_KEY
 import com.yapp.muckpot.common.constants.REFRESH_TOKEN_KEY
 import com.yapp.muckpot.common.utils.CookieUtil
@@ -45,7 +44,7 @@ class UserService(
             val refreshToken = jwtService.generateRefreshToken(request.email, refreshTokenSeconds)
 
             redisService.setDataExpireWithNewest(request.email, refreshToken, refreshTokenSeconds)
-            CookieUtil.addHttpOnlyCookie(ACCESS_TOKEN_KEY, accessToken, ACCESS_TOKEN_COOKIE_SECONDS.toInt())
+            CookieUtil.addHttpOnlyCookie(ACCESS_TOKEN_KEY, accessToken, null)
             CookieUtil.addHttpOnlyCookie(REFRESH_TOKEN_KEY, refreshToken, refreshTokenSeconds.toInt())
             return response
         } ?: run {
@@ -109,7 +108,7 @@ class UserService(
             val newRefreshToken = jwtService.generateNewRefreshFromOldRefresh(user.email, refreshToken)
 
             redisService.setDataExpireWithNewest(user.email, newRefreshToken, leftRefreshTokenSeconds)
-            CookieUtil.addHttpOnlyCookie(ACCESS_TOKEN_KEY, newAccessToken, ACCESS_TOKEN_COOKIE_SECONDS.toInt())
+            CookieUtil.addHttpOnlyCookie(ACCESS_TOKEN_KEY, newAccessToken, null)
             CookieUtil.addHttpOnlyCookie(REFRESH_TOKEN_KEY, newRefreshToken, leftRefreshTokenSeconds.toInt())
         } ?: run {
             throw MuckPotException(UserErrorCode.USER_NOT_FOUND)

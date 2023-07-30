@@ -35,12 +35,14 @@ object CookieUtil {
     /**
      * 현재 응답에 HttpOnly=true 쿠키 추가.
      */
-    fun addHttpOnlyCookie(name: String, value: String, expiredSeconds: Int) {
+    fun addHttpOnlyCookie(name: String, value: String, expiredSeconds: Int?) {
         val cookie = Cookie(name, value).apply {
             path = "/"
             isHttpOnly = true
-            maxAge = expiredSeconds
             domain = COOKIE_DOMAIN
+        }
+        if (expiredSeconds != null) {
+            cookie.apply { maxAge = expiredSeconds }
         }
         // TODO 서버가 분리되면 해당 로직은 제거, (로컬에서 접근을 위한 설정)
         currentRequest.getHeader("Origin")?.let { originName ->
