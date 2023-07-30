@@ -17,7 +17,7 @@ class AuthenticationFailHandler : AuthenticationEntryPoint {
         authException: AuthenticationException
     ) {
         log.debug(authException) { NO_AUTH }
-        ResponseWriter.writeResponse(response, HttpStatus.FORBIDDEN, NO_AUTH)
+        ResponseWriter.writeResponse(response, HttpStatus.FORBIDDEN.value(), NO_AUTH)
     }
 
     companion object {
