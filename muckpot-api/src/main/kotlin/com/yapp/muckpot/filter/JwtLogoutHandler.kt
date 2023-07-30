@@ -13,7 +13,7 @@ class JwtLogoutHandler(
 ) : LogoutHandler {
     override fun logout(request: HttpServletRequest, response: HttpServletResponse, authentication: Authentication?) {
         if (!jwtService.allTokenClear()) {
-            ResponseWriter.writeResponse(response, HttpStatus.BAD_REQUEST, "로그아웃 실패.")
+            ResponseWriter.writeResponse(response, HttpStatus.BAD_REQUEST.value(), "로그아웃 실패.")
         }
     }
 }

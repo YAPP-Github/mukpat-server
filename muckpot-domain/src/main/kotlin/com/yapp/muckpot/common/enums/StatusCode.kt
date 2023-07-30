@@ -11,6 +11,7 @@ enum class StatusCode(
     UNAUTHORIZED(401),
     FORBIDDEN(403),
     NOT_FOUND(404),
+    INVALID_TOKEN(498),
 
     INTERNAL_SERVER(500);
 }

@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.lang.IllegalArgumentException
 import javax.validation.Valid
 
 @RestController
@@ -174,7 +175,8 @@ class UserController(
     )
     @ApiOperation(value = "JWT 재발급")
     @PostMapping("/v1/users/refresh")
-    fun reissueJwt(@CookieValue(REFRESH_TOKEN_KEY) refreshToken: String, @CookieValue(ACCESS_TOKEN_KEY) accessToken: String): ResponseEntity<ResponseDto> {
+    fun reissueJwt(@CookieValue(REFRESH_TOKEN_KEY, required = false) refreshToken: String? = null, @CookieValue(ACCESS_TOKEN_KEY) accessToken: String): ResponseEntity<ResponseDto> {
+        refreshToken ?: throw IllegalArgumentException("리프레시 토큰이 존재하지 않습니다.")
         userService.reissueJwt(refreshToken, accessToken)
         return ResponseEntityUtil.noContent()
     }

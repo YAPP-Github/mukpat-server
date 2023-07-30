@@ -3,10 +3,10 @@ package com.yapp.muckpot.domains.user.service
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
+import com.auth0.jwt.exceptions.TokenExpiredException
 import com.auth0.jwt.interfaces.DecodedJWT
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.yapp.muckpot.common.constants.ACCESS_TOKEN_KEY
-import com.yapp.muckpot.common.constants.ACCESS_TOKEN_SECONDS
 import com.yapp.muckpot.common.constants.JWT_LOGOUT_VALUE
 import com.yapp.muckpot.common.constants.MS
 import com.yapp.muckpot.common.constants.REFRESH_TOKEN_BASIC_SECONDS
@@ -17,6 +17,7 @@ import com.yapp.muckpot.common.constants.USER_EMAIL_CLAIM
 import com.yapp.muckpot.common.enums.YesNo
 import com.yapp.muckpot.common.utils.CookieUtil
 import com.yapp.muckpot.domains.user.controller.dto.UserResponse
+import com.yapp.muckpot.domains.user.controller.dto.UserResponse.Companion.expiredUser
 import com.yapp.muckpot.domains.user.exception.UserErrorCode
 import com.yapp.muckpot.exception.MuckPotException
 import com.yapp.muckpot.redis.RedisService
@@ -42,7 +43,9 @@ class JwtService(
         val jwtBuilder = JWT.create()
             .withIssuer(issuer)
             .withClaim(USER_CLAIM, objectMapper.writeValueAsString(response))
-            .withExpiresAt(Date(Date().time + ACCESS_TOKEN_SECONDS * MS))
+            // TODO 테스트 후 원복
+            // .withExpiresAt(Date(Date().time + ACCESS_TOKEN_SECONDS * MS))
+            .withExpiresAt(Date(Date().time + 20 * MS))
         return jwtBuilder.sign(algorithm)
     }
 
@@ -51,7 +54,9 @@ class JwtService(
             .withIssuer(issuer)
             .withClaim(USER_EMAIL_CLAIM, email)
             .withIssuedAt(Date())
-            .withExpiresAt(Date(Date().time + expiredSeconds * MS))
+            // TODO 테스트 후 원복
+            // .withExpiresAt(Date(Date().time + expiredSeconds * MS))
+            .withExpiresAt(Date(Date().time + 180 * MS))
         return jwtBuilder.sign(algorithm)
     }
 
@@ -68,6 +73,9 @@ class JwtService(
             }
             val decodedJwt = jwtVerifier.verify(token)
             objectMapper.readValue(decodedJwt.getClaim(USER_CLAIM).asString(), UserResponse::class.java)
+        } catch (tokenExpiredException: TokenExpiredException) {
+            log.debug(tokenExpiredException) { tokenExpiredException.message }
+            return expiredUser()
         } catch (exception: Exception) {
             log.debug(exception) { exception.message }
             null
