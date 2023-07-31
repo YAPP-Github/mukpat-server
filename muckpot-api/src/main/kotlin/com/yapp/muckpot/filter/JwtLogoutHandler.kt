@@ -1,5 +1,6 @@
 package com.yapp.muckpot.filter
 
+import com.yapp.muckpot.common.utils.CookieUtil
 import com.yapp.muckpot.common.utils.ResponseWriter
 import com.yapp.muckpot.domains.user.service.JwtService
 import org.springframework.http.HttpStatus
@@ -15,5 +16,6 @@ class JwtLogoutHandler(
         if (!jwtService.allTokenClear()) {
             ResponseWriter.writeResponse(response, HttpStatus.BAD_REQUEST.value(), "로그아웃 실패.")
         }
+        CookieUtil.allTokenClear()
     }
 }
