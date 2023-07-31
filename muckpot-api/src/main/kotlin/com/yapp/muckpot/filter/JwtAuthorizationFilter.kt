@@ -1,10 +1,8 @@
 package com.yapp.muckpot.filter
 
 import com.yapp.muckpot.common.constants.LOGIN_URL
-import com.yapp.muckpot.common.constants.LOGIN_URL_V1
 import com.yapp.muckpot.common.constants.REISSUE_JWT_URL
 import com.yapp.muckpot.common.constants.SIGN_UP_URL
-import com.yapp.muckpot.common.constants.SIGN_UP_URL_V1
 import com.yapp.muckpot.common.enums.StatusCode
 import com.yapp.muckpot.common.security.AuthenticationUser
 import com.yapp.muckpot.common.utils.ResponseWriter
@@ -56,9 +54,7 @@ class JwtAuthorizationFilter(private val jwtService: JwtService) : OncePerReques
         private val LOGIN_USER_AUTHORITIES = listOf(SimpleGrantedAuthority("ROLE_USER"))
         private val ALREADY_LOGIN_REJECT_URLS = listOf(
             LOGIN_URL,
-            SIGN_UP_URL,
-            SIGN_UP_URL_V1,
-            LOGIN_URL_V1
+            SIGN_UP_URL
         )
         private val TOKEN_EXPIRED_NOT_CHECK_URLS = listOf(
             REISSUE_JWT_URL
