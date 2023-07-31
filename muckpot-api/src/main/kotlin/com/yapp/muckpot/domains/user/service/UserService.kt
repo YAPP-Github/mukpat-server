@@ -4,7 +4,6 @@ import com.yapp.muckpot.common.constants.ACCESS_TOKEN_KEY
 import com.yapp.muckpot.common.constants.REFRESH_TOKEN_KEY
 import com.yapp.muckpot.common.utils.CookieUtil
 import com.yapp.muckpot.common.utils.RandomCodeUtil
-import com.yapp.muckpot.domains.user.controller.dto.EmailAuthResponse
 import com.yapp.muckpot.domains.user.controller.dto.LoginRequest
 import com.yapp.muckpot.domains.user.controller.dto.SendEmailAuthRequest
 import com.yapp.muckpot.domains.user.controller.dto.SignUpRequest
@@ -53,7 +52,7 @@ class UserService(
     }
 
     @Transactional
-    fun sendEmailAuth(request: SendEmailAuthRequest): EmailAuthResponse {
+    fun sendEmailAuth(request: SendEmailAuthRequest) {
         userRepository.findByEmail(request.email)?.let {
             throw MuckPotException(UserErrorCode.ALREADY_EXISTS_USER)
         } ?: run {
@@ -66,7 +65,6 @@ class UserService(
                 )
             )
             redisService.setDataExpireWithNewest(key = request.email, value = authKey, duration = THIRTY_MINS)
-            return EmailAuthResponse(authKey)
         }
     }
 
