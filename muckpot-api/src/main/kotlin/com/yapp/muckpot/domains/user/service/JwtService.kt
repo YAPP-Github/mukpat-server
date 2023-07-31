@@ -56,7 +56,7 @@ class JwtService(
             .withIssuedAt(Date())
             // TODO 테스트 후 원복
             // .withExpiresAt(Date(Date().time + expiredSeconds * MS))
-            .withExpiresAt(Date(Date().time + 540 * MS))
+            .withExpiresAt(Date(Date().time + 300 * MS))
         return jwtBuilder.sign(algorithm)
     }
 
