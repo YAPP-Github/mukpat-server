@@ -5,8 +5,8 @@ import com.yapp.muckpot.common.constants.ACCESS_TOKEN_SECONDS
 import com.yapp.muckpot.common.constants.REFRESH_TOKEN_KEY
 import com.yapp.muckpot.common.utils.CookieUtil
 import com.yapp.muckpot.common.utils.RandomCodeUtil
-import com.yapp.muckpot.domains.user.controller.dto.EmailAuthResponse
 import com.yapp.muckpot.domains.user.controller.dto.UserResponse
+import com.yapp.muckpot.domains.user.controller.dto.deprecated.EmailAuthResponse
 import com.yapp.muckpot.domains.user.controller.dto.deprecated.LoginRequestV1
 import com.yapp.muckpot.domains.user.controller.dto.deprecated.SendEmailAuthRequestV1
 import com.yapp.muckpot.domains.user.controller.dto.deprecated.SignUpRequestV1

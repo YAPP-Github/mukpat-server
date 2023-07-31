@@ -2,7 +2,6 @@ package com.yapp.muckpot.domains.user.controller
 
 import com.yapp.muckpot.common.ResponseDto
 import com.yapp.muckpot.common.constants.ACCESS_TOKEN_KEY
-import com.yapp.muckpot.common.constants.EMAIL_AUTH_REQ_RESPONSE
 import com.yapp.muckpot.common.constants.LOGIN_RESPONSE
 import com.yapp.muckpot.common.constants.NO_BODY_RESPONSE
 import com.yapp.muckpot.common.constants.REFRESH_TOKEN_KEY
@@ -69,7 +68,7 @@ class UserController(
                 code = 201,
                 examples = Example(
                     ExampleProperty(
-                        value = EMAIL_AUTH_REQ_RESPONSE,
+                        value = NO_BODY_RESPONSE,
                         mediaType = MediaType.APPLICATION_JSON_VALUE
                     )
                 ),
@@ -83,7 +82,8 @@ class UserController(
         @RequestBody @Valid
         request: SendEmailAuthRequest
     ): ResponseEntity<ResponseDto> {
-        return ResponseEntityUtil.created(userService.sendEmailAuth(request))
+        userService.sendEmailAuth(request)
+        return ResponseEntityUtil.noContent()
     }
 
     @ApiResponses(
