@@ -1,5 +1,4 @@
 import com.yapp.muckpot.common.Location
-import com.yapp.muckpot.common.QLocation.location
 import com.yapp.muckpot.common.constants.AGE_MAX
 import com.yapp.muckpot.common.constants.AGE_MIN
 import com.yapp.muckpot.common.enums.Gender
@@ -7,18 +6,16 @@ import com.yapp.muckpot.domains.board.entity.Board
 import com.yapp.muckpot.domains.board.entity.City
 import com.yapp.muckpot.domains.board.entity.Participant
 import com.yapp.muckpot.domains.board.entity.Province
-import com.yapp.muckpot.domains.board.entity.QProvince.province
 import com.yapp.muckpot.domains.user.entity.MuckPotUser
 import com.yapp.muckpot.domains.user.enums.JobGroupMain
 import com.yapp.muckpot.domains.user.enums.MuckPotStatus
-import org.testcontainers.shaded.org.bouncycastle.asn1.x500.style.RFC4519Style.title
 import java.time.LocalDateTime
 import java.util.*
 
 object Fixture {
     fun createUser(
         id: Long? = null,
-        email: String = UUID.randomUUID().toString().substring(0, 5) + "@naver.com",
+        email: String = UUID.randomUUID().toString().substring(0, 5) + "@samsung.com",
         password: String = "abcd1234",
         nickName: String = UUID.randomUUID().toString().substring(0, 10),
         gender: Gender = Gender.MEN,

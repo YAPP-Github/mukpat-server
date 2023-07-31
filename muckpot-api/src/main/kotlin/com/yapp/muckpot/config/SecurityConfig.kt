@@ -2,16 +2,12 @@ package com.yapp.muckpot.config
 
 import com.yapp.muckpot.common.constants.ACCESS_TOKEN_KEY
 import com.yapp.muckpot.common.constants.EMAIL_REQUEST_URL
-import com.yapp.muckpot.common.constants.EMAIL_REQUEST_URL_V1
 import com.yapp.muckpot.common.constants.EMAIL_VERIFY_URL
-import com.yapp.muckpot.common.constants.EMAIL_VERIFY_URL_V1
 import com.yapp.muckpot.common.constants.LOGIN_URL
-import com.yapp.muckpot.common.constants.LOGIN_URL_V1
 import com.yapp.muckpot.common.constants.LOGOUT_URL
 import com.yapp.muckpot.common.constants.REFRESH_TOKEN_KEY
 import com.yapp.muckpot.common.constants.REISSUE_JWT_URL
 import com.yapp.muckpot.common.constants.SIGN_UP_URL
-import com.yapp.muckpot.common.constants.SIGN_UP_URL_V1
 import com.yapp.muckpot.domains.user.service.JwtService
 import com.yapp.muckpot.filter.AuthenticationFailHandler
 import com.yapp.muckpot.filter.JwtAuthorizationFilter
@@ -123,11 +119,7 @@ class SecurityConfig(
             SIGN_UP_URL,
             EMAIL_REQUEST_URL,
             EMAIL_VERIFY_URL,
-            REISSUE_JWT_URL,
-            SIGN_UP_URL_V1,
-            LOGIN_URL_V1,
-            EMAIL_REQUEST_URL_V1,
-            EMAIL_VERIFY_URL_V1
+            REISSUE_JWT_URL
         )
     }
 }

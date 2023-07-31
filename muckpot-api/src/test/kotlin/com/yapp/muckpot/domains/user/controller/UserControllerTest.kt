@@ -1,5 +1,6 @@
 package com.yapp.muckpot.domains.user.controller
 
+import Fixture
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.yapp.muckpot.common.constants.ACCESS_TOKEN_KEY
 import com.yapp.muckpot.common.constants.JWT_LOGOUT_VALUE
@@ -43,7 +44,7 @@ class UserControllerTest @Autowired constructor(
     fun loginAndInit() {
         loginUser = userRepository.save(user)
         val response = mockMvc.perform(
-            post("/api/v1/users/login")
+            post("/api/v2/users/login")
                 .content(objectMapper.writeValueAsBytes(loginRequest))
                 .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(
