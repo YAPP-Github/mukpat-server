@@ -135,7 +135,11 @@ class UserController(
             ResponseEntityUtil.ok(it)
         } ?: run {
             // 로그인 했지만 refreshToken 만료 && 로그인 하지 않은 유저
-            refreshToken ?: return ResponseEntityUtil.noContent()
+            refreshToken?.let {
+                if (jwtService.isTokenExpired(it)) {
+                    return ResponseEntityUtil.noContent()
+                }
+            } ?: return ResponseEntityUtil.noContent()
             // 로그인 했지만 accessToken 만료
             accessToken?.let {
                 if (jwtService.isTokenExpired(it)) {
