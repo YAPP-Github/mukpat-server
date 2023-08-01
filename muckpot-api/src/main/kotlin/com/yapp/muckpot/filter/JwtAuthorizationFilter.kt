@@ -1,5 +1,7 @@
 package com.yapp.muckpot.filter
 
+import com.yapp.muckpot.common.constants.EMAIL_REQUEST_URL
+import com.yapp.muckpot.common.constants.EMAIL_VERIFY_URL
 import com.yapp.muckpot.common.constants.LOGIN_URL
 import com.yapp.muckpot.common.constants.REISSUE_JWT_URL
 import com.yapp.muckpot.common.constants.SIGN_UP_URL
@@ -23,7 +25,7 @@ class JwtAuthorizationFilter(private val jwtService: JwtService) : OncePerReques
         filterChain: FilterChain
     ) {
         jwtService.getCurrentUserClaim()?.let { userResponse ->
-            if (ALREADY_LOGIN_REJECT_URLS.contains(request.requestURI.toString())) {
+            if (ONLY_NON_LOGIN_USER_URLS.contains(request.requestURI.toString())) {
                 if (userResponse.tokenExpired) {
                     filterChain.doFilter(request, response)
                     return
@@ -46,15 +48,18 @@ class JwtAuthorizationFilter(private val jwtService: JwtService) : OncePerReques
         }
         filterChain.doFilter(request, response)
     }
+
     private fun needAccessTokenExpiredCheck(requestMethod: String, requestUri: String): Boolean {
         return (requestMethod != HttpMethod.GET.toString() && !TOKEN_EXPIRED_NOT_CHECK_URLS.contains(requestUri))
     }
 
     companion object {
         private val LOGIN_USER_AUTHORITIES = listOf(SimpleGrantedAuthority("ROLE_USER"))
-        private val ALREADY_LOGIN_REJECT_URLS = listOf(
+        private val ONLY_NON_LOGIN_USER_URLS = listOf(
             LOGIN_URL,
-            SIGN_UP_URL
+            SIGN_UP_URL,
+            EMAIL_REQUEST_URL,
+            EMAIL_VERIFY_URL
         )
         private val TOKEN_EXPIRED_NOT_CHECK_URLS = listOf(
             REISSUE_JWT_URL

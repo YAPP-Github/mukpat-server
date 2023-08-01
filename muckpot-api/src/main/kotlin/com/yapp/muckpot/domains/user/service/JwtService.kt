@@ -64,6 +64,8 @@ class JwtService(
      * 현재 HttpServletRequest의 AccessToken을 찾아 유저 정보 반환
      *
      * @return UserResponse? 유저 정보가 없는 경우 null 반환
+     * @return UserResponse tokenExpired=false 로그인 유저
+     * @return UserResponse tokenExpired=true 토큰이 만료된 유저 (비정상), 별도 처리 필요
      */
     fun getCurrentUserClaim(): UserResponse? {
         return try {

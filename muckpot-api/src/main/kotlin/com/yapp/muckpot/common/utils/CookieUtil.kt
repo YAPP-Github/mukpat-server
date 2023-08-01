@@ -1,5 +1,7 @@
 package com.yapp.muckpot.common.utils
 
+import com.yapp.muckpot.common.constants.ACCESS_TOKEN_KEY
+import com.yapp.muckpot.common.constants.REFRESH_TOKEN_KEY
 import com.yapp.muckpot.domains.user.exception.UserErrorCode
 import com.yapp.muckpot.exception.MuckPotException
 import org.springframework.web.context.request.RequestContextHolder
@@ -51,5 +53,10 @@ object CookieUtil {
             }
         }
         currentResponse.addCookie(cookie)
+    }
+
+    fun allTokenClear() {
+        addHttpOnlyCookie(ACCESS_TOKEN_KEY, "", 0)
+        addHttpOnlyCookie(REFRESH_TOKEN_KEY, "", 0)
     }
 }
