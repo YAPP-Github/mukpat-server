@@ -31,7 +31,8 @@ class MuckpotUpdateRequestTest : StringSpec({
             content = null,
             chatLink = "chat_link",
             region_1depth_name = "서울특별시",
-            region_2depth_name = "강남구"
+            region_2depth_name = "강남구",
+            addressName = "addressName"
         )
     }
 
