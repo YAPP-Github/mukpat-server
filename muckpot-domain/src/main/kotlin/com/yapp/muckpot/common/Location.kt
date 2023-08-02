@@ -11,16 +11,15 @@ class Location(
     @Column(name = "location_name")
     var locationName: String,
 
-    // TODO FE 작업 완료 후 nullable 제거
     @Column(name = "address_name")
-    var addressName: String? = null,
+    var addressName: String,
 
     @Column(name = "location_point", columnDefinition = "Point")
     val locationPoint: Point
 ) {
     constructor(
         locationName: String,
-        addressName: String? = null,
+        addressName: String,
         x: Double,
         y: Double
     ) : this(

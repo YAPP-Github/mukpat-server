@@ -45,7 +45,8 @@ class MuckpotCreateRequestTest : StringSpec({
             content = content,
             chatLink = chatLink,
             region_1depth_name = region_1depth_name,
-            region_2depth_name = region_2depth_name
+            region_2depth_name = region_2depth_name,
+            addressName = "addressName"
         )
     }
 

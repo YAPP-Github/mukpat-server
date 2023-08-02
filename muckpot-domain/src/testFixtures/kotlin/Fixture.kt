@@ -21,8 +21,7 @@ object Fixture {
         gender: Gender = Gender.MEN,
         yearOfBirth: Int = 2000,
         mainCategory: JobGroupMain = JobGroupMain.DEVELOPMENT,
-        subCategory: String? = "subCategory",
-        imageUrl: String? = "image_url"
+        subCategory: String? = "subCategory"
     ): MuckPotUser {
         return MuckPotUser(
             id,
@@ -32,8 +31,7 @@ object Fixture {
             gender,
             yearOfBirth,
             mainCategory,
-            subCategory,
-            imageUrl
+            subCategory
         )
     }
 

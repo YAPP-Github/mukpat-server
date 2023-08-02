@@ -18,8 +18,7 @@ data class MuckpotUpdateDetailResponse(
     var minAge: Int? = null,
     var maxAge: Int? = null,
     val locationName: String,
-    // TODO FE 작업 완료 후 nullable 제거
-    val addressName: String? = null,
+    val addressName: String,
     val region_1depth_name: String,
     val region_2depth_name: String,
     val x: Double,
@@ -50,9 +49,8 @@ data class MuckpotUpdateDetailResponse(
                 maxAge = board.maxAge,
                 locationName = board.location.locationName,
                 addressName = board.location.addressName,
-                // TODO board.province nullable 제거하면서 엘비스 연산자 같이 제거 필요
-                region_1depth_name = board.province?.city?.name ?: "undefined",
-                region_2depth_name = board.province?.name ?: "undefined",
+                region_1depth_name = board.province.city.name,
+                region_2depth_name = board.province.name,
                 x = board.getX(),
                 y = board.getY(),
                 locationDetail = board.locationDetail,

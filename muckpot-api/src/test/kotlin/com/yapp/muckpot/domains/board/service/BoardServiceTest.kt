@@ -64,7 +64,8 @@ class BoardServiceTest @Autowired constructor(
         content = null,
         chatLink = "chatLink",
         region_1depth_name = "서울특별시",
-        region_2depth_name = "강남구"
+        region_2depth_name = "강남구",
+        addressName = "addressName"
     )
     val updateRequest = MuckpotUpdateRequest(
         meetingDate = LocalDate.now().plusDays(1),
@@ -80,7 +81,8 @@ class BoardServiceTest @Autowired constructor(
         content = "content",
         chatLink = "modify chatLink",
         region_1depth_name = "서울특별시",
-        region_2depth_name = "송파구"
+        region_2depth_name = "송파구",
+        addressName = "addressName"
     )
     val regionsRedisKey = "$REGIONS_CACHE_NAME::all"
 
@@ -321,7 +323,8 @@ class BoardServiceTest @Autowired constructor(
                 content = "content",
                 chatLink = "modify chatLink",
                 region_1depth_name = "서울특별시",
-                region_2depth_name = "송파구"
+                region_2depth_name = "송파구",
+                addressName = " "
             )
             // when
             boardService.updateBoardAndSendEmail(userId, boardId, request)
@@ -338,8 +341,14 @@ class BoardServiceTest @Autowired constructor(
             val boardId = boardService.saveBoard(userId, createRequest)!!
             val applyUser = userRepository.save(
                 MuckPotUser(
-                    null, "test1@naver.com", "pw", "nickname1",
-                    Gender.MEN, 2000, JobGroupMain.DEVELOPMENT, "sub", "url"
+                    null,
+                    "test1@naver.com",
+                    "pw",
+                    "nickname1",
+                    Gender.MEN,
+                    2000,
+                    JobGroupMain.DEVELOPMENT,
+                    "sub"
                 )
             )
             val applyUserId = applyUser.id!!
@@ -366,8 +375,14 @@ class BoardServiceTest @Autowired constructor(
             val boardId = boardService.saveBoard(userId, createRequest)!!
             val applyUser = userRepository.save(
                 MuckPotUser(
-                    null, "test1@naver.com", "pw", "nickname1",
-                    Gender.MEN, 2000, JobGroupMain.DEVELOPMENT, "sub", "url"
+                    null,
+                    "test1@naver.com",
+                    "pw",
+                    "nickname1",
+                    Gender.MEN,
+                    2000,
+                    JobGroupMain.DEVELOPMENT,
+                    "sub"
                 )
             )
             val applyId = applyUser.id!!

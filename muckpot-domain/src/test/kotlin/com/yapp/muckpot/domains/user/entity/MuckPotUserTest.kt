@@ -12,8 +12,14 @@ class MuckPotUserTest : FunSpec({
             // when & then
             shouldThrow<IllegalArgumentException> {
                 MuckPotUser(
-                    null, "email#email.com", "pw", "nickname",
-                    Gender.MEN, 2000, JobGroupMain.DEVELOPMENT, "sub", "url"
+                    null,
+                    "email#email.com",
+                    "pw",
+                    "nickname",
+                    Gender.MEN,
+                    2000,
+                    JobGroupMain.DEVELOPMENT,
+                    "sub"
                 )
             }.message shouldBe "유효한 이메일 형식이 아닙니다"
         }
@@ -22,8 +28,14 @@ class MuckPotUserTest : FunSpec({
             // when & then
             shouldThrow<IllegalArgumentException> {
                 MuckPotUser(
-                    null, "email@email.com", "pw", "nickname",
-                    Gender.MEN, 1899, JobGroupMain.DEVELOPMENT, "sub", "url"
+                    null,
+                    "email@email.com",
+                    "pw",
+                    "nickname",
+                    Gender.MEN,
+                    1899,
+                    JobGroupMain.DEVELOPMENT,
+                    "sub"
                 )
             }.message shouldBe "잘못된 출생 연도입니다"
         }
