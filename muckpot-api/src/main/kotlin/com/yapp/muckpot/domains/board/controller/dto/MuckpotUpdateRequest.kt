@@ -47,9 +47,8 @@ data class MuckpotUpdateRequest(
     val maxAge: Int? = null,
     @field:ApiModelProperty(notes = "장소명, 업체명", required = true, example = "빽다방 용인구성언남점")
     var locationName: String,
-    // TODO FE 작업 완료 후 nullable 제거
     @field:ApiModelProperty(notes = "도로명(지번) 주소", required = true, example = "경기 용인시 기흥구 구성로 102")
-    var addressName: String? = null,
+    var addressName: String,
     @field:ApiModelProperty(notes = "주소 상세", required = false, example = "6층")
     var locationDetail: String? = null,
     @field:ApiModelProperty(notes = "x 좌표", required = true, example = "127.02970799701643")

@@ -51,9 +51,6 @@ class MuckPotUser(
     @Column(name = "sub_category")
     var subCategory: String? = null,
 
-    @Column(name = "image_url")
-    var imageUrl: String? = null,
-
     @Column(name = "state")
     @Enumerated(value = EnumType.STRING)
     var state: State = State.ACTIVE

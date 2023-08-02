@@ -24,8 +24,7 @@ data class MuckpotDetailResponse(
     var minAge: Int? = null,
     var maxAge: Int? = null,
     val locationName: String,
-    // TODO FE 작업 완료 후 nullable 제거
-    val addressName: String? = null,
+    val addressName: String,
     val x: Double,
     val y: Double,
     val locationDetail: String? = null,

@@ -82,10 +82,9 @@ class Board(
     @Enumerated(value = EnumType.STRING)
     var state: State = State.ACTIVE,
 
-    // TODO 1.0 개발 완료 후 null 제거
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "location_id", referencedColumnName = "province_id")
-    var province: Province? = null
+    var province: Province
 ) : BaseTimeEntity() {
     init {
         require(minAge in AGE_MIN..AGE_MAX) { AGE_EXP_MSG }
