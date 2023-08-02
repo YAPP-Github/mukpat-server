@@ -76,12 +76,13 @@ class BoardService(
                 board.visit()
             }
             val userAge: Int? = loginUserInfo?.let { userRepository.findByIdOrNull(it.userId)?.getAge() }
+            val prevAndNextId = boardQuerydslRepository.findPrevAndNextId(boardId, request.cityId, request.provinceId)
 
             return MuckpotDetailResponse.of(
                 board = board,
                 participants = participantQuerydslRepository.findByBoardIds(listOf(boardId)),
-                prevId = boardQuerydslRepository.findPrevId(boardId, request.cityId, request.provinceId),
-                nextId = boardQuerydslRepository.findNextId(boardId, request.cityId, request.provinceId),
+                prevId = prevAndNextId.first,
+                nextId = prevAndNextId.second,
                 userAge = userAge
             ).apply {
                 sortParticipantsByLoginUser(loginUserInfo)
