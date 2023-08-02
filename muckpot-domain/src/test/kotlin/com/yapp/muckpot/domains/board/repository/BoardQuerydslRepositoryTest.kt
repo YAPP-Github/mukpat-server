@@ -36,7 +36,7 @@ class BoardQuerydslRepositoryTest(
         province = provinceRepository.save(Fixture.createProvince(city = city))
         boards = listOf(
             Fixture.createBoard(title = "board1", user = user, province = province).apply { createdAt = LocalDateTime.now() },
-            Fixture.createBoard(title = "board2", user = user, province = province, status = MuckPotStatus.DONE).apply { createdAt = LocalDateTime.now().plusDays(1) },
+            Fixture.createBoard(title = "board2", user = user, province = province).apply { createdAt = LocalDateTime.now().plusDays(1) },
             Fixture.createBoard(title = "board3", user = user, province = province).apply { createdAt = LocalDateTime.now().plusDays(2) }
         )
 
@@ -59,35 +59,35 @@ class BoardQuerydslRepositoryTest(
         result shouldHaveSize countPerScroll
     }
 
-    "진행중 먹팟부터 생성일자 기준 내림차순 정렬" {
+    "생성일자 기준 내림차순 정렬" {
         // when
         val result = boardQuerydslRepository.findAllWithPaginationAndRegion(null, 3, null, null)
         // then
         result[0].id shouldBe boards[2].id
-        result[1].id shouldBe boards[0].id
-        result[2].id shouldBe boards[1].id
+        result[1].id shouldBe boards[1].id
+        result[2].id shouldBe boards[0].id
     }
 
-    "이전 아이디는 진행중 먹팟부터 생성일자 기준 내림차순 정렬 후, 한칸 높은 순위(직후 생성 된)의 번호이다." {
+    "이전 아이디는 현재 게시글 이후에 등록된 첫번째 글이다." {
         // when
-        val todayPrev = boardQuerydslRepository.findPrevAndNextId(boards[0].id!!, null, null).first
-        val tomorrowPrev = boardQuerydslRepository.findPrevAndNextId(boards[1].id!!, null, null).first
-        val twoDaysLaterPrev = boardQuerydslRepository.findPrevAndNextId(boards[2].id!!, null, null).first
+        val todayPrev = boardQuerydslRepository.findPrevId(boards[0].id!!)
+        val tomorrowPrev = boardQuerydslRepository.findPrevId(boards[1].id!!)
+        val twoDaysLaterPrev = boardQuerydslRepository.findPrevId(boards[2].id!!)
         // then
-        todayPrev shouldBe boards[2].id
-        tomorrowPrev shouldBe boards[0].id
+        todayPrev shouldBe boards[1].id
+        tomorrowPrev shouldBe boards[2].id
         twoDaysLaterPrev shouldBe null
     }
 
-    "이전 아이디는 진행중 먹팟부터 생성일자 기준 내림차순 정렬 후, 한칸 낮은 순위(먼저 생성 된)의 번호이다." {
+    "다음 아이디는 현재 게시글 이전에 등록된 마지막 글이다." {
         // when
-        val todayNext = boardQuerydslRepository.findPrevAndNextId(boards[0].id!!, null, null).second
-        val tomorrowNext = boardQuerydslRepository.findPrevAndNextId(boards[1].id!!, null, null).second
-        val twoDaysLaterNext = boardQuerydslRepository.findPrevAndNextId(boards[2].id!!, null, null).second
+        val todayNext = boardQuerydslRepository.findNextId(boards[0].id!!)
+        val tomorrowNext = boardQuerydslRepository.findNextId(boards[1].id!!)
+        val twoDaysLaterNext = boardQuerydslRepository.findNextId(boards[2].id!!)
         // then
-        todayNext shouldBe boards[1].id
-        tomorrowNext shouldBe null
-        twoDaysLaterNext shouldBe boards[0].id
+        todayNext shouldBe null
+        tomorrowNext shouldBe boards[0].id
+        twoDaysLaterNext shouldBe boards[1].id
     }
 
     "현재시간 미만의 먹팟 상태 업데이트" {
@@ -114,12 +114,6 @@ class BoardQuerydslRepositoryTest(
 
         actual.province?.name shouldBe province.name
         actual.province?.city?.name shouldBe city.name
-    }
-
-    "DONE 상태의 먹팟을 나중에 조회한다." {
-        val actual = boardQuerydslRepository.findAllWithPaginationAndRegion(null, 10, null, null)
-
-        actual[2].status shouldBe MuckPotStatus.DONE
     }
 }) {
     override fun extensions() = listOf(SpringExtension)

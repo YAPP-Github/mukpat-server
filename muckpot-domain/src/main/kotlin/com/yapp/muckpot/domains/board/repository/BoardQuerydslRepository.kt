@@ -20,23 +20,20 @@ import java.time.LocalDateTime
 class BoardQuerydslRepository(
     private val queryFactory: JPAQueryFactory
 ) {
-    fun findPrevAndNextId(boardId: Long, cityId: Long? = null, provinceId: Long? = null): Pair<Long?, Long?> {
-        val idList = queryFactory.from(board)
+    fun findPrevId(boardId: Long, cityId: Long? = null, provinceId: Long? = null): Long? {
+        return queryFactory.from(board)
             .innerJoin(board.province, province)
-            .select(board.id)
-            .where(cityIdEqBoard(cityId), provinceIdEqBoard(provinceId))
-            .orderBy(*boardCommonOrderByList.toTypedArray())
-            .fetch()
-        var prevId: Long? = null
-        var nextId: Long? = null
-        val boardIdIndex = idList.indexOf(boardId)
-        if (boardIdIndex > 0) {
-            prevId = idList[boardIdIndex - 1]
-        }
-        if (boardIdIndex + 1 < idList.size) {
-            nextId = idList[boardIdIndex + 1]
-        }
-        return prevId to nextId
+            .select(board.id.min())
+            .where(board.id.gt(boardId), cityIdEqBoard(cityId), provinceIdEqBoard(provinceId))
+            .fetchOne()
+    }
+
+    fun findNextId(boardId: Long, cityId: Long? = null, provinceId: Long? = null): Long? {
+        return queryFactory.from(board)
+            .innerJoin(board.province, province)
+            .select(board.id.max())
+            .where(board.id.lt(boardId), cityIdEqBoard(cityId), provinceIdEqBoard(provinceId))
+            .fetchOne()
     }
 
     @Transactional
@@ -92,7 +89,7 @@ class BoardQuerydslRepository(
             .select(board)
             .innerJoin(board.province, province)
             .where(lessThanLastId(lastId), cityIdEqBoard(cityId), provinceIdEqBoard(provinceId))
-            .orderBy(*boardCommonOrderByList.toTypedArray())
+            .orderBy(board.createdAt.desc())
             .limit(countPerScroll)
             .fetch()
     }
@@ -104,9 +101,5 @@ class BoardQuerydslRepository(
             .leftJoin(province.city, city).fetchJoin()
             .where(board.id.eq(boardId))
             .fetchOne()
-    }
-
-    companion object {
-        private val boardCommonOrderByList = listOf(board.status.desc(), board.createdAt.desc())
     }
 }
