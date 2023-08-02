@@ -104,7 +104,8 @@ class BoardServiceMockTest @Autowired constructor(
             // given
             every { boardRepository.findByIdOrNull(any()) } returns board
             every { participantQuerydslRepository.findByBoardIds(any()) } returns participantResponses
-            every { boardQuerydslRepository.findPrevAndNextId(any()) } returns Pair(null, null)
+            every { boardQuerydslRepository.findPrevId(any()) } returns null
+            every { boardQuerydslRepository.findNextId(any()) } returns null
         }
 
         test("먹팟 상세조회 성공") {
