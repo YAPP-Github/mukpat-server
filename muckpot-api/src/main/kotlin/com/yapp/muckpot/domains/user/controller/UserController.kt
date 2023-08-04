@@ -7,6 +7,7 @@ import com.yapp.muckpot.common.constants.NO_BODY_RESPONSE
 import com.yapp.muckpot.common.constants.REFRESH_TOKEN_KEY
 import com.yapp.muckpot.common.constants.SIGN_UP_RESPONSE
 import com.yapp.muckpot.common.enums.StatusCode
+import com.yapp.muckpot.common.utils.CookieUtil
 import com.yapp.muckpot.common.utils.ResponseEntityUtil
 import com.yapp.muckpot.common.utils.SecurityContextHolderUtil
 import com.yapp.muckpot.domains.user.controller.dto.LoginRequest
@@ -185,13 +186,21 @@ class UserController(
     @ApiOperation(value = "JWT 재발급")
     @PostMapping("/v1/users/refresh")
     fun reissueJwt(@CookieValue(REFRESH_TOKEN_KEY, required = false) refreshToken: String? = null, @CookieValue(ACCESS_TOKEN_KEY) accessToken: String): ResponseEntity<ResponseDto> {
-        refreshToken ?: throw NOT_EXIST_REFRESH_TOKEN_EXP
+        refreshToken?.let {
+            if (jwtService.isTokenExpired(refreshToken)) {
+                CookieUtil.allTokenClear()
+                throw NOT_EXIST_REFRESH_TOKEN_EXP
+            }
+        } ?: run {
+            CookieUtil.allTokenClear()
+            throw NOT_EXIST_REFRESH_TOKEN_EXP
+        }
         userService.reissueJwt(refreshToken, accessToken)
         return ResponseEntityUtil.noContent()
     }
 
     companion object {
-        private val NOT_EXIST_REFRESH_TOKEN_EXP = IllegalArgumentException("리프레시 토큰이 존재하지 않습니다.")
+        private val NOT_EXIST_REFRESH_TOKEN_EXP = IllegalArgumentException("리프레시 토큰이 만료되었습니다.")
         private val NOT_EXIST_ACCESS_TOKEN_EXP = ResponseEntity
             .status(StatusCode.INVALID_TOKEN.code)
             .body(ResponseDto(StatusCode.INVALID_TOKEN.code, "만료된 토큰입니다."))
