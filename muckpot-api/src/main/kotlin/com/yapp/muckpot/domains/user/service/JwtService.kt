@@ -7,6 +7,7 @@ import com.auth0.jwt.exceptions.TokenExpiredException
 import com.auth0.jwt.interfaces.DecodedJWT
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.yapp.muckpot.common.constants.ACCESS_TOKEN_KEY
+import com.yapp.muckpot.common.constants.ACCESS_TOKEN_SECONDS
 import com.yapp.muckpot.common.constants.JWT_LOGOUT_VALUE
 import com.yapp.muckpot.common.constants.MS
 import com.yapp.muckpot.common.constants.REFRESH_TOKEN_BASIC_SECONDS
@@ -43,9 +44,7 @@ class JwtService(
         val jwtBuilder = JWT.create()
             .withIssuer(issuer)
             .withClaim(USER_CLAIM, objectMapper.writeValueAsString(response))
-            // TODO 테스트 후 원복
-            // .withExpiresAt(Date(Date().time + ACCESS_TOKEN_SECONDS * MS))
-            .withExpiresAt(Date(Date().time + 180 * MS))
+            .withExpiresAt(Date(Date().time + ACCESS_TOKEN_SECONDS * MS))
         return jwtBuilder.sign(algorithm)
     }
 
@@ -54,9 +53,7 @@ class JwtService(
             .withIssuer(issuer)
             .withClaim(USER_EMAIL_CLAIM, email)
             .withIssuedAt(Date())
-            // TODO 테스트 후 원복
-            // .withExpiresAt(Date(Date().time + expiredSeconds * MS))
-            .withExpiresAt(Date(Date().time + 300 * MS))
+            .withExpiresAt(Date(Date().time + expiredSeconds * MS))
         return jwtBuilder.sign(algorithm)
     }
 
