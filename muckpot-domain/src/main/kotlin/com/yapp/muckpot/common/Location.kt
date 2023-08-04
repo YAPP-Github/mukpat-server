@@ -11,11 +11,20 @@ class Location(
     @Column(name = "location_name")
     var locationName: String,
 
+    @Column(name = "address_name")
+    var addressName: String,
+
     @Column(name = "location_point", columnDefinition = "Point")
     val locationPoint: Point
 ) {
-    constructor(locationName: String, x: Double, y: Double) : this(
-        locationName,
+    constructor(
+        locationName: String,
+        addressName: String,
+        x: Double,
+        y: Double
+    ) : this(
+        locationName = locationName,
+        addressName = addressName,
         GeometryFactory().createPoint(Coordinate(x, y))
     )
 

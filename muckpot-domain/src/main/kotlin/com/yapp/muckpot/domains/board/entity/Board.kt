@@ -80,14 +80,20 @@ class Board(
 
     @Column(name = "state")
     @Enumerated(value = EnumType.STRING)
-    var state: State = State.ACTIVE
+    var state: State = State.ACTIVE,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "location_id", referencedColumnName = "province_id")
+    var province: Province
 ) : BaseTimeEntity() {
     init {
         require(minAge in AGE_MIN..AGE_MAX) { AGE_EXP_MSG }
         require(maxAge in AGE_MIN..AGE_MAX) { AGE_EXP_MSG }
         require(minAge < maxAge) { "최소나이는 최대나이보다 작아야 합니다." }
         require(maxApply >= MAX_APPLY_MIN) { "최대 인원은 ${MAX_APPLY_MIN}명 이상 가능합니다." }
-        require(meetingTime > LocalDateTime.now()) { "만날 시간은 현재시간 이후에 가능합니다." }
+        if (isOutOfDate()) {
+            this.status = DONE
+        }
     }
 
     fun join(userAge: Int) {
@@ -95,17 +101,13 @@ class Board(
         require(currentApply < maxApply) { "참여 모집이 마감되었습니다." }
         require(status == IN_PROGRESS) { "참여 모집이 마감되었습니다." }
         this.currentApply++
-        if (currentApply == maxApply) {
+        if (isFull()) {
             this.status = DONE
         }
     }
 
     fun visit() {
         this.views++
-    }
-
-    fun expired(): Boolean {
-        return (this.status == IN_PROGRESS && this.meetingTime.isBefore(LocalDateTime.now()))
     }
 
     fun getX(): Double {
@@ -123,17 +125,35 @@ class Board(
     fun changeStatus(changeStatus: MuckPotStatus) {
         require(
             (this.status == IN_PROGRESS && changeStatus == DONE) ||
-                ((this.status == DONE && changeStatus == IN_PROGRESS) && currentApply < maxApply)
+                (this.status == DONE && changeStatus == IN_PROGRESS)
         ) { "변경 가능한 상태가 아닙니다." }
-
+        validateToday()
         this.status = changeStatus
     }
 
     fun cancelJoin() {
+        validateToday()
+        this.status = IN_PROGRESS
         this.currentApply--
     }
 
     fun isNotAgeLimit(): Boolean {
         return (this.minAge == AGE_MIN && this.maxAge == AGE_MAX)
+    }
+
+    fun isDone(): Boolean {
+        return this.status == DONE
+    }
+
+    fun isFull(): Boolean {
+        return this.currentApply == this.maxApply
+    }
+
+    fun isOutOfDate(): Boolean {
+        return meetingTime < LocalDateTime.now()
+    }
+
+    private fun validateToday() {
+        require(meetingTime > LocalDateTime.now()) { "이미 마감된 먹팟입니다." }
     }
 }

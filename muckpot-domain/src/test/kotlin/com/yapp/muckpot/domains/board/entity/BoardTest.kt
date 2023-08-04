@@ -27,12 +27,10 @@ class BoardTest : FunSpec({
             }.message shouldBe "최대 인원은 ${MAX_APPLY_MIN}명 이상 가능합니다."
         }
 
-        test("만날 시간은 현재시간 이후로만 가능하다.") {
-            shouldThrow<IllegalArgumentException> {
-                Fixture.createBoard(
-                    meetingTime = LocalDateTime.now().minusMinutes(30)
-                )
-            }.message shouldBe "만날 시간은 현재시간 이후에 가능합니다."
+        test("현재시간 미만의 먹팟은 DONE으로 생성된다.") {
+            val board = Fixture.createBoard(meetingTime = LocalDateTime.now().minusMinutes(10))
+
+            board.status shouldBe MuckPotStatus.DONE
         }
 
         test("정원이 초과된 경우 참여할 수 없다.") {
@@ -72,15 +70,16 @@ class BoardTest : FunSpec({
             }.message shouldBe "변경 가능한 상태가 아닙니다."
         }
 
-        test("모집인원이 마감된 경우에는 IN_PROGRESS 로 변경할 수 없다.") {
+        test("모집인원이 마감된 경우에도 IN_PROGRESS 로 변경할 수 있다.") {
             val board = Fixture.createBoard(
                 status = MuckPotStatus.DONE,
                 currentApply = 3,
                 maxApply = 3
             )
-            shouldThrow<IllegalArgumentException> {
-                board.changeStatus(MuckPotStatus.IN_PROGRESS)
-            }.message shouldBe "변경 가능한 상태가 아닙니다."
+            // when
+            board.changeStatus(MuckPotStatus.IN_PROGRESS)
+            // then
+            board.status shouldBe MuckPotStatus.IN_PROGRESS
         }
 
         test("IN_PROGRESS -> DONE 변경 성공") {
@@ -94,6 +93,25 @@ class BoardTest : FunSpec({
             val board = Fixture.createBoard(status = MuckPotStatus.DONE)
             board.changeStatus(MuckPotStatus.IN_PROGRESS)
 
+            board.status shouldBe MuckPotStatus.IN_PROGRESS
+        }
+
+        test("현재 시간 이전의 먹팟은 상태를 변경할 수 없다.") {
+            val board = Fixture.createBoard(status = MuckPotStatus.DONE)
+                .apply { meetingTime = LocalDateTime.now().minusMinutes(30) }
+
+            shouldThrow<IllegalArgumentException> {
+                board.changeStatus(MuckPotStatus.IN_PROGRESS)
+            }.message shouldBe "이미 마감된 먹팟입니다."
+        }
+
+        test("먹팟 취소시 상태 IN_PROGRESS 변경 성공") {
+            // given
+            val board = Fixture.createBoard(maxApply = 2, currentApply = 2, status = MuckPotStatus.DONE)
+            // when
+            board.cancelJoin()
+            // then
+            board.currentApply shouldBe 1
             board.status shouldBe MuckPotStatus.IN_PROGRESS
         }
     }

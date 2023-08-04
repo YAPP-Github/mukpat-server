@@ -27,7 +27,9 @@ class MuckpotCreateRequestTest : StringSpec({
         y: Double = 0.0,
         title: String = "title",
         content: String? = null,
-        chatLink: String = "chat_link"
+        chatLink: String = "chat_link",
+        region_1depth_name: String = "서울특별시",
+        region_2depth_name: String = "강남구"
     ): MuckpotCreateRequest {
         return MuckpotCreateRequest(
             meetingDate = meetingDate,
@@ -41,7 +43,10 @@ class MuckpotCreateRequestTest : StringSpec({
             y = y,
             title = title,
             content = content,
-            chatLink = chatLink
+            chatLink = chatLink,
+            region_1depth_name = region_1depth_name,
+            region_2depth_name = region_2depth_name,
+            addressName = "addressName"
         )
     }
 
@@ -86,6 +91,36 @@ class MuckpotCreateRequestTest : StringSpec({
         violations.size shouldBe 1
         for (violation in violations) {
             violation.message shouldBe NOT_BLANK_COMMON
+        }
+    }
+
+    "시/도는 공백이 될 수 없다." {
+        val request = createMuckpotCreateRequest(region_1depth_name = " ")
+
+        val violations: MutableSet<ConstraintViolation<MuckpotCreateRequest>> = validator.validate(request)
+        violations.size shouldBe 1
+        for (violation in violations) {
+            violation.message shouldBe NOT_BLANK_COMMON
+        }
+    }
+
+    "구/군은 공백이 될 수 없다." {
+        val request = createMuckpotCreateRequest(region_2depth_name = " ")
+
+        val violations: MutableSet<ConstraintViolation<MuckpotCreateRequest>> = validator.validate(request)
+        violations.size shouldBe 1
+        for (violation in violations) {
+            violation.message shouldBe NOT_BLANK_COMMON
+        }
+    }
+
+    "참여인원은 100명을 넘을 수 없다." {
+        val request = createMuckpotCreateRequest(maxApply = 101)
+
+        val violations: MutableSet<ConstraintViolation<MuckpotCreateRequest>> = validator.validate(request)
+        violations.size shouldBe 1
+        for (violation in violations) {
+            violation.message shouldBe "참여 인원은 2 ~ 100로 입력해주세요."
         }
     }
 })

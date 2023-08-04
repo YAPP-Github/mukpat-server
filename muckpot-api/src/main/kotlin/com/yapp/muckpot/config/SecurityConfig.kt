@@ -8,7 +8,6 @@ import com.yapp.muckpot.common.constants.LOGOUT_URL
 import com.yapp.muckpot.common.constants.REFRESH_TOKEN_KEY
 import com.yapp.muckpot.common.constants.REISSUE_JWT_URL
 import com.yapp.muckpot.common.constants.SIGN_UP_URL
-import com.yapp.muckpot.common.constants.USER_PROFILE_URL
 import com.yapp.muckpot.domains.user.service.JwtService
 import com.yapp.muckpot.filter.AuthenticationFailHandler
 import com.yapp.muckpot.filter.JwtAuthorizationFilter
@@ -45,8 +44,8 @@ class SecurityConfig(
             .authorizeHttpRequests { authz ->
                 authz
                     .antMatchers(HttpMethod.POST, *POST_PERMIT_ALL_URLS.toTypedArray()).permitAll()
-                    .antMatchers(HttpMethod.GET, "/api/**", "/swagger-ui/**")
-                    .permitAll()
+                    .antMatchers(HttpMethod.GET, "/api/**", "/swagger-ui/**").permitAll()
+                    .antMatchers("/swagger-resources/**").permitAll()
                     .antMatchers("/api/**").apply {
                         if (permitAll) {
                             permitAll()
@@ -94,7 +93,13 @@ class SecurityConfig(
     fun webSecurityCustomizer(): WebSecurityCustomizer {
         return WebSecurityCustomizer { web: WebSecurity ->
             web.ignoring()
-                .antMatchers("/swagger-ui/**")
+                .antMatchers(
+                    "/swagger-ui/**",
+                    "/swagger-resources/**",
+                    "/swagger-ui.html",
+                    "/v3/api-docs",
+                    "/webjars/**"
+                )
         }
     }
 
@@ -114,7 +119,6 @@ class SecurityConfig(
             SIGN_UP_URL,
             EMAIL_REQUEST_URL,
             EMAIL_VERIFY_URL,
-            USER_PROFILE_URL,
             REISSUE_JWT_URL
         )
     }

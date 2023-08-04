@@ -3,7 +3,6 @@ package com.yapp.muckpot.common.utils
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.yapp.muckpot.common.ResponseDto
-import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import javax.servlet.http.HttpServletResponse
 
@@ -16,14 +15,14 @@ object ResponseWriter {
     /**
      * Response에 직접 예외 응답 작성
      */
-    fun writeResponse(response: HttpServletResponse, httpStatus: HttpStatus, message: String) {
+    fun writeResponse(response: HttpServletResponse, statusCode: Int, message: String) {
         response.contentType = MediaType.APPLICATION_JSON_VALUE
-        response.status = httpStatus.value()
+        response.status = statusCode
         response.outputStream.use { os ->
             objectMapper.writeValue(
                 os,
                 ResponseDto(
-                    status = httpStatus.value(),
+                    status = statusCode,
                     message
                 )
             )

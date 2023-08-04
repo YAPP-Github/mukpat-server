@@ -2,8 +2,14 @@ package com.yapp.muckpot.domains.board.repository
 
 import com.querydsl.core.types.dsl.BooleanExpression
 import com.querydsl.jpa.impl.JPAQueryFactory
+import com.yapp.muckpot.domains.board.dto.QRegionDto
+import com.yapp.muckpot.domains.board.dto.QRegionDto_CityDto
+import com.yapp.muckpot.domains.board.dto.QRegionDto_ProvinceDto
+import com.yapp.muckpot.domains.board.dto.RegionDto
 import com.yapp.muckpot.domains.board.entity.Board
 import com.yapp.muckpot.domains.board.entity.QBoard.board
+import com.yapp.muckpot.domains.board.entity.QCity.city
+import com.yapp.muckpot.domains.board.entity.QProvince.province
 import com.yapp.muckpot.domains.user.enums.MuckPotStatus
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
@@ -14,28 +20,19 @@ import java.time.LocalDateTime
 class BoardQuerydslRepository(
     private val queryFactory: JPAQueryFactory
 ) {
-    fun findAllWithPagination(lastId: Long?, countPerScroll: Long): List<Board> {
+    fun findPrevId(boardId: Long, cityId: Long? = null, provinceId: Long? = null): Long? {
         return queryFactory.from(board)
-            .select(board)
-            .where(
-                lessThanLastId(lastId)
-            )
-            .orderBy(board.createdAt.desc())
-            .limit(countPerScroll)
-            .fetch()
-    }
-
-    fun findPrevId(boardId: Long): Long? {
-        return queryFactory.from(board)
+            .innerJoin(board.province, province)
             .select(board.id.min())
-            .where(board.id.gt(boardId))
+            .where(board.id.gt(boardId), cityIdEqBoard(cityId), provinceIdEqBoard(provinceId))
             .fetchOne()
     }
 
-    fun findNextId(boardId: Long): Long? {
+    fun findNextId(boardId: Long, cityId: Long? = null, provinceId: Long? = null): Long? {
         return queryFactory.from(board)
+            .innerJoin(board.province, province)
             .select(board.id.max())
-            .where(board.id.lt(boardId))
+            .where(board.id.lt(boardId), cityIdEqBoard(cityId), provinceIdEqBoard(provinceId))
             .fetchOne()
     }
 
@@ -48,9 +45,61 @@ class BoardQuerydslRepository(
             .execute()
     }
 
+    fun findAllRegions(): List<RegionDto> {
+        return queryFactory.select(
+            QRegionDto(
+                board.id,
+                board.status,
+                QRegionDto_CityDto(
+                    province.city.id,
+                    province.city.name
+                ),
+                QRegionDto_ProvinceDto(
+                    board.province.id,
+                    board.province.name
+                )
+            )
+        )
+            .from(board)
+            .innerJoin(board.province, province)
+            .innerJoin(province.city, city)
+            .fetch()
+    }
+
     private fun lessThanLastId(lastId: Long?): BooleanExpression? {
         return lastId?.let {
             board.id.lt(it)
         }
+    }
+
+    private fun cityIdEqBoard(cityId: Long?): BooleanExpression? {
+        return cityId?.let {
+            board.province.city.id.eq(cityId)
+        }
+    }
+
+    private fun provinceIdEqBoard(provinceId: Long?): BooleanExpression? {
+        return provinceId?.let {
+            board.province.id.eq(provinceId)
+        }
+    }
+
+    fun findAllWithPaginationAndRegion(lastId: Long?, countPerScroll: Long, cityId: Long?, provinceId: Long?): List<Board> {
+        return queryFactory.from(board)
+            .select(board)
+            .innerJoin(board.province, province)
+            .where(lessThanLastId(lastId), cityIdEqBoard(cityId), provinceIdEqBoard(provinceId))
+            .orderBy(board.createdAt.desc())
+            .limit(countPerScroll)
+            .fetch()
+    }
+
+    fun findByIdOrNullWithRegion(boardId: Long?): Board? {
+        return queryFactory.from(board)
+            .select(board)
+            .leftJoin(board.province, province).fetchJoin()
+            .leftJoin(province.city, city).fetchJoin()
+            .where(board.id.eq(boardId))
+            .fetchOne()
     }
 }

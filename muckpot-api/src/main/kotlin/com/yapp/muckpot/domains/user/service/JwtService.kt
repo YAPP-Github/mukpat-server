@@ -3,6 +3,7 @@ package com.yapp.muckpot.domains.user.service
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
+import com.auth0.jwt.exceptions.TokenExpiredException
 import com.auth0.jwt.interfaces.DecodedJWT
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.yapp.muckpot.common.constants.ACCESS_TOKEN_KEY
@@ -17,6 +18,7 @@ import com.yapp.muckpot.common.constants.USER_EMAIL_CLAIM
 import com.yapp.muckpot.common.enums.YesNo
 import com.yapp.muckpot.common.utils.CookieUtil
 import com.yapp.muckpot.domains.user.controller.dto.UserResponse
+import com.yapp.muckpot.domains.user.controller.dto.UserResponse.Companion.expiredUser
 import com.yapp.muckpot.domains.user.exception.UserErrorCode
 import com.yapp.muckpot.exception.MuckPotException
 import com.yapp.muckpot.redis.RedisService
@@ -59,6 +61,8 @@ class JwtService(
      * 현재 HttpServletRequest의 AccessToken을 찾아 유저 정보 반환
      *
      * @return UserResponse? 유저 정보가 없는 경우 null 반환
+     * @return UserResponse tokenExpired=false 로그인 유저
+     * @return UserResponse tokenExpired=true 토큰이 만료된 유저 (비정상), 별도 처리 필요
      */
     fun getCurrentUserClaim(): UserResponse? {
         return try {
@@ -68,6 +72,9 @@ class JwtService(
             }
             val decodedJwt = jwtVerifier.verify(token)
             objectMapper.readValue(decodedJwt.getClaim(USER_CLAIM).asString(), UserResponse::class.java)
+        } catch (tokenExpiredException: TokenExpiredException) {
+            log.debug(tokenExpiredException) { tokenExpiredException.message }
+            return expiredUser()
         } catch (exception: Exception) {
             log.debug(exception) { exception.message }
             null

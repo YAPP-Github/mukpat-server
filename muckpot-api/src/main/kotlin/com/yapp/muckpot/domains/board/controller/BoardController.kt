@@ -3,14 +3,17 @@ package com.yapp.muckpot.domains.board.controller
 import com.yapp.muckpot.common.ResponseDto
 import com.yapp.muckpot.common.constants.MUCKPOT_FIND_ALL
 import com.yapp.muckpot.common.constants.MUCKPOT_FIND_BY_ID
+import com.yapp.muckpot.common.constants.MUCKPOT_FIND_BY_ID_FOR_UPDATE
 import com.yapp.muckpot.common.constants.MUCKPOT_JOIN_RESPONSE
+import com.yapp.muckpot.common.constants.MUCKPOT_REGIONS
 import com.yapp.muckpot.common.constants.MUCKPOT_SAVE_RESPONSE
-import com.yapp.muckpot.common.dto.CursorPaginationRequest
 import com.yapp.muckpot.common.utils.ResponseEntityUtil
 import com.yapp.muckpot.common.utils.SecurityContextHolderUtil
+import com.yapp.muckpot.domains.board.controller.dto.AllMuckpotGetRequest
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateRequest
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotCreateResponse
 import com.yapp.muckpot.domains.board.controller.dto.MuckpotUpdateRequest
+import com.yapp.muckpot.domains.board.controller.dto.RegionFilterRequest
 import com.yapp.muckpot.domains.board.service.BoardService
 import com.yapp.muckpot.domains.user.enums.MuckPotStatus
 import io.swagger.annotations.Api
@@ -55,7 +58,7 @@ class BoardController(
         ]
     )
     @ApiOperation(value = "먹팟 글 생성")
-    @PostMapping("/v1/boards")
+    @PostMapping("/v2/boards")
     fun saveBoard(
         @AuthenticationPrincipal userId: Long,
         @RequestBody @Valid
@@ -83,9 +86,9 @@ class BoardController(
         ]
     )
     @ApiOperation(value = "먹팟 글 리스트 조회")
-    @GetMapping("/v1/boards")
-    fun findAll(@ModelAttribute request: CursorPaginationRequest): ResponseEntity<ResponseDto> {
-        return ResponseEntityUtil.ok(boardService.findAllMuckpot(request))
+    @GetMapping("/v2/boards")
+    fun findAll(@ModelAttribute request: AllMuckpotGetRequest): ResponseEntity<ResponseDto> {
+        return ResponseEntityUtil.ok(boardService.findAllBoards(request))
     }
 
     @ApiResponses(
@@ -104,24 +107,26 @@ class BoardController(
     )
     @ApiOperation(value = "먹팟 글 상세 조회")
     @GetMapping("/v1/boards/{boardId}")
-    fun findByBoardId(@PathVariable boardId: Long): ResponseEntity<ResponseDto> {
+    fun findByBoardId(@PathVariable boardId: Long, request: RegionFilterRequest): ResponseEntity<ResponseDto> {
+        request.validate()
         return ResponseEntityUtil.ok(
             boardService.findBoardDetailAndVisit(
                 boardId,
-                SecurityContextHolderUtil.getCredentialOrNull()
+                SecurityContextHolderUtil.getCredentialOrNull(),
+                request
             )
         )
     }
 
     @ApiOperation(value = "먹팟 글 수정")
-    @PatchMapping("/v1/boards/{boardId}")
+    @PatchMapping("/v2/boards/{boardId}")
     fun updateBoard(
         @AuthenticationPrincipal userId: Long,
         @PathVariable boardId: Long,
         @RequestBody @Valid
         request: MuckpotUpdateRequest
     ): ResponseEntity<ResponseDto> {
-        boardService.updateBoard(userId, boardId, request)
+        boardService.updateBoardAndSendEmail(userId, boardId, request)
         return ResponseEntityUtil.noContent()
     }
 
@@ -164,7 +169,7 @@ class BoardController(
         @AuthenticationPrincipal userId: Long,
         @PathVariable boardId: Long
     ): ResponseEntity<ResponseDto> {
-        boardService.deleteBoard(userId, boardId)
+        boardService.deleteBoardAndSendEmail(userId, boardId)
         return ResponseEntityUtil.noContent()
     }
 
@@ -201,7 +206,52 @@ class BoardController(
         @AuthenticationPrincipal userId: Long,
         @PathVariable boardId: Long
     ): ResponseEntity<ResponseDto> {
-        boardService.cancelJoin(userId, boardId)
+        boardService.cancelJoinAndSendEmail(userId, boardId)
         return ResponseEntityUtil.noContent()
+    }
+
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                code = 200,
+                examples = Example(
+                    ExampleProperty(
+                        value = MUCKPOT_REGIONS,
+                        mediaType = MediaType.APPLICATION_JSON_VALUE
+                    )
+                ),
+                message = "성공"
+            )
+        ]
+    )
+    @ApiOperation(value = "필터링 지역 카테고리 조회")
+    @GetMapping("/v1/boards/regions")
+    fun findAllRegions(): ResponseEntity<ResponseDto> {
+        return ResponseEntityUtil.ok(boardService.findAllRegions())
+    }
+
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                code = 200,
+                examples = Example(
+                    ExampleProperty(
+                        value = MUCKPOT_FIND_BY_ID_FOR_UPDATE,
+                        mediaType = MediaType.APPLICATION_JSON_VALUE
+                    )
+                ),
+                message = "성공"
+            )
+        ]
+    )
+    @ApiOperation(value = "먹팟 수정 정보 조회")
+    @GetMapping("/v1/boards/{boardId}/update")
+    fun findUpdateBoardDetail(@PathVariable boardId: Long): ResponseEntity<ResponseDto> {
+        return ResponseEntityUtil.ok(
+            boardService.findUpdateBoardDetail(
+                boardId,
+                SecurityContextHolderUtil.getCredentialOrNull()
+            )
+        )
     }
 }

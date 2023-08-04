@@ -2,9 +2,10 @@ import com.yapp.muckpot.common.Location
 import com.yapp.muckpot.common.constants.AGE_MAX
 import com.yapp.muckpot.common.constants.AGE_MIN
 import com.yapp.muckpot.common.enums.Gender
-import com.yapp.muckpot.common.enums.State
 import com.yapp.muckpot.domains.board.entity.Board
+import com.yapp.muckpot.domains.board.entity.City
 import com.yapp.muckpot.domains.board.entity.Participant
+import com.yapp.muckpot.domains.board.entity.Province
 import com.yapp.muckpot.domains.user.entity.MuckPotUser
 import com.yapp.muckpot.domains.user.enums.JobGroupMain
 import com.yapp.muckpot.domains.user.enums.MuckPotStatus
@@ -14,16 +15,13 @@ import java.util.*
 object Fixture {
     fun createUser(
         id: Long? = null,
-        email: String = UUID.randomUUID().toString().substring(0, 5) + "@naver.com",
+        email: String = UUID.randomUUID().toString().substring(0, 5) + "@samsung.com",
         password: String = "abcd1234",
-        nickName: String = UUID.randomUUID().toString(),
+        nickName: String = UUID.randomUUID().toString().substring(0, 10),
         gender: Gender = Gender.MEN,
         yearOfBirth: Int = 2000,
         mainCategory: JobGroupMain = JobGroupMain.DEVELOPMENT,
-        subCategory: String? = "subCategory",
-        location: Location = Location("userLocation", 40.7128, -74.0060),
-        imageUrl: String? = "image_url",
-        state: State = State.ACTIVE
+        subCategory: String? = "subCategory"
     ): MuckPotUser {
         return MuckPotUser(
             id,
@@ -33,10 +31,7 @@ object Fixture {
             gender,
             yearOfBirth,
             mainCategory,
-            subCategory,
-            location,
-            imageUrl,
-            state
+            subCategory
         )
     }
 
@@ -44,7 +39,10 @@ object Fixture {
         id: Long? = null,
         user: MuckPotUser = createUser(),
         title: String = "board_title",
-        location: Location = Location("boardLocation", 40.7128, -74.0060),
+        locationName: String = "locationName",
+        addressName: String = "addressName",
+        x: Double = 40.7128,
+        y: Double = -74.0060,
         locationDetail: String? = null,
         meetingTime: LocalDateTime = LocalDateTime.now().plusMinutes(30),
         content: String? = "content",
@@ -55,24 +53,24 @@ object Fixture {
         status: MuckPotStatus = MuckPotStatus.IN_PROGRESS,
         minAge: Int = AGE_MIN,
         maxAge: Int = AGE_MAX,
-        state: State = State.ACTIVE
+        province: Province = createProvince()
     ): Board {
         return Board(
-            id,
-            user,
-            title,
-            location,
-            locationDetail,
-            meetingTime,
-            content,
-            views,
-            currentApply,
-            maxApply,
-            chatLink,
-            status,
-            minAge,
-            maxAge,
-            state
+            id = id,
+            user = user,
+            title = title,
+            location = Location(locationName, addressName, x, y),
+            locationDetail = locationDetail,
+            meetingTime = meetingTime,
+            content = content,
+            views = views,
+            currentApply = currentApply,
+            maxApply = maxApply,
+            chatLink = chatLink,
+            status = status,
+            minAge = minAge,
+            maxAge = maxAge,
+            province = province
         )
     }
 
@@ -81,5 +79,23 @@ object Fixture {
         board: Board = createBoard()
     ): Participant {
         return Participant(user, board)
+    }
+
+    fun createProvince(
+        name: String = "강남구",
+        city: City = createCity()
+    ): Province {
+        return Province(
+            name,
+            city
+        )
+    }
+
+    fun createCity(
+        name: String = "서울특별시"
+    ): City {
+        return City(
+            name
+        )
     }
 }

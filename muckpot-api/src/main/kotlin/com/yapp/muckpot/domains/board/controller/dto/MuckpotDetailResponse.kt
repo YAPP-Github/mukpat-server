@@ -1,8 +1,8 @@
 package com.yapp.muckpot.domains.board.controller.dto
 
 import com.yapp.muckpot.common.TimeUtil
-import com.yapp.muckpot.common.constants.KR_MM_DD_E
 import com.yapp.muckpot.common.constants.KR_YYYY_MM_DD
+import com.yapp.muckpot.common.constants.KR_YYYY_MM_DD_E
 import com.yapp.muckpot.common.constants.a_hhmm
 import com.yapp.muckpot.domains.board.dto.ParticipantReadResponse
 import com.yapp.muckpot.domains.board.entity.Board
@@ -24,12 +24,14 @@ data class MuckpotDetailResponse(
     var minAge: Int? = null,
     var maxAge: Int? = null,
     val locationName: String,
+    val addressName: String,
     val x: Double,
     val y: Double,
     val locationDetail: String? = null,
     val views: Int,
     val userAge: Int?,
-    var participants: List<ParticipantReadResponse>
+    var participants: List<ParticipantReadResponse>,
+    val isOutOfDate: Boolean
 ) {
     init {
         if (participants.isNotEmpty()) {
@@ -71,7 +73,7 @@ data class MuckpotDetailResponse(
                 content = board.content,
                 chatLink = board.chatLink,
                 status = board.status.korNm,
-                meetingDate = TimeUtil.localeKoreanFormatting(board.meetingTime, KR_MM_DD_E),
+                meetingDate = TimeUtil.localeKoreanFormatting(board.meetingTime, KR_YYYY_MM_DD_E),
                 meetingTime = TimeUtil.localeKoreanFormatting(board.meetingTime, a_hhmm),
                 createDate = TimeUtil.localeKoreanFormatting(board.createdAt, KR_YYYY_MM_DD),
                 maxApply = board.maxApply,
@@ -79,12 +81,14 @@ data class MuckpotDetailResponse(
                 minAge = board.minAge,
                 maxAge = board.maxAge,
                 locationName = board.location.locationName,
+                addressName = board.location.addressName,
                 x = board.getX(),
                 y = board.getY(),
                 locationDetail = board.locationDetail,
                 views = board.views,
                 userAge = userAge,
-                participants = participants
+                participants = participants,
+                isOutOfDate = board.isOutOfDate()
             )
             if (board.isNotAgeLimit()) {
                 response.changeIsNotAgeLimit()

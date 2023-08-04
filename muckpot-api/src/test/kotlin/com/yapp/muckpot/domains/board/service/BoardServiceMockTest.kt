@@ -2,13 +2,20 @@ package com.yapp.muckpot.domains.board.service
 
 import Fixture
 import com.ninjasquad.springmockk.MockkBean
-import com.yapp.muckpot.common.dto.CursorPaginationRequest
+import com.yapp.muckpot.common.constants.TODAY_KR
+import com.yapp.muckpot.common.constants.TOMORROW_KR
+import com.yapp.muckpot.domains.board.controller.dto.AllMuckpotGetRequest
+import com.yapp.muckpot.domains.board.controller.dto.RegionFilterRequest
 import com.yapp.muckpot.domains.board.dto.ParticipantReadResponse
+import com.yapp.muckpot.domains.board.dto.RegionDto
+import com.yapp.muckpot.domains.board.dto.RegionDto.CityDto
+import com.yapp.muckpot.domains.board.dto.RegionDto.ProvinceDto
 import com.yapp.muckpot.domains.board.repository.BoardQuerydslRepository
 import com.yapp.muckpot.domains.board.repository.BoardRepository
 import com.yapp.muckpot.domains.board.repository.ParticipantQuerydslRepository
 import com.yapp.muckpot.domains.user.controller.dto.UserResponse
-import com.yapp.muckpot.domains.user.enums.MuckPotStatus
+import com.yapp.muckpot.domains.user.enums.MuckPotStatus.DONE
+import com.yapp.muckpot.domains.user.enums.MuckPotStatus.IN_PROGRESS
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
@@ -32,8 +39,8 @@ class BoardServiceMockTest @Autowired constructor(
         val allBoardSize = 3
         val allBoard = listOf(
             Fixture.createBoard(id = 1, title = "board1").apply { meetingTime = LocalDateTime.MIN },
-            Fixture.createBoard(id = 2, title = "board2"),
-            Fixture.createBoard(id = 3, title = "board3")
+            Fixture.createBoard(id = 2, title = "board2").apply { meetingTime = LocalDateTime.now() },
+            Fixture.createBoard(id = 3, title = "board3").apply { meetingTime = LocalDateTime.now().plusDays(1) }
         )
         val participantResponses = listOf(
             ParticipantReadResponse(boardId = 1, userId = 1, nickName = "user1"),
@@ -50,12 +57,12 @@ class BoardServiceMockTest @Autowired constructor(
         )
         beforeTest {
             // given
-            every { boardQuerydslRepository.findAllWithPagination(any(), any()) } returns allBoard
+            every { boardQuerydslRepository.findAllWithPaginationAndRegion(any(), any(), any(), any()) } returns allBoard
             every { participantQuerydslRepository.findByBoardIds(any()) } returns participantResponses
         }
         test("모든 먹팟 조회 성공") {
             // when
-            val actual = boardService.findAllMuckpot(CursorPaginationRequest(null, allBoardSize.toLong()))
+            val actual = boardService.findAllBoards(AllMuckpotGetRequest(null, allBoardSize.toLong(), null, null))
             // then
             actual.list shouldHaveSize 3
             actual.lastId shouldBe allBoard.last().id
@@ -63,26 +70,28 @@ class BoardServiceMockTest @Autowired constructor(
 
         test("참가자가 6명을 넘어가면 마지막에 외N 명으로 응답한다") {
             // when
-            val actual = boardService.findAllMuckpot(CursorPaginationRequest(null, allBoardSize.toLong()))
+            val actual = boardService.findAllBoards(AllMuckpotGetRequest(null, allBoardSize.toLong(), null, null))
             // then
             actual.list[0].participants.last().nickName shouldBe "외 3명"
         }
 
-        test("현재 시간 이전인 경우 모집마감 으로 바꾸어 응답한다.") {
-
+        test("오늘, 내일은 meetingTime 기준으로 생성된다.") {
             // when
-            val actual = boardService.findAllMuckpot(CursorPaginationRequest(null, allBoardSize.toLong()))
+            val actual = boardService.findAllBoards(AllMuckpotGetRequest(null, allBoardSize.toLong(), null, null))
             // then
-            actual.list[0].status shouldBe MuckPotStatus.DONE.korNm
+            actual.list[1].todayOrTomorrow shouldBe TODAY_KR
+            actual.list[2].todayOrTomorrow shouldBe TOMORROW_KR
         }
     }
 
-    context("findBoardDetailAndVisit 성공") {
+    context("findBoardDetailAndVisit") {
         val loginUser = UserResponse(2, "user2")
         val board = Fixture.createBoard(
             id = 1,
             title = "board1",
-            meetingTime = LocalDateTime.of(2100, 12, 25, 12, 20, 30)
+            meetingTime = LocalDateTime.of(2100, 12, 25, 12, 20, 30),
+            locationName = "빽다방 용인구성언남점",
+            addressName = "경기 용인시 기흥구 구성로 102"
         ).apply {
             createdAt = LocalDateTime.of(2100, 12, 23, 12, 20, 30)
         }
@@ -101,14 +110,51 @@ class BoardServiceMockTest @Autowired constructor(
 
         test("먹팟 상세조회 성공") {
             // when
-            val actual = boardService.findBoardDetailAndVisit(1, loginUser)
+            val actual = boardService.findBoardDetailAndVisit(board.id!!, loginUser, RegionFilterRequest())
 
             // then
-            actual.meetingDate shouldBe "12월 25일 (토)"
+            actual.participants shouldHaveSize participantResponses.size
+            actual.meetingDate shouldBe "2100년 12월 25일 (토)"
             actual.meetingTime shouldBe "오후 12:20"
             actual.createDate shouldBe "2100년 12월 23일"
-            actual.status shouldBe MuckPotStatus.IN_PROGRESS.korNm
-            actual.participants shouldHaveSize participantResponses.size
+            actual.status shouldBe IN_PROGRESS.korNm
+            actual.locationName shouldBe board.location.locationName
+            actual.addressName shouldBe board.location.addressName
+        }
+    }
+
+    context("findAllRegions 테스트") {
+        beforeTest {
+            // given
+            val allRegions = listOf(
+                RegionDto(1, IN_PROGRESS, CityDto(1, "경기도"), ProvinceDto(1, "용인시 기흥구")),
+                RegionDto(2, DONE, CityDto(1, "경기도"), ProvinceDto(1, "용인시 기흥구")),
+                RegionDto(4, DONE, CityDto(1, "경기도"), ProvinceDto(2, "용인시 수지구")),
+                RegionDto(5, DONE, CityDto(2, "서울특별시"), ProvinceDto(3, "강남구")),
+                RegionDto(6, DONE, CityDto(2, "서울특별시"), ProvinceDto(3, "강남구")),
+                RegionDto(7, DONE, CityDto(2, "서울특별시"), ProvinceDto(4, "강동구"))
+            )
+            every { boardQuerydslRepository.findAllRegions() } returns allRegions
+        }
+
+        test("지역 별 합계는 IN_PROGRESS 인것만 계산해야 한다, 없으면 0") {
+            // when
+            val actual = boardService.findAllRegions()
+            // then
+            actual.list shouldHaveSize 2
+            actual.list[0].sumByCity shouldBe 1
+            actual.list[0].provinces shouldHaveSize 2
+            actual.list[0].provinces[0].provinceName shouldBe "용인시 기흥구"
+            actual.list[0].provinces[0].sumByProvince shouldBe 1
+            actual.list[0].provinces[1].provinceName shouldBe "용인시 수지구"
+            actual.list[0].provinces[1].sumByProvince shouldBe 0
+            actual.list[1].cityName shouldBe "서울특별시"
+            actual.list[1].sumByCity shouldBe 0
+            actual.list[1].provinces shouldHaveSize 2
+            actual.list[1].provinces[0].provinceName shouldBe "강남구"
+            actual.list[1].provinces[0].sumByProvince shouldBe 0
+            actual.list[1].provinces[1].provinceName shouldBe "강동구"
+            actual.list[1].provinces[1].sumByProvince shouldBe 0
         }
     }
 })

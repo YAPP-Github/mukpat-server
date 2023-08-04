@@ -1,11 +1,9 @@
 package com.yapp.muckpot.domains.user.service
 
 import com.yapp.muckpot.common.constants.ACCESS_TOKEN_KEY
-import com.yapp.muckpot.common.constants.ACCESS_TOKEN_SECONDS
 import com.yapp.muckpot.common.constants.REFRESH_TOKEN_KEY
 import com.yapp.muckpot.common.utils.CookieUtil
 import com.yapp.muckpot.common.utils.RandomCodeUtil
-import com.yapp.muckpot.domains.user.controller.dto.EmailAuthResponse
 import com.yapp.muckpot.domains.user.controller.dto.LoginRequest
 import com.yapp.muckpot.domains.user.controller.dto.SendEmailAuthRequest
 import com.yapp.muckpot.domains.user.controller.dto.SignUpRequest
@@ -14,9 +12,11 @@ import com.yapp.muckpot.domains.user.controller.dto.VerifyEmailAuthRequest
 import com.yapp.muckpot.domains.user.enums.JobGroupMain
 import com.yapp.muckpot.domains.user.exception.UserErrorCode
 import com.yapp.muckpot.domains.user.repository.MuckPotUserRepository
-import com.yapp.muckpot.email.EmailService
+import com.yapp.muckpot.email.EmailSendEvent
+import com.yapp.muckpot.email.EmailTemplate
 import com.yapp.muckpot.exception.MuckPotException
 import com.yapp.muckpot.redis.RedisService
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -27,7 +27,7 @@ class UserService(
     private val jwtService: JwtService,
     private val redisService: RedisService,
     private val passwordEncoder: PasswordEncoder,
-    private val emailService: EmailService
+    private val eventPublisher: ApplicationEventPublisher
 ) {
     val THIRTY_MINS: Long = 60 * 30L
 
@@ -43,7 +43,7 @@ class UserService(
             val refreshToken = jwtService.generateRefreshToken(request.email, refreshTokenSeconds)
 
             redisService.setDataExpireWithNewest(request.email, refreshToken, refreshTokenSeconds)
-            CookieUtil.addHttpOnlyCookie(ACCESS_TOKEN_KEY, accessToken, ACCESS_TOKEN_SECONDS.toInt())
+            CookieUtil.addHttpOnlyCookie(ACCESS_TOKEN_KEY, accessToken, null)
             CookieUtil.addHttpOnlyCookie(REFRESH_TOKEN_KEY, refreshToken, refreshTokenSeconds.toInt())
             return response
         } ?: run {
@@ -52,14 +52,19 @@ class UserService(
     }
 
     @Transactional
-    fun sendEmailAuth(request: SendEmailAuthRequest): EmailAuthResponse {
+    fun sendEmailAuth(request: SendEmailAuthRequest) {
         userRepository.findByEmail(request.email)?.let {
             throw MuckPotException(UserErrorCode.ALREADY_EXISTS_USER)
         } ?: run {
             val authKey = RandomCodeUtil.generateRandomCode()
-            emailService.sendAuthMail(authKey = authKey, to = request.email)
+            eventPublisher.publishEvent(
+                EmailSendEvent(
+                    subject = EmailTemplate.AUTH_EMAIL.subject,
+                    body = EmailTemplate.AUTH_EMAIL.formatBody(authKey),
+                    to = request.email
+                )
+            )
             redisService.setDataExpireWithNewest(key = request.email, value = authKey, duration = THIRTY_MINS)
-            return EmailAuthResponse(authKey)
         }
     }
 
@@ -102,7 +107,7 @@ class UserService(
             val newRefreshToken = jwtService.generateNewRefreshFromOldRefresh(user.email, refreshToken)
 
             redisService.setDataExpireWithNewest(user.email, newRefreshToken, leftRefreshTokenSeconds)
-            CookieUtil.addHttpOnlyCookie(ACCESS_TOKEN_KEY, newAccessToken, ACCESS_TOKEN_SECONDS.toInt())
+            CookieUtil.addHttpOnlyCookie(ACCESS_TOKEN_KEY, newAccessToken, null)
             CookieUtil.addHttpOnlyCookie(REFRESH_TOKEN_KEY, newRefreshToken, leftRefreshTokenSeconds.toInt())
         } ?: run {
             throw MuckPotException(UserErrorCode.USER_NOT_FOUND)

@@ -7,6 +7,7 @@ import com.yapp.muckpot.domains.user.controller.dto.UserResponse
 import com.yapp.muckpot.domains.user.enums.JobGroupMain
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
+import java.time.LocalDateTime
 
 class MuckpotDetailResponseTest : StringSpec({
     "로그인 유저가 참여했다면 가장 첫번째로 정렬된다." {
@@ -54,5 +55,37 @@ class MuckpotDetailResponseTest : StringSpec({
         // then
         response.minAge shouldBe null
         response.maxAge shouldBe null
+    }
+
+    "현재시간 미만은 isOutOfDate=true" {
+        // given
+        val participants = listOf(
+            ParticipantReadResponse(1, 1, "user1", JobGroupMain.DEVELOPMENT)
+        )
+        // when
+        val response = MuckpotDetailResponse.of(
+            Fixture.createBoard(
+                meetingTime = LocalDateTime.now().minusMinutes(10)
+            ),
+            participants
+        )
+        // then
+        response.isOutOfDate shouldBe true
+    }
+
+    "현재시간 이후는 isOutOfDate=false" {
+        // given
+        val participants = listOf(
+            ParticipantReadResponse(1, 1, "user1", JobGroupMain.DEVELOPMENT)
+        )
+        // when
+        val response = MuckpotDetailResponse.of(
+            Fixture.createBoard(
+                meetingTime = LocalDateTime.now().plusMinutes(10)
+            ),
+            participants
+        )
+        // then
+        response.isOutOfDate shouldBe false
     }
 })

@@ -10,3 +10,4 @@ const val MAX_APPLY_MIN = 2
 
 // 예외 메시지
 const val AGE_EXP_MSG = "나이는 $AGE_MIN ~ $AGE_MAX 범위로 입력해주세요."
+const val ONLY_SAMSUNG_EXP_MSG = "현재 버전은 삼성전자 사우만 이용 가능합니다."
