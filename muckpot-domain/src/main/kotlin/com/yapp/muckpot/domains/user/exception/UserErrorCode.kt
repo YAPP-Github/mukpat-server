@@ -16,7 +16,8 @@ enum class UserErrorCode(
     WRONG_MAIN_JOB(StatusCode.BAD_REQUEST.code, "잘못된 직군 대분류입니다."),
     NOT_FOUND_TOKEN(StatusCode.BAD_REQUEST.code, "토큰 정보를 찾을 수 없습니다."),
     IS_BLACKLIST_TOKEN(StatusCode.BAD_REQUEST.code, "로그아웃 된 토큰 정보입니다."),
-    FAIL_JWT_REISSUE(StatusCode.BAD_REQUEST.code, "JWT 재발급 실패");
+    FAIL_JWT_REISSUE(StatusCode.BAD_REQUEST.code, "JWT 재발급 실패"),
+    REFRESH_TOKEN_EXPIRED(StatusCode.BAD_REQUEST.code, "재발급 토큰이 만료되었습니다.");
 
     override fun toResponseDto(): ResponseDto {
         return ResponseDto(this.status, this.reason, null)

@@ -95,6 +95,10 @@ class UserService(
     @Transactional
     fun reissueJwt(refreshToken: String, accessToken: String) {
         if (!jwtService.isTokenExpired(accessToken)) throw MuckPotException(UserErrorCode.FAIL_JWT_REISSUE)
+        if (jwtService.isTokenExpired(refreshToken)) {
+            CookieUtil.allTokenClear()
+            throw MuckPotException(UserErrorCode.REFRESH_TOKEN_EXPIRED)
+        }
         val email = jwtService.getCurrentUserEmail(refreshToken)
             ?: throw MuckPotException(UserErrorCode.FAIL_JWT_REISSUE)
         val redisToken = redisService.getData(email) ?: throw MuckPotException(UserErrorCode.FAIL_JWT_REISSUE)

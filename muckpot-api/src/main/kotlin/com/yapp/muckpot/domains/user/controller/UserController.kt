@@ -135,11 +135,7 @@ class UserController(
             ResponseEntityUtil.ok(it)
         } ?: run {
             // 로그인 했지만 refreshToken 만료 && 로그인 하지 않은 유저
-            refreshToken?.let {
-                if (jwtService.isTokenExpired(it)) {
-                    return ResponseEntityUtil.noContent()
-                }
-            } ?: return ResponseEntityUtil.noContent()
+            refreshToken ?: return ResponseEntityUtil.noContent()
             // 로그인 했지만 accessToken 만료
             accessToken?.let {
                 if (jwtService.isTokenExpired(it)) {
@@ -191,9 +187,6 @@ class UserController(
     @ApiOperation(value = "JWT 재발급")
     @PostMapping("/v1/users/refresh")
     fun reissueJwt(@CookieValue(REFRESH_TOKEN_KEY, required = false) refreshToken: String? = null, @CookieValue(ACCESS_TOKEN_KEY) accessToken: String): ResponseEntity<ResponseDto> {
-        if (1 == 1) {
-            throw IllegalArgumentException("무조건 400")
-        }
         refreshToken ?: throw NOT_EXIST_REFRESH_TOKEN_EXP
         userService.reissueJwt(refreshToken, accessToken)
         return ResponseEntityUtil.noContent()
