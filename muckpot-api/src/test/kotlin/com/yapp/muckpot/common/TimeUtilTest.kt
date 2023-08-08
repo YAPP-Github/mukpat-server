@@ -85,7 +85,7 @@ class TimeUtilTest : FunSpec({
         }
     }
 
-    context("a_hhmm 포 테스트") {
+    context("a_hhmm 포맷 테스트") {
         withData(
             nameFn = { "${it.a}:${it.b}" },
             row(0, 0, "오전"),

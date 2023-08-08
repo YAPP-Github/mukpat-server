@@ -16,7 +16,7 @@ class BoardTest : FunSpec({
                     minAge = 25,
                     maxAge = 21
                 )
-            }.message shouldBe "최소나이는 최대나이보다 작아야 합니다."
+            }.message shouldBe "최대 나이는 최소 나이 이상이어야 합니다."
         }
 
         test("최대 참여인원은 2명 이상이어야 한다.") {

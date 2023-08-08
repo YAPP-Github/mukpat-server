@@ -34,8 +34,8 @@ class ProvinceServiceTest @Autowired constructor(
         val actual = provinceService.saveProvinceIfNot(cityName = city.name, provinceName = province.name)
 
         // then
-        actual?.name shouldBe province.name
-        actual?.city?.name shouldBe city.name
+        actual.name shouldBe province.name
+        actual.city.name shouldBe city.name
     }
 
     test("군/구는 같은데 시/도는 다른경우 새롭게 생성한다.") {
@@ -49,7 +49,7 @@ class ProvinceServiceTest @Autowired constructor(
         val actual = provinceService.saveProvinceIfNot(cityName = inCheon.name, provinceName = provinceName)
 
         // then
-        actual?.name shouldBe provinceName
-        actual?.city?.name shouldBe inCheon.name
+        actual.name shouldBe provinceName
+        actual.city.name shouldBe inCheon.name
     }
 })

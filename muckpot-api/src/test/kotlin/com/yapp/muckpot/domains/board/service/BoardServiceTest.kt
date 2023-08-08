@@ -132,7 +132,7 @@ class BoardServiceTest @Autowired constructor(
             val findProvince = provinceRepository.findByName(createRequest.region_2depth_name)
 
             findBoard1 shouldNotBe null
-            findBoard1.province!!.id.shouldBe(findBoard2.province!!.id)
+            findBoard1.province.id.shouldBe(findBoard2.province.id)
             findCity shouldNotBe null
             findProvince shouldNotBe null
         }
@@ -283,7 +283,7 @@ class BoardServiceTest @Autowired constructor(
             actual.title shouldBe updateRequest.title
             actual.content shouldBe updateRequest.content
             actual.chatLink shouldBe updateRequest.chatLink
-            actual.province!!.id.shouldBe(findProvince[0].id)
+            actual.province.id.shouldBe(findProvince[0].id)
         }
 
         test("자신의 글만 수정할 수 있다.") {
