@@ -11,13 +11,19 @@
 ## 📋 기능 설명
 
 1️⃣ 내 주변 먹팟 찾기  
-- 지역 필터를 이용해 쉽게 내 주변 먹팟을 찾을 수 있어요. 
+- 지역 필터를 이용해 쉽게 내 주변 먹팟을 찾을 수 있어요.
+
+![먹팟조회](https://github.com/YAPP-Github/mukpat-server/assets/67696767/06a3b216-6870-426e-b30b-ea1c3c4ba44d)
 
 2️⃣ 먹팟 만들기  
-- 내가 원하는 다양한 조건으로 먹팟을 등록할 수 있어요.    
+- 내가 원하는 다양한 조건으로 먹팟을 등록할 수 있어요.
+  
+![먹팟생성](https://github.com/YAPP-Github/mukpat-server/assets/67696767/4cfdac2c-cd09-4a20-b021-74a098fde6d6)
   
 3️⃣ 먹팟 참여하기  
 - 원하는 먹팟을 찾았다면? '참여하기'를 누르고 멤버들을 만나요.
+  
+![먹팟참여](https://github.com/YAPP-Github/mukpat-server/assets/67696767/bc13a892-9949-4496-944b-12ed215bfec1)
 
 <br/> 
 
